@@ -35,8 +35,6 @@ import getopt
 import sys
 
 
-#message = "GET / HTTP /1.1\r\n\r\n"
-
 def usage():
     print "Usage: python etss_server.py -i <ip address>  -p 'Port number'"
     print "     -i --ip     Provide IP address from server to test"
@@ -66,19 +64,6 @@ def connect_socket(s, host_ip, port):
         print "Unable to connect socket, Error code: %s ,\nError message: %s. Program will exit" % (str(msg[0]), msg[1])
         sys.exit()
     print "Socket connected to port %s on ip %s" % (port, host_ip)
-
-#def send_info(message):
-#    try:
-#        s.sendall(message)
-#    except socket.error:
-#        print "Send failed"
-#        sys.exit()
-#    print "Send message completed"
-
-#def recv_info():
-#    reply = s.recv(4096)
-#    print reply
-
 
 def main():
     # need to define = for options that need input
