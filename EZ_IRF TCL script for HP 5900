@@ -1,0 +1,958 @@
+###############################################################################
+# EZ-IRF Script for HP 5900 Series switches
+# Author: Olaf Borowski, Hewlett-Packard Co.
+# Version: 1.6
+# Revision history: 	1.0 = Initial coding
+#			1.1 = added ASIC determination code
+#			1.2 = added input checking
+#			1.3 = added 'save_configuration' before activating IRF
+#			1.4 = added command line version to interactive mode
+#			1.5 = changed interface naming to standard "ten1/0/1"
+#			1.6 = some code cleanup
+#   
+#
+# This script is provided with no support or guarantees.
+# You may use it, modify and distribute with no restrictions
+# as long as original author is mentioned.
+#
+# Script is designed to make it easier to configure IRF on 5900 series switches
+# Copy EZ_IRF.tcl to internal flash of device
+#
+# Usage: (in TCLSH)
+# <HP-5900-1-tcl>source EZ_IRF.tcl
+#
+# Script can be used in "interactive mode" or "command-line mode"
+# 
+###############################################################################
+#
+### Definition of fixed varialbes
+### start
+set current_irf_member_id ""
+set question_m           "Please enter new Member ID.....................:"
+set question_p           "Please enter new Priority......................: "
+set question_d           "Please enter new Domain ID.....................: "
+set question_i           "Please enter new Virtual IRF Interface.........: "
+set question_e           "Please enter Ethernet Ports \(Members\)..........: "
+set err_msg(member_id)   "Invalid Member ID..............................: "
+set err_msg(priority)    "Invalid Priority...............................: "
+set err_msg(domain_id)   "Invalid Domain ID..............................: "
+set err_msg(irf_port)    "Invalid IRF-Port...............................: "
+set err_msg(irf_member)  "Invalid IRF Member Ports.......................: "
+set err_msg(if_syntax)   "Invalid Interface syntax.......................: "
+set err_msg(if_combo)    "Invalid combination of ports...................: "
+set err_msg(span_asic)   "Invalid ASIC combination, please re-enter....... "
+set err_msg(arg_count)   "Invalid number of arguments, re-enter..........: "
+set err_msg(cli_invalid) "Invalid command line input, re-enter...........: "
+set msg(exit)            "Exiting script.................................. "
+set question_y_n "Ready to proceed <y/n>?"
+set range_m_min 1
+set range_m_max 10
+set range_p_min 1
+set range_p_max 32
+set range_d_min 0
+set range_d_max 4294967295
+set range_e_T_min 1
+set range_e_T_max 48
+set range_e_F_min 49
+set range_e_F_max 52
+set pattern_10G {^XGE[1-9][0]?[/][0-9][/][0-9]*}
+set pattern_40G {^FGE[1-9][0]?[/][0-9][/][0-9]*}
+set pattern_10G_dec {^ten[1-9][0]?[/][0-9][/]}
+set AsicType Trident
+### end
+#
+### Definition of global variables
+### start
+set TenGIG 0
+set FortyGIG 0
+set port_string [list]
+set asic_ports [list]
+set ten_gig_ints [list]
+set forty_gig_ints [list]
+set irf_port "1/1"
+set arguments ""
+set argument_count 0
+# array will contain parameters for IRF configuration
+# inital parameters are set
+array set param {   
+    m 1             
+    p 1
+    d 0
+    i "1/1"
+    e ""
+}
+### end
+#
+### Definition of  ARRAY for ASIC grouping (what port == what ASIC)
+### start
+set asic(1) {1 2 3 4}
+set asic(2) {5 6 7 8}
+set asic(3) {9 10 11 12}
+set asic(4) {13 14 15 16}
+set asic(5) {17 18 19 20}
+set asic(6) {21 22 23 24}
+set asic(7) {25 26 27 28}
+set asic(8) {29 30 31 32}
+set asic(9) {33 34 35 36}
+set asic(10) {37 38 39 40}
+set asic(11) {41 42 43 44}
+set asic(12) {45 46 47 48}
+### end
+#
+###############################################################################
+#
+#******************************************************************************
+#                       Procedure definitions start
+#******************************************************************************
+#
+###############################################################################
+    ###   procedure to clear screen
+    ###########################################################################
+    proc clearscreen {} {
+	flush stdout
+	    puts "\x1B\x5B\x32\x4A\x1B\x5B\x30\x3B\x30\x48"
+	}
+###############################################################################
+    ###   procedure to get current MemberID
+    ###########################################################################
+    proc get_current_member_id {} {
+	set CMO [exec dis irf]
+	set MEMBERIDIDX [string first "*+" $CMO]
+        set temp [string range $CMO 62 63]
+	set ::current_irf_member_id [string trim $temp]
+    }
+###############################################################################
+    ###   procedure to get 10Gig interfaces of switch
+    ###########################################################################
+    proc get_tengig_int {} {
+	set int_list [exec display interface brief | include XGE]
+	    foreach int $int_list {
+		set match_flag [regexp -- $::pattern_10G $int match]
+		    if {$match_flag != 0} {
+			set interface_name [string replace $match 0 2 ten]
+			lappend ::ten_gig_ints $interface_name
+		    } 
+		}
+    }
+###############################################################################
+    ####   procedure to get 40Gig interfaces of switch
+    ###########################################################################
+    proc get_fortygig_int {} {
+	set int_list [exec display interface brief | include FGE]
+	    foreach int $int_list {
+		    set match_flag [regexp -- $::pattern_40G $int match]
+			if {$match_flag != 0} {
+			    set interface_name [string replace $match 0 2 for]
+			    lappend ::forty_gig_ints $interface_name
+			} 
+		    }
+	}
+###############################################################################
+    ###   procedure to reboot unit
+    ###########################################################################
+    proc exec_reboot {} {
+        set cli0 [ ::comware::create-cli ]
+        ::comware::write-cli $cli0 "reboot force"
+        ::comware::write-cli $cli0 "y"
+        ::comware::write-cli $cli0 "end"
+        ::comware::destroy-cli $cli0
+    }
+###############################################################################
+    ###   procedure renumber IRF-Member-ID
+    ###########################################################################
+    proc renumber {current new} {
+        set cli0 [ ::comware::create-cli ]
+        ::comware::write-cli $cli0 "system-view"
+        ::comware::write-cli $cli0 "irf mem $current ren $new"
+        ::comware::write-cli $cli0 "y"
+        ::comware::write-cli $cli0 "end"
+        ::comware::destroy-cli $cli0
+    }   
+###############################################################################
+    ###   procedure to set Domain ID
+    ###########################################################################
+    proc set_domain_id {domain_id} {
+        set cli1 [ ::comware::create-cli ]
+        ::comware::write-cli $cli1 "system-view"
+        ::comware::write-cli $cli1 "irf domain $domain_id"
+        ::comware::write-cli $cli1 "end"
+        ::comware::destroy-cli $cli1
+    }
+###############################################################################
+    ###   procedure to set IRF priority
+    ###########################################################################
+    proc set_irf_priority {member_id irf_priority} {
+        set cli1 [ ::comware::create-cli ]
+        ::comware::write-cli $cli1 "system-view"
+        ::comware::write-cli $cli1 "irf member $member_id priority $irf_priority"
+        ::comware::write-cli $cli1 "end"
+        ::comware::destroy-cli $cli1
+    }
+###############################################################################
+    ###   procedure to create Virtual IRF port and add members
+    ###########################################################################
+    proc set_irf_port {irf_port member_port} {
+        set cli1 [ ::comware::create-cli ]
+        ::comware::write-cli $cli1 "system-view"
+        ::comware::write-cli $cli1 "irf-port $irf_port"
+        ::comware::write-cli $cli1 "port group interface $member_port"
+        ::comware::write-cli $cli1 "end"
+        ::comware::destroy-cli $cli1
+    }
+###############################################################################
+    ###   procedure to activate IRF
+    ###########################################################################
+    proc activate_irf {} {
+        set cli1 [ ::comware::create-cli ]
+        ::comware::write-cli $cli1 "system-view"
+        ::comware::write-cli $cli1 "irf-port-configuration active"
+        ::comware::write-cli $cli1 "end"
+        ::comware::destroy-cli $cli1
+    }   
+###############################################################################
+    ###   procedure to shutdown or undo shutdown all ports on the box
+    ###########################################################################
+    proc shut_undo_shut {mem_id action} {
+    if {$action == "shut"} {
+        puts "	Interfaces ten$mem_id/0/1 to ten$mem_id/0/48......................................."
+        puts "	Interfaces for$mem_id/0/49 to for$mem_id/0/52......................................"
+        set cli0 [ ::comware::create-cli ]
+        ::comware::write-cli $cli0 "system-view"
+        ::comware::write-cli $cli0 "int range ten$mem_id/0/1 to ten$mem_id/0/48"
+        ::comware::write-cli $cli0 "shutdown"
+        ::comware::write-cli $cli0 "int range for$mem_id/0/49 to for$mem_id/0/52"
+        ::comware::write-cli $cli0 "shutdown"
+        ::comware::write-cli $cli0 "end"
+        ::comware::destroy-cli $cli0
+        } 
+    if {$action == "undo"} {	
+        puts "	Interfaces ten$mem_id/0/1 to ten$mem_id/0/48......................................."
+        puts "	Interfaces for$mem_id/0/49 to for$mem_id/0/52......................................"
+        set cli0 [ ::comware::create-cli ]
+        ::comware::write-cli $cli0 "system-view"
+        ::comware::write-cli $cli0 "int range ten$mem_id/0/1 to ten$mem_id/0/48"
+        ::comware::write-cli $cli0 "undo shutdown"
+        ::comware::write-cli $cli0 "int range for$mem_id/0/49 to for$mem_id/0/52"
+        ::comware::write-cli $cli0 "undo shutdown"
+        ::comware::write-cli $cli0 "end"
+        ::comware::destroy-cli $cli0
+        } 
+    }
+###############################################################################
+    ###   procedure to save configuration
+    ###########################################################################
+    proc save_configuration {} {
+        set cli0 [ ::comware::create-cli ]
+        ::comware::write-cli $cli0 "save force"
+        ::comware::write-cli $cli0 "end"
+        ::comware::destroy-cli $cli0
+    }
+###############################################################################
+    ###   procedure to get Yes or No answer
+    ###########################################################################	
+    proc get_ui_yes_no {string_to_print} {
+    puts $string_to_print
+    set input [gets stdin]
+        switch -- $input {
+            y { return 1 }
+            n { return 0 }
+	    q { error $::msg(exit) }
+            default {get_ui_yes_no $string_to_print}
+        }
+    }       
+###############################################################################
+    ###   procedure to print welcome message
+    ###########################################################################	
+    proc print_welcome_msg {} {
+	puts "
+###############################################################################\
+#                                                                             #\
+#                                 EZ-IRF                                      #\
+#                                                                             #\
+#        This script is intended to simplify the setup of IRF.                #\
+#                                                                             #\
+#        Options: Interactive mode or Command line mode                       #\
+#                                                                             #\
+#        - Interactive mode: Parameters are entered one by one, with help     #\
+#                                                                             #\
+#        - Command line mode: Parameter are enters in one line, no help       #\
+#                                                                             #\
+###############################################################################\
+"
+    puts ""
+    }
+###############################################################################
+    ###   procedure to print usage of command line mode
+    ###########################################################################	
+    proc print_usage_cli {} {
+    puts "
+###############################################################################\
+#                                                                             #\
+#                    EZ IRF command line usage                                #\
+#                                                                             #\
+#                                                                             #\
+#        -m = Member ID...............<1-10>                                  #\
+#        -p = Priority................<1-32>                                  #\
+#        -d = Domain ID...............<0-4294967295>                          #\
+#        -i = virtual IRF Port .......<1/1 or 1/2 or 2/1 or 2/2>              #\
+#        -e = Ethernet ports..........<ten1/0/1,ten1/0/2 or for1/0/49> etc.   #\
+#                                                                             #\
+#        Example:  -m1 -p30 -d0 -i1/1 -eten1/0/1,ten1/0/2                     #\
+#                                                                             #\
+###############################################################################\
+"
+    puts ""
+    }
+###############################################################################
+    ###   procedure to print usage of script
+    ###########################################################################	
+    proc print_interactive_usage {} {
+    puts "
+###############################################################################\
+#                                                                             #\
+#                    EZ-IRF  Interactive parameters entry                     #\
+#                                                                             #\
+#        Parameter the have to be entered:                                    #\
+#                                                                             #\
+#        Member ID...............<1-10>                                       #\
+#        Priority................<1-32>                                       #\
+#        Domain ID...............<0-4294967295>                               #\
+#        Virtual IRF Port .......<1/1 or 1/2 or 2/1 or 2/2>                   #\
+#        Ethernet ports..........<tenx/y/z,forx/y/z>                          #\
+#                                                                             #\
+###############################################################################\
+"
+    puts ""
+    }
+###############################################################################
+    ###   procedure to print usage of Member ID
+    ###########################################################################	
+    proc print_usage_member_id {} {
+    puts "
+###############################################################################\
+#                                                                             #\
+#                   Member ID:                                                #\
+#                                                                             #\
+#        Member ID...............Range: <1-10>                                #\
+#                                                                             #\
+#        The Member ID is the unit number of the IRF Stack.                   #\
+#        By default, the Member ID is \"1\"                                     #\
+#        Current Member ID of the unit: $::current_irf_member_id                                     #\
+#                                                                             #\
+###############################################################################\
+"
+puts ""
+    }
+###############################################################################
+    ###   procedure to print usage of Priority
+    ###########################################################################	
+    proc print_usage_priority {} {
+    puts "
+###############################################################################\
+#                                                                             #\
+#                   IRF Priority:                                             #\
+#                                                                             #\
+#        IRF Priority...............Range: <1-32>                             #\
+#                                                                             #\
+#        The IRF Priority determines the priority of the \"Master\" election    #\
+#        in an IRF stack. 1 = lowest, 32 = highest
+#        By default, the IRF Priority is \"1\"                                  #\
+#                                                                             #\
+###############################################################################\
+"
+puts ""
+    }
+###############################################################################
+    ###   procedure to print usage of Domain ID
+    ###########################################################################	
+    proc print_usage_domain_id {} {
+    puts "
+###############################################################################\
+#                                                                             #\
+#                   IRF Domain ID:                                            #\
+#                                                                             #\
+#        IRF Domain ID...............Range: <0-4294967295>                    #\
+#                                                                             #\
+#        The IRF Domain ID determines what IRF Domain the unit belongs to.    #\
+#        If you have 2 pairs of IRF stacks and you want them to operate       #\
+#        indenpendently, configure different Domain ID on each pair.          #\
+#        Otherwise, the 4 units will become one stack consisting of 4 units.  #\
+#        By default, the IRF Domain ID is \"0\"                                 #\
+#                                                                             #\
+###############################################################################\
+"
+puts ""
+    }
+###############################################################################
+    ###   procedure to print usage of Domain ID
+    ###########################################################################	
+    proc print_usage_irf_port {} {
+    puts "
+###############################################################################\
+#                                                                             #\
+#                   Virtual IRF-Port:                                         #\
+#                                                                             #\
+#        Virtual IRF Port...............Range: <1/1, 1/2, 2,1, 2/2>           #\
+#                                                                             #\
+#        The Virtual IRF port defines the connection to the neighboring       #\
+#        switch. X/1 has to connect to X/2 on the neighboring switch.         #\
+#        Example: 1/1 has to connect to 2/2 or                                #\
+#                 1/2 has to connect to 2/1                                   #\
+#        In the next section, you will add the physical ports that will be    #\
+#        associated with the Virtual IRF Port                                 #\
+#        By default, no Virtual IRF port is defined                           #\
+#                                                                             #\
+###############################################################################\
+"
+    puts ""
+    }
+###############################################################################
+    ###   procedure to print usage of Ethernet Interfaces
+    ###########################################################################	
+    proc print_usage_port_member {} {
+    puts "
+###############################################################################\
+#                                                                             #\
+#                   Virtual IRF member ports:                                 #\
+#                                                                             #\
+#        Virtual IRF Port member ports....Range: <available Ethernet Ports>   #\
+#                                                                             #\
+#        The Virtual IRF member ports are Ethernet ports that are associated  #\
+#        with a Virtual IRF port. For Ten Gigabit Ethernet, all ports have    #\
+#        to be associated with the same ASIC.                                 #\
+#        Example: Port 1,2,3,4 are associated with ASIC 1                     #\
+#        Port membership cannot span ASICs!!!!!! \(Port 1\) and Port \(5\) is     #\
+#        is not a valid configuration. For Forty Gigabit interfaces, this     #\
+#        restriction does not exist for \(ports > 48\)                          #\
+#        By default, no ports are assigned.                                   #\
+#        Input: Ethernet port seperated by \",\"                                #\
+#        Example: ten1/0/1,ten1/0/2 or for1/0/49,for1/0/50                    #\
+#                                                                             #\
+###############################################################################\
+"  
+    }
+###############################################################################
+    ###   procedure to get user input
+    ###########################################################################
+    proc get_user_input {prompt} {
+        puts ""
+        puts $prompt
+        set input [gets stdin]
+        if {$input == "q"} {
+            error $::msg(exit)
+        } else {
+            return $input
+        }
+    }
+###############################################################################
+    ###   procedure to get input for Member ID
+    ###########################################################################
+    proc get_ui_member_id {} {
+        set user_input [get_user_input $::question_m]
+	set check_range_result [check_range $user_input $::range_m_min $::range_m_max]
+        if {$check_range_result != 1} {
+	    puts "$::err_msg(member_id) $user_input"
+	    set ::param(m) ""
+            return 0
+	} else {
+            set ::param(m) $user_input
+            ;# input is valid and within range. Set global value
+            puts ""
+            if {$::param(m) != $::current_irf_member_id} {
+                puts "Current IRF Member ID:....$::current_irf_member_id"
+                puts "New IRF Member ID:........$::param(m)"
+                puts ""
+                puts "Need to re-boot the unit to apply new IRF Member ID............................." 
+                puts "Re-run script after re-number..................................................."
+                puts ""
+                puts "Applying re-number command ....................................................."
+                puts ""
+                        renumber $::current_irf_member_id $::param(m)
+                puts ""
+                puts "Done, rebooting now............................................................."
+                puts ""
+                        exec_reboot
+            }             
+        }
+        return 1
+    }
+###############################################################################
+    ###   procedure to check input for validity (within range)
+    ###########################################################################
+    proc check_range {input min max} {
+	set chk_digit [string is digit $input] ;# check if input is only digits
+	if {$chk_digit == 1 } {
+	    if {($input >=$min ) && ($input <= $max)} {  ;# within range
+	     return 1
+	     } else {
+		#puts "Outside of range: $min <=> $max, re-enter"
+		return 0
+	     }
+	} else {
+	  return 0  
+	}
+    } 
+###############################################################################
+    ###   procedure to get input for Priority
+    ###########################################################################
+    proc get_ui_priority {} {
+	set user_input [get_user_input $::question_p]
+	set check_range_result [check_range $user_input $::range_p_min $::range_p_max]
+	    if {$check_range_result != 1} {
+		puts "$::err_msg(priority) $user_input"
+		set ::param(p) ""
+		return 0
+	    } else {
+		set ::param(p) $user_input
+		return 1
+		}
+    }
+###############################################################################
+    ###   procedure to get input for Domain ID
+    ###########################################################################
+    proc get_ui_domain_id {} {
+	set user_input [get_user_input $::question_d]
+	set check_range_result [check_range $user_input $::range_d_min $::range_d_max]
+	    if {$check_range_result != 1} {
+		puts "$::err_msg(domain_id) $user_input"
+		set ::param(d) ""
+		return 0
+	    } else {
+	    set ::param(d) $user_input
+	    return 1
+	    }
+    }    
+###############################################################################
+    ###   procedure to get input for Virtual IRF interface 
+    ###########################################################################
+    proc get_ui_irf_port {} {
+	set user_input [get_user_input $::question_i]
+	set verif_irf_port_result [verify_irf_port $user_input]
+	    if {$verif_irf_port_result != 1} {
+		puts "$::err_msg(irf_port) $user_input"
+		set ::param(i) ""
+		return 0
+	    }
+	    set ::param(i) $user_input
+	    return 1
+    } 
+###############################################################################
+    ###   procedure to check for valid input of Virtual IRF port 
+    ###########################################################################
+    proc verify_irf_port {user_input} {
+	if {$user_input == "1/1" || $user_input == "1/2" || \
+	    $user_input == "2/1" || $user_input == "2/2"} {
+	    return 1
+            } else {
+            return 0
+            }
+    }
+###############################################################################
+    ####   procedure to check if port syntax is valid and classify 10G or 40G
+    ###########################################################################
+    proc check_port_valid {user_input} {   
+        foreach int $user_input {
+            set match [lsearch $::ten_gig_ints $int] ;# not 10G interface
+                if {$match == -1} {
+                    set match [lsearch -exact $::forty_gig_ints $int]
+                        if {$match == -1} { ;# not 10G or 40G interface
+                            set ::FortyGIG 0
+                            set ::TenGIG 0
+                            return 0
+                            } else { ;# is fortygig interface
+                                set ::FortyGIG 1
+                                }
+                } else { ;# is tengig interface
+                    if {$match != -1 } {
+                        set ::TenGIG 1
+                        }
+                    }
+        }
+        return 1
+    }
+###############################################################################
+    ####   procedure to process IRF Member Ports
+    ###########################################################################    
+    proc process_irf_member_ports {port_list} {
+	set check_port_valid_result [check_port_valid $port_list]
+	    if {$check_port_valid_result != 1} {
+		puts "$::err_msg(irf_member) $port_list"
+		return 0
+		}
+	set check_port_combination_result [check_port_combination]
+	    if {$check_port_combination_result != 1} {
+		puts "$::err_msg(if_combo) $port_list"
+		return 0
+		}
+	if {$::TenGIG == 0 && $::FortyGIG == 1} {
+	    # only FortyGIG interfaces, nothing special. Set param(e) to sorted user input
+	    set ::param(e) [lsort -dictionary $port_list]
+	    return 1
+	    }
+	if {$::AsicType == "Trident" && $::TenGIG == 1} {
+	    # need to check if 10G ports are on same Asic
+	    set get_asic_association_result [get_asic_association $port_list]
+	    if {$get_asic_association_result == 0} {
+		puts "$::err_msg(span_asic) $port_list"
+		return 0
+		}
+	    set used_asic $get_asic_association_result
+		foreach port $::asic($used_asic) {
+		    lappend ports_to_configure ten$::current_irf_member_id/0/$port
+		}
+	    set ::param(e) [lsort -dictionary $ports_to_configure]
+	    return 1
+	    
+	}
+    }
+###############################################################################
+    ####   procedure to get list of Virtual IRF Member Ethernet Ports
+    ###########################################################################
+    proc get_ui_irf_member_ports {} {
+	set process_irf_member_ports_result 0
+	    while {$process_irf_member_ports_result != 1} {
+	    set user_input [get_user_input $::question_e]
+	    set port_list [split $user_input ","]
+	    set process_irf_member_ports_result [process_irf_member_ports $port_list]
+	    }
+	    return 1
+    }
+###############################################################################
+    ####   procedure to check for valid port combination
+    ###########################################################################
+    proc check_port_combination {} {
+        if {$::TenGIG == 1 && $::FortyGIG == 1} {
+            set ::TenGIG 0
+            set ::FortyGIG 0
+            return 0
+        } else {
+            return 1
+        }
+    }
+###############################################################################
+    ####   procedure to get Asic to Port association
+    ###########################################################################
+    proc get_asic_association {port_list} {
+    global pattern_10G_dec
+    global dec_port_list
+    global asic
+    # build a list of ports (decimal numbers), strip the tenx/y/
+        set dec_port_list {}
+        foreach port $port_list {
+            set index [string last "/" $port]
+            set decimal_port [string replace $port 0 $index ""]
+            lappend dec_port_list $decimal_port
+        }
+    # $dec_port_list now has a list of ethernet port (decimal, like 1,3,7)
+	set asic_num [get_asic [lindex $dec_port_list 0]] ;# set the number of first asic
+	    foreach temp_port $dec_port_list {
+		set next_asic [get_asic $temp_port]
+		if {$next_asic != $asic_num} {
+		    return 0
+		}
+	    }
+	return $asic_num
+    }   
+###############################################################################
+    ###   procedure to get what ASIC the port belongs to
+    ###########################################################################
+	proc get_asic {temp_port} {
+            for {set A 1} { $A < 13} {incr A} { 
+		set result [lsearch -index 0 $::asic($A) $temp_port]
+                    if {$result ne -1} {        
+			  #Aputs "Port: $temp_port belongs to ASIC: $A"
+			  return $A 
+                    }  
+	    }
+	}    
+###############################################################################	
+    ####   procedure to print parameters
+    ###########################################################################
+	proc print_parameters {} {
+	    clearscreen
+	    global param
+	    puts "IRF Member ID..................................: $param(m)"
+	    puts "IRF Priority...................................: $param(p)"
+	    puts "IRF Domain ID..................................: $param(d)"
+	    puts "Virtual IRF-Port...............................: $param(i)"
+		foreach port $::param(e) {
+		    puts "Ethernet Ports.................................: $port"
+		    }   
+		}
+	    puts ""
+###############################################################################	
+    ###   procedure to get parameters interactivly
+    ########################################################################### 
+    
+    proc interactive {} {
+        print_interactive_usage		;# print interactive usage of script
+    puts ""
+    set ready_to_proceed [get_ui_yes_no $::question_y_n]
+	if {$ready_to_proceed == 0} {
+	    error "Re-run scripts when ready"
+	}
+    #
+    clearscreen
+    ###########################################################################
+    print_usage_member_id		        ;# print usage for Member ID
+        puts ""
+        set result 0
+        while {$result != 1} {
+            set result [get_ui_member_id]          ;# get new Member ID
+        }			
+        puts ""
+    #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
+    ###########################################################################
+    print_usage_priority		        ;# print usage for IRF Priority
+        puts ""
+        set result 0
+        while {$result != 1} {
+            set result [get_ui_priority]        ;# get new IRF priority value
+        }
+        puts ""
+    #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    ###########################################################################
+    print_usage_domain_id                       ;# print usage for Domain ID
+        puts ""
+        set result 0
+        while {$result != 1} {
+            set result [get_ui_domain_id]       ;# get new Domain ID
+        }
+        puts ""
+    #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
+    ###########################################################################    
+    print_usage_irf_port
+        puts ""
+        set result 0
+        while {$result != 1} {
+            set result [get_ui_irf_port]
+        }         
+        puts ""
+    #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++       
+
+    ###########################################################################    
+    print_usage_port_member                       ;# print usage for Domain ID
+        puts ""
+        set result 0
+        while {$result != 1} {
+            set result [get_ui_irf_member_ports]  ;# get member ports
+        }
+        puts ""
+    #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
+}
+##### end procedure to get parameters interactively
+
+###############################################################################	
+    ###   procedure to get cli parameters and process them
+    ###########################################################################
+    proc get_cli_input {} {
+        global param
+        puts "Please enter all parameters on one line............."
+        puts ""
+        set ::arguments [gets stdin]
+        set ::argument_count [llength $::arguments]
+        if {$::argument_count == 1 && $::arguments == "q"} {
+            error "Exiting script.............................."
+            }
+        if {$::argument_count != 5} {
+                puts "$::err_msg(arg_count) $::arguments" ;# number of parameters incorrect
+                set ::arguments ""
+                set ::argument_count 0
+                return 0
+        }
+        foreach arg $::arguments { 
+                set prefix [string range $arg 0 1]
+                    switch -- $prefix {
+                            "-m" {set param(m) [string range $arg 2 end]}
+                            "-p" {set param(p) [string range $arg 2 end]}
+                            "-d" {set param(d) [string range $arg 2 end]}
+                            "-i" {set param(i) [string range $arg 2 end]}
+                            "-e" {set param(e) [string range $arg 2 end]}
+                            default { 
+                                puts "Invalid parameter in command-line..........: $::arguments"
+                                return 0
+                                }
+                    }
+        }  
+        # must be valid number of parameters and right prefix
+        #verify each parameter
+        set check_range_result [check_range $::param(m) $::range_m_min $::range_m_max]
+	if {$check_range_result != 1} {
+	    puts "$::err_msg(member_id) $::param(m)"
+            return 0
+        }
+        if {$check_range_result != 1} {
+            puts "$::err_msg(cli_invalid) "
+            set ::arguments ""
+            set ::argument_count 0
+            return 0   
+        }
+	if {$::current_irf_member_id != $::param(m)} {
+            puts ""
+            puts "Current IRF Member ID:....$::current_irf_member_id"
+            puts "New IRF Member ID:........$::param(m)"
+            puts ""
+            puts "Need to re-boot the unit to apply new IRF Member ID............................" 
+            puts "Re-run script after re-number.................................................."
+            puts ""
+            puts "Applying re-number command ...................................................."
+            puts ""
+                    renumber $::current_irf_member_id $::param(m)
+            puts ""
+            puts "Done, rebooting now............................................................"
+            puts ""
+                    exec_reboot
+	}            
+        set check_range_result [check_range $::param(p) $::range_p_min $::range_p_max]
+	if {$check_range_result != 1} {
+	    puts "$::err_msg(priority) $::param(p)"
+	    set ::param(p) ""
+            return 0
+	}
+        set check_range_result [check_range $::param(d) $::range_d_min $::range_d_max]
+	if {$check_range_result != 1} {
+	    puts "$::err_msg(domain_id) $::param(d)"
+            return 0
+	}
+	if {$::param(i) == "1/1" || $::param(i) == "1/2" || \
+	    $::param(i) == "2/1" || $::param(i) == "2/2"} {
+            # parameter correct
+	} else {
+	    puts "$::err_msg(irf_port) $::param(i)"
+            return 0
+	    }
+        set port_list [split $::param(e) ","] 
+        set process_irf_member_ports_result  [process_irf_member_ports $port_list]
+        if {$process_irf_member_ports_result != 1} {
+            return 0
+        }
+        return 1 
+    }
+
+###############################################################################	
+#******************************************************************************
+#                       Procedure definitions end
+#******************************************************************************
+#
+###############################################################################
+
+###############################################################################
+###                     Main Code
+###############################################################################
+    
+    #get a list of TenGIG interfaces or the unit. "dis int br | include XGE"
+        get_tengig_int
+    
+    #get a list of FortyGIG interfaces or the unit. "dis int br | include FGE"
+        get_fortygig_int
+    
+    #get current Member ID of unit. "dis irf", parse "*+"
+        get_current_member_id
+     
+        clearscreen
+        print_welcome_msg
+        set string_to_print "Ready to proceed in Interactive mode <y/n>? "
+        set answer [get_ui_yes_no $string_to_print]
+        set return_val 0
+        switch -- $answer {
+            puts "Answer: $answer"
+            1 { interactive }
+            0 {
+                clearscreen
+                print_usage_cli      
+                while { $return_val == 0} {
+                    set ::param(m) 0
+                    set ::param(p) 0
+                    set ::param(d) 0
+                    set ::param(i) ""
+                    set ::param(e) ""
+                    set return_val [get_cli_input]
+                    }
+            }
+            default {get_ui_yes_no $string_to_print}
+            }
+            
+#
+  
+        # done with either cli or interactive
+        print_parameters
+        puts ""
+        #
+### shut down all port, just to be save
+#
+	puts "Shutting down all ports on the unit............................................"
+	puts ""
+	set action "shut"
+		shut_undo_shut $::current_irf_member_id $action 
+	puts ""
+	puts "You can now physically connect all ports......................................."
+	puts ""
+#
+### set IRF Priority
+#
+	puts "Setting IRF-Priority..........................................................."
+		set_irf_priority $::current_irf_member_id $param(p)
+#
+### set Domain ID
+#
+	puts "Setting Domain ID.............................................................."
+		set_domain_id $param(d)
+#
+### create virtual IRF-Port and assign the Ethernet ports to it
+#
+	puts ""
+	puts "Creating Virutal IRF-Port and adding Ethernet ports............................"
+	puts ""
+	foreach member_port $::param(e) {
+		puts "	Adding port: $member_port to IRF-Port: $param(i)"
+		set_irf_port $param(i) $member_port
+		}
+	puts ""
+#
+### re-enabling all ports
+#	
+	puts "Re-enabling all ports on the unit.............................................."
+	puts ""
+		################# renenable all ports now
+		unset action
+		set action "undo"
+		shut_undo_shut $current_irf_member_id $action
+	puts ""
+#
+### saving configuration before activating since IRF merge will automatically reboot
+#
+	puts "Saving configuration now......................................................."
+		save_configuration
+
+#
+### activate IRF
+#
+	puts "Activating IRF ................................................................"
+		activate_irf
+#
+### save configuration again since main box will not reboot and "undo shut" should be saved
+#	
+	puts "Saving configuration again....................................................."
+		save_configuration
+#
+### display the IRF configuration
+#	
+	puts ""
+	puts "Displaying IRF configuration..................................................."
+	puts ""
+	puts "###########################################################################"
+	puts "#                       dis irf                                           #"
+	puts "###########################################################################"	
+		dis irf 
+	puts "###########################################################################"
+	puts "#                       dis irf configuration                             #"
+	puts "###########################################################################"	
+		dis irf configuration
+	puts "###########################################################################"
+	puts ""
+	
+	puts "Done..........................................................................."
