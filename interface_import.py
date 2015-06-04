@@ -8,9 +8,9 @@ __author__ = 'Remi Batist'
 # used row format shown in the example below
 # csv delimiter ' ; '
 
-# interface	                	  description	  linktype		  permitvlan     	pvid
-# GigabitEthernet1/0/21	        server-1	    access		                	  23
-# GigabitEthernet1/0/22	        server-2	    trunk	        10 12	          10
+# interface	               	description	linktype	permitvlan     	pvid
+# GigabitEthernet1/0/21	        server-1	access		                23
+# GigabitEthernet1/0/22	        server-2	trunk	        10 12	        10
 
 
 #### Importing python modules
