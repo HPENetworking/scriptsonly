@@ -3,7 +3,7 @@ __version__ = '0.9'
 __author__ = 'Remi Batist'
 
 # Overview of vlans including ip-addresses in procurve-style
-# An example below
+# Example below
 
 # VLAN-ID | IP Address       IP Subnet        NAME
 # ------- | ---------------  ---------------  ---------------
