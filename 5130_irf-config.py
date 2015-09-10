@@ -5,7 +5,7 @@ __version__ = '1.2'
 ###     version 1.1: adding support for 9 members
 ###     version 1.2: compacting script
 
-###     Python Script for Deploying IRF-config and software on 5130 switches #########
+###     Python Script for Deploying IRF-config and software on 5130 switches
 ###     WARNING!: When changing IRF Configuration, the current startup-configuration is overwritten!
 ###     In this script the IRF-Port-config is a fixed value for faster deploy, see settings below
 
@@ -20,6 +20,7 @@ __version__ = '1.2'
 
 ###		This script is currently supporting boot/system/PoE updates
 ### 	You can edit the custom config below to change the firmware/poe file-names for future releases
+###	'tftpsrv' is the server where you put your firmware/poe files for downloading (for example: imc-server)
 
 print "\n######## Deploying IRF-config and software on 5130 switches #########\n"
 
