@@ -18,7 +18,9 @@ __version__ = '1.2'
 ###             1         Ten-GigabitEthernetX/0/25            
 ###             2         Ten-GigabitEthernetX/0/27
 
-###		This script is currently supporting boot/system/PoE updates
+### 	Priority starts with member1: 32, member2: 31, member3: 30, .....
+
+###	This script is currently supporting boot/system/PoE updates
 ### 	You can edit the custom config below to change the firmware/poe file-names for future releases
 ###	'tftpsrv' is the server where you put your firmware/poe files for downloading (for example: imc-server)
 
