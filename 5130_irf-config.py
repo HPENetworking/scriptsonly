@@ -6,7 +6,7 @@ __version__ = '1.2'
 ###     version 1.2: compacting script
 
 ###     Python Script for Deploying IRF-config and software on 5130 switches #########
-####    WARNING!: When changing IRF Configuration, the current startup-configuration is overwritten!
+###     WARNING!: When changing IRF Configuration, the current startup-configuration is overwritten!
 ###     In this script the IRF-Port-config is a fixed value for faster deploy, see settings below
 
 ###     48 Ports Switch IRF-Config
