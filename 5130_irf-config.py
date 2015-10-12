@@ -11,7 +11,7 @@ __version__ = '2.0'
 
 ###     I build this script to support adding additional members, when auto-deploying HP5130-switches with HP iMC.
 ###     When deploying the first member of an IRF-stack with HP iMC, the switch is always added as a managed device in HP iMC.
-###     If you want to add another member of the same stack this procedure is failing, because it's already added in iMC...
+###     If you want to auto-deploy another member of the same stack this procedure is failing, because it's already added in iMC...
 
 ###     In this script I give you the choice for updating switch-software, poe-software and the changing IRF-member-ID.
 ###     It also support the different member-deploy-scenarios by chosing between the IRF-port-config or iMC-auto-deploy.
