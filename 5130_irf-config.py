@@ -10,11 +10,27 @@ __version__ = '2.0'
 ###     version 2.0: Changed to deploy with only one 'main' menu
 
 ###     I build this script to support adding additional members, when auto-deploying HP5130-switches with HP iMC.
-###     When deploying the first member of an IRF-stack with HP iMC, the switch is allways added as a managed device in HP iMC.
+###     When deploying the first member of an IRF-stack with HP iMC, the switch is always added as a managed device in HP iMC.
 ###     If you want to add another member of the same stack this procedure is failing, because it's already added in iMC...
 
-###     In this script I give you the choice for updating software and/or the changing IRF-member-ID.
-###     To support the different member-deploy-scenarios, you can also choose between the IRF-port-config or iMC-auto-deploy
+###     In this script I give you the choice for updating switch-software, poe-software and the changing IRF-member-ID.
+###     It also support the different member-deploy-scenarios by chosing between the IRF-port-config or iMC-auto-deploy.
+
+###	EXAMPLE:
+###        Current Switch Model         48 Ports
+###        Current Software version     H3C Comware Software, Version 7.1.059, Alpha 7159
+###        Current PoE version          Version 143
+###        Current Member ID            1
+###        New Member ID                5
+
+
+###        1.Update Switch Firmware                           [ X ]
+###        2.Update PoE Firmware                              [ X ]
+###        3.Change IRF MemberID Only                         [ X ]
+###        4.Change IRF MemberID and set IRF-Port-config      [   ]
+###        5.Trigger iMC for deployment                       [ X ]
+###        6.Run selection
+###        7.Exit/Quit and reboot
 
 ###     For faster deploy the IRF-Port-config is fixed by a value, see settings below
 
