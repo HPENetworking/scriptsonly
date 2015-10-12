@@ -1,7 +1,7 @@
 
 __author__ = 'Remi Batist / AXEZ ICT Solutions'
 __version__ = '2.0'
-###     Python Script for Deploying (IRF-)config and software on 5130 switches #########
+###     Deploying (IRF-)(iMC-)config and software on 5130 switches #########
 
 ###     version 1.0: first release (support for 6 members)
 ###     version 1.1: adding support for 9 members
