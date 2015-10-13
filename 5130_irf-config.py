@@ -1,6 +1,6 @@
 
 __author__ = 'Remi Batist / AXEZ ICT Solutions'
-__version__ = '2.0'
+__version__ = '2.1'
 ###     Deploying (IRF-)(iMC-)config and software on 5130 switches #########
 
 ###     version 1.0: first release (support for 6 members)
@@ -8,6 +8,7 @@ __version__ = '2.0'
 ###     version 1.2: compacting script
 ###	version 1.3: supporting autodeploy IMC
 ###     version 2.0: Changed to deploy with only one 'main' menu
+###	Version 2.1: Bugfixes
 
 ###     I build this script to support adding additional members, when auto-deploying HP5130-switches with HP iMC.
 ###     When deploying the first member of an IRF-stack with HP iMC, the switch is always added as a managed device in HP iMC.
@@ -47,7 +48,7 @@ __version__ = '2.0'
 
 
 #### Custom settings
-tftpsrv = "192.168.10.10"
+tftpsrv = "192.168.10.1"
 imcfile = "autocfg_startup.cfg"
 bootfile = "5130ei-cmw710-boot-r3109p05.bin"
 sysfile = "5130ei-cmw710-system-r3109p05.bin"
@@ -282,10 +283,4 @@ def main():
 			
 if __name__ == "__main__":
 	main()
-
-		
-		
-		
-
-
 
