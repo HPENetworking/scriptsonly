@@ -244,14 +244,14 @@ def SetIRFPorts(memberid, model, checkbox3, checkbox4, set_memberid):
 		startup_file.write("\nirf member "+ set_memberid +" priority "+ set_prio + "\n")
 		if model == "48 Ports":
 			startup_file.write("\nirf-port "+ set_memberid +"/1")
-			startup_file.write("\nport group interface Ten-GigabitEthernet"+ set_memberid + irf_48_port_1)
+			startup_file.write("\nport group interface Ten-GigabitEthernet"+ set_memberid + irf_48_port_1 + '\n')
 			startup_file.write("\nirf-port "+ set_memberid +"/2")
-			startup_file.write("\nport group interface Ten-GigabitEthernet"+ set_memberid + irf_48_port_2)
+			startup_file.write("\nport group interface Ten-GigabitEthernet"+ set_memberid + irf_48_port_2 + '\n')
 		if model == "24 Ports":
 			startup_file.write("\nirf-port "+ set_memberid +"/1")
-			startup_file.write("\nport group interface Ten-GigabitEthernet"+ set_memberid + irf_24_port_1)
+			startup_file.write("\nport group interface Ten-GigabitEthernet"+ set_memberid + irf_24_port_1 + '\n')
 			startup_file.write("\nirf-port "+ set_memberid +"/2")
-			startup_file.write("\nport group interface Ten-GigabitEthernet"+ set_memberid + irf_24_port_2)
+			startup_file.write("\nport group interface Ten-GigabitEthernet"+ set_memberid + irf_24_port_2 + '\n')
 		startup_file.close()
 		comware.CLI("startup saved-configuration startup.cfg")
 		comware.CLI("reboot force")
@@ -263,7 +263,7 @@ def TriggeriMC(checkbox5):
 	if checkbox5 == 'X':
 		print "\nTriggering iMC for deploy, please wait..."
 		comware.CLI('system ; snmp-agent ; snmp-agent community read iMCV5read ; snmp-agent community write iMCV5write ; snmp-agent sys-info version all', False)
-		comware.CLI('tftp ' + tftpsrv + ' get ' + imcfile + ' flash:/tmp.cfg')
+		comware.CLI('tftp ' + tftpsrv + ' get ' + imcfile + ' tmp.cfg')
 		print "\nSuccess, waiting for config..."
 		time.sleep(300)
 	else:
