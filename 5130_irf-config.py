@@ -1,6 +1,6 @@
 
 __author__ = 'Remi Batist / AXEZ ICT Solutions'
-__version__ = '2.1'
+__version__ = '2.2'
 ###     Deploying (IRF-)(iMC-)config and software on 5130 switches #########
 
 ###     version 1.0: first release (support for 6 members)
@@ -9,10 +9,25 @@ __version__ = '2.1'
 ###	version 1.3: supporting autodeploy IMC
 ###     version 2.0: Changed to deploy with only one 'main' menu
 ###	Version 2.1: Bugfixes
+###	Version 2.2: added "How to use the script"
 
-###     I build this script to support adding additional members, when auto-deploying HP5130-switches with HP iMC.
-###     When deploying the first member of an IRF-stack with HP iMC, the switch is always added as a managed device in HP iMC.
-###     If you want to auto-deploy another member of the same stack this procedure is failing, because it's already added in iMC...
+###	How to use de script;
+###	1) On the HP IMC server(or other tftp-srver), put this script in the "%IMC Install Folder%\server\tmp" folder.
+###	2) Set the DHCP-Server in the "deploy" network with this script as bootfile. Example on a Comware devices below.
+###			dhcp enable
+###			dhcp server forbid 10.0.1.1 10.0.1.200
+###			dhcp server ip-pool v1
+### 			gateway 10.0.1.1
+### 			bootfile-name 5130_irf-config.py
+### 			tftp-server ip 10.0.1.100
+### 			network 10.0.1.0 24
+###	3) Boot a switch without a config-file and connect it to the "deploy" network.
+
+###     I build this script to support additional members when auto-deploying HP5130-switches with HP iMC.
+
+###	Why ?
+###     Normally when deploying the first member of an IRF-stack with HP iMC, the switch is always added as a managed device in HP iMC.
+###     Then if you want to auto-deploy another "member" of the same stack this procedure is failing, because it's already added in iMC...
 
 ###     In this script I give you the choice for updating switch-software, poe-software and the changing IRF-member-ID.
 ###     It also support the different member-deploy-scenarios by chosing between the IRF-port-config or iMC-auto-deploy.
@@ -23,7 +38,6 @@ __version__ = '2.1'
 ###        Current PoE version          Version 143
 ###        Current Member ID            1
 ###        New Member ID                5
-
 
 ###        1.Update Switch Firmware                           [ X ]
 ###        2.Update PoE Firmware                              [ X ]
@@ -48,7 +62,7 @@ __version__ = '2.1'
 
 
 #### Custom settings
-tftpsrv = "192.168.10.1"
+tftpsrv = "10.0.1.100"
 imcfile = "autocfg_startup.cfg"
 bootfile = "5130ei-cmw710-boot-r3109p05.bin"
 sysfile = "5130ei-cmw710-system-r3109p05.bin"
