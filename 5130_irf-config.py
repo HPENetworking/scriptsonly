@@ -1,6 +1,7 @@
 
 __author__ = 'Remi Batist / AXEZ ICT Solutions'
 __version__ = '2.2'
+__email__= 'remi.batist@axez.nl'
 ###     Deploying (IRF-)(iMC-)config and software on 5130 switches #########
 
 ###     version 1.0: first release (support for 6 members)
