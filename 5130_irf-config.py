@@ -1,7 +1,7 @@
 
 __author__ = 'Remi Batist / AXEZ ICT Solutions'
-__version__ = '2.2'
-__email__= 'remi.batist@axez.nl'
+__version__ = '2.3'
+__comments__= 'remi.batist@axez.nl'
 ###     Deploying (IRF-)(iMC-)config and software on 5130 switches #########
 
 ###     version 1.0: first release (support for 6 members)
@@ -11,6 +11,10 @@ __email__= 'remi.batist@axez.nl'
 ###     version 2.0: Changed to deploy with only one 'main' menu
 ###	Version 2.1: Bugfixes
 ###	Version 2.2: added "How to use the script"
+###	Version 2.3: Changed SNMP Community to support iMC version 7.2
+###			imc_snmpread = 'iMCV5read' -> 'iMCread'
+###			imc_snmpwrite = 'iMCV5write' -> 'iMCwrite'
+###
 
 ###	How to use de script;
 ###	1) On the HP IMC server(or other tftp-srver), put this script in the "%IMC Install Folder%\server\tmp" folder.
@@ -48,7 +52,7 @@ __email__= 'remi.batist@axez.nl'
 ###        6.Run selection
 ###        7.Exit/Quit and reboot
 
-###     For faster deploy the IRF-Port-config is fixed by a value, see settings below
+###     For faster deploy the IRF-Port-config is configured by a custom value, see settings below
 
 ###          48 Ports IRF-Config
 ###                  IRF Port  Interface                             
@@ -59,12 +63,14 @@ __email__= 'remi.batist@axez.nl'
 ###                  1         Ten-GigabitEthernetX/0/25     (irf_24_port_1)      
 ###                  2         Ten-GigabitEthernetX/0/27     (irf_24_port_2)
 
-### 	You can change these and other custom settings below when needed
+### 	You can change this or other custom settings below when needed
 
 
 #### Custom settings
 tftpsrv = "10.0.1.100"
-imcfile = "autocfg_startup.cfg"
+imc_bootfile = "autocfg_startup.cfg"
+imc_snmpread = 'iMCread'
+imc_snmpwrite = 'iMCwrite'
 bootfile = "5130ei-cmw710-boot-r3109p05.bin"
 sysfile = "5130ei-cmw710-system-r3109p05.bin"
 poefile = "S5130EI-POE-145.bin"
@@ -278,8 +284,8 @@ def SetIRFPorts(memberid, model, checkbox3, checkbox4, set_memberid):
 def TriggeriMC(checkbox5):
 	if checkbox5 == 'X':
 		print "\nTriggering iMC for deploy, please wait..."
-		comware.CLI('system ; snmp-agent ; snmp-agent community read iMCV5read ; snmp-agent community write iMCV5write ; snmp-agent sys-info version all', False)
-		comware.CLI('tftp ' + tftpsrv + ' get ' + imcfile + ' tmp.cfg')
+		comware.CLI('system ; snmp-agent ; snmp-agent community read ' + imc_snmpread + ' ; snmp-agent community write ' + imc_snmpwrite + ' ; snmp-agent sys-info version all', False)
+		comware.CLI('tftp ' + tftpsrv + ' get ' + imc_bootfile + ' tmp.cfg')
 		print "\nSuccess, waiting for config..."
 		time.sleep(300)
 	else:
