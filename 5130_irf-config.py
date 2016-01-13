@@ -2,7 +2,9 @@
 __author__ = 'Remi Batist / AXEZ ICT Solutions'
 __version__ = '2.3'
 __comments__= 'remi.batist@axez.nl'
-###     Deploying (IRF-)(iMC-)config and software on 5130 switches #########
+###     Deploying (IRF-)(iMC-)config and software on HP5130 24/48 Ports PoE Switches #########
+
+###	Support for models JG936A & JG937A
 
 ###     version 1.0: first release (support for 6 members)
 ###     version 1.1: adding support for 9 members
@@ -28,7 +30,7 @@ __comments__= 'remi.batist@axez.nl'
 ### 			network 10.0.1.0 24
 ###	3) Boot a switch without a config-file and connect it to the "deploy" network.
 
-###     I build this script to support additional members when auto-deploying HP5130-switches with HP iMC.
+###     I build this script to support additional members when auto-deploying HP5130-PoE-switches with HP iMC.
 
 ###	Why ?
 ###     Normally when deploying the first member of an IRF-stack with HP iMC, the switch is always added as a managed device in HP iMC.
