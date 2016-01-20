@@ -1,0 +1,23 @@
+*~
+*.pyc
+*.swp
+*#
+.metadata
+.DS_Store
+HPE RealTime Flask/.idea/.name
+
+.idea/encodings.xml
+
+.idea/HPE RealTime Flask.iml
+
+.idea/misc.xml
+
+.idea/modules.xml
+
+.idea/vcs.xml
+
+.idea/workspace.xml
+
+.idea/workspace.xml
+/HPE RealTime Flask/.idea
+/HPE RealTime Flask/todo.txt
