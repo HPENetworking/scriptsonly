@@ -1,0 +1,43 @@
+
+
+{% block navbar %}
+
+<nav class="navbar navbar-inverse navbar-fixed-top ">
+  <div class="container-fluid">
+
+      <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">Real Time Location App</a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="myNavbar">
+          <ul class="nav navbar-nav">
+              <li class="active"><a href="locate">Locate New Host</a></li>
+
+
+              {% if session.host %}
+              <li class="active"><a href="results">RTL Results</a></li>
+              <li class="dropdown">
+                  <a class="dropdown-toggle" data-toggle="dropdown" href="#">Interface Info<span class="caret"></span></a>
+                  <ul class="dropdown-menu">
+                      <li><a href="intstats">Display Interface</a></li>
+                      <li><a href="stpinfo">Display STP Info</a></li>
+                      <li><a href="arpquery">Display ARP Info</a></li>
+                      <li><a href="macquery">Display MAC Info</a></li>
+                      <li><a href="lldpneigh">Display LLDP Neighbors</a></li>
+                  </ul>
+              </li>
+              {% endif %}
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+              <li><a href="logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+          </ul>
+      </div>
+  </div>
+</nav>
+{% endblock %}
+

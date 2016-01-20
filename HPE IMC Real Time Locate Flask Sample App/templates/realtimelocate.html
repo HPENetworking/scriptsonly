@@ -1,0 +1,29 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}Real Time Location{% endblock %}
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+ <div class="jumbotron">
+            <h1>Real Time Location App</h1>
+            <p class="lead"></p>
+            </p>
+        </div>
+
+<div class="container">
+<form action="/locate" method="POST">
+    {% if error %}
+    <p style=  "color:red;">
+        {{ error }}
+    </p>
+    {% endif %}
+
+    <p>Host: <input type="text" id="inputHostIP" class="form-control" placeholder="HostIP"name="host" />    </p>
+    <button class="btn btn-lg btn-default btn-md" color="black" type="submit">Locate Now</button>
+</form>
+
+</div>
+{% endblock %}

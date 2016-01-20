@@ -1,0 +1,31 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}Real Time Location{% endblock %}
+
+
+{% block content %}
+
+ <div class="jumbotron">
+            <h1>Real Time Location App</h1>
+            <p class="lead"></p>
+            </p>
+        </div>
+
+<div class="container">
+<form action="/login" method="POST">
+    {% if error %}
+    <p style=  "color:red;">
+        {{ error }}
+    </p>
+    {% endif %}
+    <p>HPE IMC Server IP Address: <input type=text" id="inputIPAddress" class="form-control" placeholder="IPAddress"  name="ipaddress" />     </p>
+    <p>HPE IMC Server Port: <input type="text" id="inputPortNumber" class="form-control" placeholder="Port"  name="port" />    </p>
+    <p>Username: <input type="text" id="inputUsername" class="form-control" placeholder="Username" name="username" />    </p>
+    <label for="inputPassword" class="sr-only">Password</label>
+    <p>Password: <input type="password" id="inputPassword" class="form-control" placeholder="Password" required name="password" />    </p>
+    <button class="btn btn-lg btn-default btn-md" type="submit">Login</button>
+</form>
+
+</div>
+{% endblock %}

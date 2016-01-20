@@ -1,0 +1,108 @@
+{% extends 'bootstrap/base.html' %}
+
+{% include 'navbar.html' %}
+
+{% block title %}Real Time Results{% endblock %}
+
+{% block content %}
+<div class="container">
+ <div class="jumbotron">
+            <h1>Host Information</h1>
+            <p class="lead"></p>
+            </p>
+        </div>
+</div>
+<div class="container">
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+        <table class='table table-hover table-stripped'>
+            <thead>
+            <tr>
+                <th><h1>Locate Host Results</h1></th>
+                </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><b>Host IP Address</b></td>
+                <td>{{ host['locateIp'] }}</td>
+            </tr>
+            <tr>
+                <td><b>Connected Interface</b></td>
+                <td> {{ host['ifDesc'] }}</td>
+            </tr>
+            <tr>
+                <td><b>Device IP</b></td>
+                <td> {{ host['deviceIp'] }}</td>
+            </tr>
+            <tr>
+                <td><b>Device Name</b></td>
+                <td> {{ device['sysName'] }}</td>
+            </tr>
+             <tr>
+                <td><b>Device Type</b></td>
+                <td> {{ device['typeName'] }}</td>
+            </tr>
+            <tr>
+                <td><b>Device Location</b></td>
+                <td> {{ device['location'] }}</td>
+            </tr>
+            <tr>
+                <td><b>Device Contact</b></td>
+                <td>{{ device['contact'] }}</td>
+            </tr>
+        </table>
+
+     </div>
+
+<div class="container">
+<form action="/results" method="POST">
+    {% if error %}
+    <p style=  "color:red;">
+    {{ error }}
+    </p>
+    {% endif %}
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Interface Information
+            <span class="caret"></span></button>
+        <ul class="dropdown-menu">
+            <li><a href="intstats">Display Interface</a></li>
+            <li><a href="stpinfo">Display STP Info</a></li>
+            <li><a href="arpquery">Display ARP Info</a></li>
+            <li><a href="macquery">Display MAC Info</a></li>
+            <li><a href="lldpneigh">Display LLDP Neighbors</a></li>
+        </ul>
+    </div>
+    <p></p>
+
+    <div class="btn-group">
+        <h3>Actions</h3>
+        <button class="btn btn-primary" type="submit" name="action" value="up">Enable Interface</>
+        <button class="btn btn-danger" type="submit" name="action" value="down">Disable Interface</>
+        <button class="btn btn-success" type="submit" name="action" value="epoe">Enable PoE</>
+        <button class="btn btn-danger" type="submit" name="action" value="dpoe">Disable PoE</>
+
+    </div>
+
+</form>
+</div>
+
+
+    <footer class="footer">
+            <p>&copy; Company 2015</p>
+        </footer>
+{% endblock %}
