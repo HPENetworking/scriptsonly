@@ -1,0 +1,479 @@
+﻿<?xml version="1.0" encoding="utf-8"?><ManagementPack ContentReadable="true" SchemaVersion="2.0" OriginalSchemaVersion="1.1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <Manifest>
+    <Identity>
+      <ID>perfiMC.integration</ID>
+      <Version>1.0.0.4</Version>
+    </Identity>
+    <Name>perfiMC integration</Name>
+    <References>
+      <Reference Alias="SCInternal">
+        <ID>Microsoft.SystemCenter.Internal</ID>
+        <Version>7.0.8433.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="SC">
+        <ID>Microsoft.SystemCenter.Library</ID>
+        <Version>7.0.8433.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="Windows">
+        <ID>Microsoft.Windows.Library</ID>
+        <Version>7.5.8501.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="Health">
+        <ID>System.Health.Library</ID>
+        <Version>7.0.8433.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="System">
+        <ID>System.Library</ID>
+        <Version>7.5.8501.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="Performance">
+        <ID>System.Performance.Library</ID>
+        <Version>7.0.8433.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="NetworkLibrary">
+        <ID>System.NetworkManagement.Library</ID>
+        <Version>7.1.10226.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="SCDW">
+        <ID>Microsoft.SystemCenter.DataWarehouse.Library</ID>
+        <Version>7.1.10226.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+    </References>
+  </Manifest>
+  <TypeDefinitions>
+    <ModuleTypes>
+      <DataSourceModuleType ID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.3.ps1.DataSourceModuleType" Accessibility="Internal" Batching="false">
+        <Configuration>
+          <xsd:element type="xsd:integer" name="TimeoutSeconds" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element type="xsd:integer" name="IntervalSeconds" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <DataSource ID="Scheduler" TypeID="System!System.Scheduler">
+                <Scheduler>
+                  <SimpleReccuringSchedule>
+                    <Interval Unit="Seconds">$Config/IntervalSeconds$</Interval>
+                  </SimpleReccuringSchedule>
+                  <ExcludeDates />
+                </Scheduler>
+              </DataSource>
+              <ProbeAction ID="Probe" TypeID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.3.ps1.ProbeActionModuleType">
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="Probe">
+                <Node ID="Scheduler" />
+              </Node>
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+      </DataSourceModuleType>
+      <ProbeActionModuleType ID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.3.ps1.ProbeActionModuleType" Accessibility="Internal" Batching="false" PassThrough="false">
+        <Configuration>
+          <xsd:element type="xsd:integer" name="TimeoutSeconds" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <ProbeAction ID="Probe" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagTriggerOnlyProbe">
+                <ScriptName>SCOM_iMC_Perf_Integration_v0.3.ps1</ScriptName>
+                <ScriptBody>
+# Copyright 2016 Hewlett Packard Enterprise Development LP.
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#####################################################################
+# Title : PowerShell script intended to be used to create new
+#         SCOM Management Pack which get performance data for
+#         network devices directly in iMC using Rest API
+# Author : Fabien GIRAUD
+# Version : 0.2
+#
+# Description :
+# PowerShell script intended to be used to create new SCOM Management
+# Pack which get performance data for network devices directly in 
+# iMC using Rest API
+#
+# Version History :
+#	V0.1 : creation of the script and simple test with CPU and/or 
+#          Memory usage (first phase : simply display the perf data
+#          on stdout and store in file).
+#          Script gets ip address of the SCOM node (for phase 1, hard
+#          coded), then using iMC API gets dev id in iMC. Then the 
+#          script will list the performance indexes for Memory and
+#          CPU usage, then it will get last performance data for 
+#          this indexes / device
+#          Parameters:
+#					- Type of output (txt, csv or scom)
+#					- Device IP (string)
+#	V0.2 : Adding SCOM capabilities in order to directly write
+#		   performance data in SCOM performance monitoring
+#   v0.3 : Changing the way scom integration works - Since it can't
+#          be run in a collection rule for each Network Device,
+#          this will run on management server and so get the list
+#          of all Network Device and put the perf data in the perf
+#          view of the management server
+#          New parameters order:
+#					- Type of output (txt, csv or scom)
+#					- Device IP (only applicable for csv and txt)
+#
+####################################################################
+
+ # Parameters
+param ($outputType,$deviceIP)
+
+ # iMC Connection variable and initialization
+ 
+$imchost = "10.10.105.21"
+$imcport = "8080"
+$imcprot = "http"
+$iMCUser = "imcrs"
+$iMCPWD = "imcrs@hpisc14"
+
+$ImcApiBaseUrl = $imcprot + "://" + $imchost + ":" + $imcport + "/imcrs/" 
+
+$secpasswd = ConvertTo-SecureString $iMCPWD -AsPlainText -Force
+$imcadmin = New-Object System.Management.Automation.PSCredential ($iMCUser, $secpasswd)
+
+
+if(!$imcadmin){ $imcadmin = Get-Credential }
+
+
+#-----------------------------------------------------------------------------#
+# Base Query of devices. Used to find the id of the current device based on IP #
+# Parameters:																   #
+#			- Device IP (string)											   #
+#-----------------------------------------------------------------------------#
+Function imcDeviceLookup
+{  
+param ($itemIP)                    
+ 
+    $url = $ImcApiBaseUrl + "plat/res/device?" + "ip" + "=" + $itemIP + "&amp;exact=true"
+ 
+    Write-Host "--Debug-- URL: $url"
+ 
+    $result = Invoke-RestMethod -Uri $url -method GET -DisableKeepAlive -TimeoutSec $customTimeOut -Verbose -Credential $imcadmin -ContentType "application/xml"
+    $imcDevice = $result.list.device
+    $imcDevID = $imcDevice.id
+    
+	write-host "--Debug-- Found device information: Label="$imcDevice.label" IP="$imcDevice.ip" Location="$imcDevice.Location
+
+    write-host "Result : Device ID = ($imcDevID)"
+if ($imcDevID) {return $imcDevID}
+else {return 0}
+}
+
+#-----------------------------------------------------------------------------#
+# Base Query of Performance Tasks. Used to find the id of the tasks we want to #
+# use (first phase : only CPU Usage and Memory Usage)                          #
+#-----------------------------------------------------------------------------#
+Function imcPerfTaskLookup
+{
+$imcPerfIndexList = @("CPU Usage","Memory Usage")
+$globalTaskIDList = @()
+
+	foreach ($item in $imcPerfIndexList) {
+		write-host "--Debug-- Perf index: $item"
+		$url = $ImcApiBaseUrl + "perf/task?" + "name" + "=" + $item
+		
+		Write-Host "--Debug-- URL: $url"
+		
+		$result = Invoke-RestMethod -Uri $url -method GET -DisableKeepAlive -TimeoutSec $customTimeOut -Verbose -Credential $imcadmin -ContentType "application/xml"
+		$imcTasks = $result.list.task
+		
+		$tempTaskIDList = @()
+		foreach($i in $imcTasks) {
+
+			write-host "--Debug-- "$i.taskName "ID="$i.taskId
+			
+			$tempTaskIDList += $i.taskId
+		}
+		
+		$globalTaskIDList += $tempTaskIDList
+
+	}
+
+	write-host "Result : Task IDs list = $globalTaskIDList"
+	
+	return $globalTaskIDList
+}
+
+#-----------------------------------------------------------------------------#
+# Query of perf data. Used to get latest perf data for both specific dev id    #
+# and task ids.                                                                #
+# Parameters:                                                                  #
+#			- Dev ID (integer)                                                 #
+#			- Task ID (integer array)                                          #
+#-----------------------------------------------------------------------------#
+Function imcPerfDataGet
+{
+param ($DevID,$TaskIDs)
+$PerfDataList = @()
+
+	foreach ($item in $TaskIDs) {
+		write-host "--Debug-- Task ID: $item"
+		$url = $ImcApiBaseUrl + "perf/summaryData?" + "taskId" + "=" + $item + "&amp;devId" + "=" + $DevID + "&amp;dataGranularity=1"
+		
+		Write-Host "--Debug-- URL: $url"
+		
+		$result = Invoke-RestMethod -Uri $url -method GET -DisableKeepAlive -TimeoutSec $customTimeOut -Verbose -Credential $imcadmin -ContentType "application/xml"
+		
+		if ($result) {
+			$imcTempPerfData = $result.list.perfSummaryData
+
+			foreach ($i in $imcTempPerfData) {
+				write-host "Performance data "$i.taskName $i.objIndexDesc "for device ID "$DevID "="$i.currentValue
+				$PerfDataList += $i
+			}
+		}
+	}
+
+return $PerfDataList
+}
+
+#-----------------------------------------------------------------------------#
+# Display perf data. This function will use the perf data collected. In a first    #
+# step we will write this to a text file. Second step will use scom management #
+# pack.                                                                        #
+# Parameters:                                                                  #
+#			- Device IP														   #
+#			- PerfData (list of performance data)                              #
+#			- Type: txt, csv or scom 										   #
+#			- Device Name (only used for scom output type)                     #
+#-----------------------------------------------------------------------------#
+Function displayPerfData
+{
+param ($type, $devIP, $perfDataList, $devName)
+
+	# option 1 : txt
+	# write in a readable text format file
+	if ($type -eq "txt") {
+		$txtFile = "Perf_$devIP.txt"
+		$FileExists =  Test-Path $txtFile
+		if (-not $FileExists) {
+			$text = " ------------------------------------------"
+			$text | Out-File $txtFile
+			$text = "| Performance data for device $devIP |"
+			$text | Out-File $txtFile -Append
+			$text = " ------------------------------------------"
+			$text | Out-File $txtFile -Append
+		
+		}
+		
+		$text = "--------------------------------------------"
+		$text | Out-File $txtFile -Append
+		$text = Get-date -format g
+		$text | Out-File $txtFile -Append
+		$text = "--------------------------------------------"
+		$text | Out-File $txtFile -Append
+		foreach ($i in $perfDataList) {
+			$text = $i.taskName + $i.objIndexDesc + "=" + $i.currentValue
+			$text | Out-File $txtFile -Append
+		}
+	}
+	
+	# option 2 : csv
+	# write in a csv comma separated file to be used in external soft such as excel
+	elseif ($type -eq "csv") {
+		$txtFile = "Perf_$devIP.csv"
+		$FileExists =  Test-Path $txtFile
+		if (-not $FileExists) {
+			foreach ($i in $perfDataList) {
+				if ($text) {$text +=","}
+				$text += $i.taskName + $i.objIndexDesc
+			}
+			$text += ",DateTime"
+			$text | Out-File $txtFile
+		}
+		foreach ($i in $perfDataList) {
+			if ($text2) {$text2 +=","}
+			$text2 += $i.currentValue
+		}
+		$currentDateTime = Get-date
+		$text2 += "," + $currentDateTime
+		$text2 | Out-File $txtFile -Append
+	}
+	
+	# option 3 : scom
+	# write directly in scom performance view (will be done in release 0.2 :))
+	elseif ($type -eq "scom") {
+		#Load the MOMScript API, PropertyBag, and log a starting script event 
+#		$api = New-Object -comObject 'MOM.ScriptAPI'
+#		$bag = $api.CreatePropertyBag()
+		$api.LogScriptEvent("SCOM_iMC_Perf_integration.ps1",100,4,"Starting write perf data in SCOM for $devIP")
+
+		foreach ($i in $perfDataList) {
+            $PerfName=$i.taskname
+            $InstanceDesc=$i.objIndexDesc
+            $Counter = $PerfName +"---" + $InstanceDesc
+            $PerfValue=$i.currentValue
+		    $bag = $api.CreatePropertyBag()
+			$bag.AddValue("Counter",$Counter)
+			$bag.AddValue("Instance",$devName)
+			$bag.AddValue("PerfValue",$PerfValue)
+            write-host "--Debug-- Writing perf data on device $devName for $Counter = $PerfValue"
+            $bag
+		}
+		$api.LogScriptEvent("SCOM_iMC_Perf_integration.ps1",101,4,"Ending write perf data in SCOM for $devIP")
+
+	}
+}
+
+#-----------------------------------------------------------------------------#
+# Base Query of Network devices in SCOM. Used to get the list of all Network   #
+# Devices discovered in SCOM. 												   #
+#-----------------------------------------------------------------------------#
+Function SCOMNetworkDeviceLookup
+{  
+
+	$SCOMNetworkDevices = Get-SCOMClass -DisplayName "Network Device" | Get-SCOMClassInstance
+	$SCOMNetworkDevices | Format-List *
+	$SCOMNetDevicesShort=$SCOMNetworkDevices | select DisplayName, @{Label="SNMPAddress";Expression={$_.'[System.NetworkManagement.Node].SNMPAddress'}}
+	
+	write-host "--Debug-- List of Device IP on which we'll get perf data in iMC :" $SCOMNetDevicesShort.SNMPAddress.Value
+	return $SCOMNetDevicesShort
+}
+#-----------------------------------------------------------------------------#
+#        Main                                                                 #
+#-----------------------------------------------------------------------------#
+
+$customTimeOut=5
+$headers = @{"X-Requested-With"="powershell"}
+
+ # Beginning of execution :)
+ 
+$TasksIDList = imcPerfTaskLookup
+
+if ($outputType -eq "scom") {
+	$api = New-Object -comObject 'MOM.ScriptAPI'
+	$api.LogScriptEvent("SCOM_iMC_Perf_integration.ps1",100,4,"Starting get performance data in iMC through rest API for device $deviceIP")
+	$SCOMNetDevices=SCOMNetworkDeviceLookup
+	
+	foreach ($NetDevice in $SCOMNetDevices)
+	{
+        if ($NetDevice.SNMPAddress.Value) {
+            write-host "--Debug-- Getting info on " $NetDevice.DisplayName "SNMP Address="$NetDevice.SNMPAddress.Value
+		    $deviceID = imcDeviceLookup $NetDevice.SNMPAddress.Value
+		    if ($deviceID) {
+                $PerfData = imcPerfDataGet $deviceID $TasksIDList
+                displayPerfData $outputType $deviceIP $PerfData $NetDevice.DisplayName
+            }
+        }
+	}
+	
+}
+
+else {	
+	$deviceID = imcDeviceLookup $deviceIP
+	if ($deviceID) {
+        $PerfData = imcPerfDataGet $deviceID $TasksIDList
+        displayPerfData $outputType $deviceIP $PerfData
+    }
+}
+	
+if ($outputType -eq "scom") {
+	$api.LogScriptEvent("SCOM_iMC_Perf_integration.ps1",101,4,"Ending get performance data in iMC through rest API for device $deviceIP")
+}
+
+</ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>outputType</Name>
+                    <Value>scom</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="Probe" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+        <TriggerOnly>true</TriggerOnly>
+      </ProbeActionModuleType>
+    </ModuleTypes>
+  </TypeDefinitions>
+  <Monitoring>
+    <Rules>
+      <Rule ID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.3.ps1" Comment="&lt;Silect&gt;&lt;Op&gt;Created&lt;/Op&gt;&lt;User&gt;HPINTELCO\fgir&lt;/User&gt;&lt;Previous/&gt;&lt;LastModified&gt;2015-06-01 08:49:51Z&lt;/LastModified&gt;&lt;/Silect&gt;" Enabled="true" Target="SC!Microsoft.SystemCenter.ManagementServer" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
+        <Category>PerformanceCollection</Category>
+        <DataSources>
+          <DataSource ID="DataSource" TypeID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.3.ps1.DataSourceModuleType">
+            <TimeoutSeconds>300</TimeoutSeconds>
+            <IntervalSeconds>180</IntervalSeconds>
+          </DataSource>
+        </DataSources>
+        <ConditionDetection ID="System.Performance.DataGenericMapper" TypeID="Performance!System.Performance.DataGenericMapper">
+          <ObjectName>Network Device</ObjectName>
+          <CounterName>$Data/Property[@Name='«Counter»']$</CounterName>
+          <InstanceName>$Data/Property[@Name='«Instance»']$</InstanceName>
+          <Value>$Data/Property[@Name='PerfValue']$</Value>
+        </ConditionDetection>
+        <WriteActions>
+          <WriteAction ID="Microsoft.SystemCenter.CollectPerformanceData" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+          <WriteAction ID="Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+        </WriteActions>
+      </Rule>
+    </Rules>
+  </Monitoring>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="perfiMC.integration">
+          <Name>perfiMC integration </Name>
+          <Description>Created by HPINTELCO\fgir at 6/1/2015 10:42:24 AM using MP Author : get Network Device Perf data through iMC eAPI</Description>
+        </DisplayString>
+        <DisplayString ElementID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.3.ps1.ProbeActionModuleType">
+          <Name>perfiMC integration Microsoft SystemCenter ManagementServer Rule SCOM iMC Perf Integration v0 3 ps1 ProbeActionModuleType</Name>
+          <Description>Probe Action Module Type for Performance Rule: perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.3.ps1</Description>
+        </DisplayString>
+        <DisplayString ElementID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.3.ps1.ProbeActionModuleType" SubElementID="TimeoutSeconds">
+          <Name>Timeout Seconds</Name>
+        </DisplayString>
+        <DisplayString ElementID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.3.ps1.DataSourceModuleType">
+          <Name>perfiMC integration Microsoft SystemCenter ManagementServer Rule SCOM iMC Perf Integration v0 3 ps1 DataSourceModuleType</Name>
+          <Description>Data Source Module Type for Performance Rule: perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.3.ps1</Description>
+        </DisplayString>
+        <DisplayString ElementID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.3.ps1.DataSourceModuleType" SubElementID="TimeoutSeconds">
+          <Name>Timeout Seconds</Name>
+        </DisplayString>
+        <DisplayString ElementID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.3.ps1.DataSourceModuleType" SubElementID="IntervalSeconds">
+          <Name>Interval Seconds</Name>
+        </DisplayString>
+        <DisplayString ElementID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.3.ps1">
+          <Name>perfiMC integration Microsoft SystemCenter ManagementServer Rule SCOM iMC Perf Integration v0 3 ps1</Name>
+          <Description>Created by HPINTELCO\fgir at 6/1/2015 10:49:04 AM using MP Author : get perf data for Network devices through iMC eAPI and display in perf view of the management server</Description>
+        </DisplayString>
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPack>
