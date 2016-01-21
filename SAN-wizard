@@ -1,0 +1,1103 @@
+#******************************************************************************
+# SAN wizard
+#		provides simplified procedure for FC/FCOE configuration
+# Version: 1.1
+# Revision history: 
+# 		1.0 - 30/10/2014 : Initial coding (Yannick Castano, Hewlett-Packard)
+#		1.1 - 07/12/2014 : bug correction for 5900CP FC support 
+#		1.11- 08/12/2014 : added storage bandwidth choice for FCoE links
+#
+# Pre-requisite: 
+#
+# Roadmap:
+#				Use a system file to record previous configurations
+#				Change the behaviour: create 1 CLI command set and apply at once
+#				Add server interfaces without SAN port configuration (NPV mode)
+#				Add NPV support (is transit configuration useful ?)
+#				Add VLAN existence checking before using it for FCoE
+#				Add ACL existence checking before using it for DCBX	 
+#				Add server interface sanity check (existing, already configured)
+#				Add existing vfc interface check
+#				Add error codes handling
+#				Add choice for non 10GbE interfaces to be used
+#				Add choice for more than 2 NIC on storage array
+#
+# Remarks:		 This script needs more testing
+#				 Any comment/feedback is welcome: castano@hp.com
+#******************************************************************************
+import os
+import sys
+import termios
+import comware
+
+__author__ = 'Yannick Castano'
+
+#******************************************************************************
+# Terminal input initialization (thanks to Dobias van Ingen)
+#******************************************************************************
+fd = sys.stdin.fileno();
+new = termios.tcgetattr(fd)
+new[3] = new[3] | termios.ICANON | termios.ECHO
+new[6] [termios.VMIN] = 1
+new[6] [termios.VTIME] = 0
+termios.tcsetattr(fd, termios.TCSANOW, new)
+termios.tcsendbreak(fd,0)
+
+#******************************************************************************
+# Global variables
+#******************************************************************************
+DB_FILE = 'SAN-wizard.mdb'
+DCBX_ACL_NUMBER = '4999'
+DCBX_QOS_CLASSIFIER_NAME = 'DCBX'
+DCBX_QOS_BEHAVIOR_NAME = 'DCBX'
+DCBX_QOS_POLICY_NAME = 'DCBX'
+SERVER_BAGG_STARTING_ID = 900
+FCOE_SAN_PVID = '4000'
+#ETS Data/FCoE server bandwidth share : 50/50
+ETS_AF1 = '1'
+ETS_BE = '1'
+#ETS Data/FCoE storage bandwidth share : 80/20
+ETS_AF1_STORAGE = '4'
+ETS_BE_STORAGE = '1'
+
+## These global variables will be modified by the script
+# interface range available on the device
+INTERFACE_RANGE_LIST = []
+# FC capability will be yes according to the device (5900CP)
+FC_CAPABILITY = 'no'
+# FC SAN ports
+FC_SAN_A_PORT = ''
+FC_SAN_B_PORT = ''
+# FCOE SAN ports
+FCOE_SAN_A_PORT = ''
+FCOE_SAN_B_PORT = ''
+# FCoE VFC interfaces numbers
+FCOE_SAN_A_VFC = '301'
+FCOE_SAN_B_VFC = '302'
+# FCOE modes: npv, fcf or transit
+FCOE_MODE = 'npv'
+# VSAN numbers
+VSAN_A = '3100'
+VSAN_B = '3200'
+# FCoE VLAN numbers
+VLAN_A = '3100'
+VLAN_B = '3200'
+
+
+#******************************************************************************
+# Procedures
+#******************************************************************************
+def init():
+	# interface range global variable initialisation
+	for i in range (1,3):
+		for j in range (1,49):
+			INTERFACE_RANGE_LIST.append(str(i) + '/0/' + str(j))
+	# checks if mdb file exists
+	
+	# opening the mdb file, containing previous configuration from this script
+	database = open(DB_FILE, 'a')
+	database.close()
+
+def change_system_mode(mode):
+	print 'Changing to System Working mode ' + mode + '...\n'
+	cli_session = comware.CLI('system-view ;system-working-mode '+ mode, False)
+	
+def change_fcoe_mode(mode):
+	print 'Changing to FCOE mode ' + mode + '...\n'
+	cli_session = comware.CLI('system-view ;undo fcoe-mode ;fcoe-mode '+ mode, False)
+
+def save():
+	print 'Saving configuration ...\n'
+	cli_session = comware.CLI('save force', False)
+
+def reboot():
+	print '[!] Your device is about to reboot. You will have to launch again this script after reboot to continue FCOE configuration.'
+	reboot_choice = get_valid_input_choice (' -> Please type C to Continue or A to Abort: ', ['C','A'])
+	if reboot_choice == 'C':
+		print 'Rebooting ...\n'
+		cli_session = comware.CLI('reboot force', False)
+		return 'ok'
+	else: 
+		return 'nok'
+	
+def check_fc_capability ():
+	global FC_CAPABILITY
+	FC_CAPABILITY = 'no'
+	result = get_data_in_command_output ('display device manuinfo | include JG838A', 'JG838A', 4)
+	if result == 'JG838A':
+		FC_CAPABILITY = 'yes'
+	
+def get_valid_input_choice(input_text, input_choices):
+#--------------------------------------------------------------------------------
+# Procedure that displays an input message and waits for user to input a valid 
+# choice
+#
+# parameters:
+#	input_text is a string displayed to ask for use input
+#	input_choices is a list of valid choices that user can make (uppercase only)
+# return:
+#	uppercase valid choice of the user
+# example:
+#		 get_valid_input_choice ('Your choice', [1,2,Y,N])
+#			=> user can type in only 1, 2, Y or N
+#--------------------------------------------------------------------------------
+# Transform to UpperCase letters
+	while True:
+		input = raw_input(input_text)
+		if input.upper() in input_choices: break
+	return input.upper()
+
+def get_data_in_command_output(command_input, data_description, data_position):
+#--------------------------------------------------------------------------------
+# Procedure that extracts data contained in the command output.
+#
+# parameters:
+#	command_input is the command to run in CLI
+#	data_description is a string that marks the interesting line in command output
+#	data_position is the requested data position index is the interesting line
+#	(data line is transformed in a list of substrings using the split() function)
+# return:
+#	the data string located at the defined position
+# example:
+#	show version output is HP Comware Software, Version 7.1.045, Release 2311P03
+#		 get_data_in_command_output ('show version', 'Version', 4)
+#			=> returns 7.1.045
+#		 get_data_in_command_output ('show version', 'Version', 6)
+#			=> returns 2311P03
+#--------------------------------------------------------------------------------
+	cli_session = comware.CLI(command_input, False)
+	command_output = cli_session.get_output()
+	if len(command_output) != 1:
+		#extracts the data from data_description
+		for s in command_output:
+			#keeps only the line with the data description and data
+			if s.find(data_description) != -1:
+				data = s.split()[data_position]
+		return data
+	else:
+		return 'n0ne'
+
+def database_file(operation, line, position, content):
+#--------------------------------------------------------------------------------
+# Procedure that operates the script database file
+#
+# parameters:
+#	operation is 'read' or 'write'
+#	line is the interesting line in the file
+#	position is the requested data position index in the interesting line
+#	content is the data to write to the file
+# return:
+#	the data string located at the defined position
+#--------------------------------------------------------------------------------
+	database.open(DB_FILE,'r+')
+	if line > 1:
+		# go to the right line
+		for i in range(1,line):
+			line = database.readline()
+	database.seek(position)
+	if operation == 'read':
+		line = database.readline()
+		# remove the EoL character
+		return line.strip('\n')
+	elif operation == 'write':
+		database.write(content + '\n')
+	database.close()
+		
+def check_and_set_fcoe_mode():
+#--------------------------------------------------------------------------------
+# Procedure that checks and changes the system-working-mode and fcoe-mode to be 
+# compliant with the user's choice (npv, fcf, transit)
+#
+# parameters:
+#	none
+# return:
+#	ok: system is already compatible with the requested FCoE mode
+#	reboot: system has been reconfigured and is performing reboot
+#	nok: user does not want system to be reconfigured
+#--------------------------------------------------------------------------------
+	system_working_mode = get_data_in_command_output ('display system-working-mode', 'The current system working mode is', 6)
+	if system_working_mode == 'standard.':
+		print '[i] System is currently running in standard mode. FC/FCoE configuration requires advanced mode. Switching to advanced mode requires reboot.'
+		print '[?] Do you want to this script to automatically configure advanced mode and reboot the device (config will be automatically saved)?'
+		autoconfig_choice = get_valid_input_choice(' -> Please type Yes(Y) or No(N): ', ['Y','N'])
+		if autoconfig_choice == 'Y':
+			change_system_mode('advance')
+			save()
+			reboot_choice = reboot()
+		if autoconfig_choice == 'N' or reboot_choice == 'nok':
+			print '[i] Please manually run the "system-working-mode advance command, save your configuration, reboot the device and launch this script again.'
+			return 'nok'
+	elif system_working_mode == 'advance.':
+		system_fcoe_mode = get_data_in_command_output ('display fcoe-mode', 'The FCoE mode is', 4)
+		if system_fcoe_mode.lower() != (FCOE_MODE + '.'):
+			print '[!] The device is already running FCoE but in a different mode ('+ system_fcoe_mode.lower() +')'
+			print '[?] Do you want to change it to '+ FCOE_MODE +' ?'
+			change_choice = get_valid_input_choice(' -> Please type Yes(Y) or No(N): ', ['Y','N'])
+			if change_choice == 'Y':
+				change_fcoe_mode(FCOE_MODE)
+			else:
+				print '[i] Please manually run the "fcoe-mode ' + FCOE_MODE + '" command, save your configuration, reboot the device and launch this script again.'
+				return 'nok'
+		else:
+			return 'ok'
+	else:
+		print '[!] Error in getting the system FCoE current capabilities'
+		return 'nok'
+		
+def set_global_dcbx():
+#--------------------------------------------------------------------------------
+# Procedure that sets the global LLDP and the DCBX qos policy
+#
+# parameters:
+#	none
+# return:
+#	none
+#--------------------------------------------------------------------------------
+	dcbx_command_set = ('system-view ;'
+						'lldp global enable ;'
+						'acl number ' + DCBX_ACL_NUMBER + ' name DCBX ;'
+						'rule 0 permit type 8906 ffff ;'
+						'rule 5 permit type 8914 ffff ;'
+						'quit ;'
+						'traffic classifier ' + DCBX_QOS_CLASSIFIER_NAME + ' operator or ;'
+						'if-match acl ' + DCBX_ACL_NUMBER + ' ;'
+						'quit ;'
+						'traffic behavior ' + DCBX_QOS_BEHAVIOR_NAME +' ;'
+						'remark dot1p 3 ;'
+						'quit ;'
+						'qos policy ' + DCBX_QOS_POLICY_NAME + ' ;'
+						'classifier ' + DCBX_QOS_CLASSIFIER_NAME + ' behavior ' + DCBX_QOS_BEHAVIOR_NAME + ' mode dcbx ;'
+						'quit'
+	)
+	print 'Configuring DCBX ...\n'
+	cli_session = comware.CLI(dcbx_command_set, False)
+
+def set_ets_mapping():
+#--------------------------------------------------------------------------------
+# Procedure that sets the right ETS qos map table
+#
+# parameters:
+#	none
+# return:
+#	none
+#--------------------------------------------------------------------------------
+	ets_command_set = ('system-view ;'
+						'qos map-table dot1p-lp ;'
+						'import 3 export 1 ;'
+						'import 0 export 0 ;'
+						'import 1 export 0 ;'
+						'import 2 export 0 ;'
+						'import 4 export 0 ;'
+						'import 5 export 0 ;'
+						'import 6 export 0 ;'
+						'import 7 export 0 ;'
+						'quit'
+	)
+	print 'Configuring ETS ...\n'
+	cli_session = comware.CLI(ets_command_set, False)
+
+def set_storage_ets_bandwidth(interface_type):
+#--------------------------------------------------------------------------------
+# Procedure that sets the right balance between data and storage
+#
+# parameters:
+#	interface_type : 'server' or 'storage'
+# return:
+#	none
+#--------------------------------------------------------------------------------
+	# ETS Data/FCoE server bandwidth share
+	global ETS_AF1
+	global ETS_BE
+	# ETS Data/FCoE storage bandwidth share
+	global ETS_AF1_STORAGE
+	global ETS_BE_STORAGE
+	print 'What percentage of bandwidth do you want to reserve for storage traffic ?'
+	print '\t1) 10%\n\t2) 20%\n\t3) 30%\n\t4) 40%\n\t5) 50%\n\t6) 60%\n\t7) 70%\n\t8) 80%\n\t9) 90%'
+	storage_percentage = int(get_valid_input_choice('Votre choix: <1-9> ', str(range(1,10))))
+	if interface_type == 'server':
+		ETS_AF1 = storage_percentage
+		ETS_BE = str(10 - int(storage_percentage))
+	elif interface_type == 'storage':
+		ETS_AF1_STORAGE = storage_percentage
+		ETS_BE_STORAGE = str(10 - int(storage_percentage))
+	else:
+		return 'nok'
+	
+def create_vsan():
+#--------------------------------------------------------------------------------
+# Procedure that asks user for VSAN config and creates it
+#
+# parameters:
+#	none
+# return:
+#	none
+#--------------------------------------------------------------------------------
+	global VSAN_A
+	global VSAN_B
+	print 'Please enter the VSAN id for your 1st SAN fabric'
+	VSAN_A = get_valid_input_choice('VSAN id <1-3839>:', str(range(1,3840)))
+	print 'Please enter the VSAN id for your 2nd SAN fabric'
+	VSAN_B = get_valid_input_choice('VSAN id <1-3839>:', str(range(1,3840)))
+	vsan_command_set = ('system-view ;'
+						'vsan ' + VSAN_A + ' ;'
+						'quit ;'
+						'vsan ' + VSAN_B + ' ;'
+						'quit'
+	)
+	print 'Configuring VSANs ...\n'
+	cli_session = comware.CLI(vsan_command_set, False)
+
+def create_vsan_with_zone():
+#--------------------------------------------------------------------------------
+# Procedure that asks user for VSAN config and creates it (with default zoning)
+#
+# parameters:
+#	none
+# return:
+#	none
+#--------------------------------------------------------------------------------
+	global VSAN_A
+	global VSAN_B
+	print 'Please enter the VSAN id for your 1st SAN fabric'
+	VSAN_A = get_valid_input_choice('VSAN id <1-3839>:', str(range(1,3840)))
+	print 'Please enter the VSAN id for your 2nd SAN fabric'
+	VSAN_B = get_valid_input_choice('VSAN id <1-3839>:', str(range(1,3840)))
+	vsan_command_set = ('system-view ;'
+						'vsan ' + VSAN_A + ' ;'
+						'zone default-zone permit ;'
+						'quit ;'
+						'vsan ' + VSAN_B + ' ;'
+						'zone default-zone permit ;'
+						'quit'
+	)
+	print 'Configuring VSANs ...\n'
+	cli_session = comware.CLI(vsan_command_set, False)
+
+def create_fcoe_vlan():
+#--------------------------------------------------------------------------------
+# Procedure that asks user for VLAN config, VSAN mapping and creates it
+#
+# parameters:
+#	none
+# return:
+#	none
+#--------------------------------------------------------------------------------
+	global VLAN_A
+	global VLAN_B
+	print 'Please enter the FCoE VLAN id for your 1st SAN fabric'
+	VLAN_A = get_valid_input_choice('VLAN id <1-4094>:', str(range(1,4095)))
+	print 'Please enter the FCoE VLAN id for your 2nd SAN fabric'
+	VLAN_B = get_valid_input_choice('VLAN id <1-4094>:', str(range(1,4095)))
+	fcoe_vlan_command_set = ('system-view ;'
+						'vlan ' + VLAN_A + ' ;'
+						'description To_SAN_A ;'
+						'fcoe enable vsan ' + VSAN_A + ' ;'
+						'quit ;'
+						'vlan ' + VLAN_B + ' ;'
+						'description To_SAN_B ;'
+						'fcoe enable vsan ' + VSAN_B + ' ;'
+						'quit'
+	)
+	print 'Configuring FCoE VLANs ...\n'
+	cli_session = comware.CLI(fcoe_vlan_command_set, False)
+
+def create_vlan(vlan_list):
+#--------------------------------------------------------------------------------
+# Procedure that creates VLAN provided in vlan_list
+#
+# parameters:
+#	vlan_list : list of VLAN to be created
+# return:
+#	none
+#--------------------------------------------------------------------------------
+	vlan_command_set = 'system-view ;'
+	for vlan_index in range(len(vlan_list)):
+		vlan_command_set += 'vlan ' + vlan_list[int(vlan_index)] + ' ;'
+	print 'Configuring data VLANs ...\n'
+	cli_session = comware.CLI(vlan_command_set, False)
+	
+def get_server_data_vlan():
+#--------------------------------------------------------------------------------
+# Procedure that asks user for server port configuration
+#(data VLAN to be carried over)
+#
+# parameters:
+#	none
+# return:
+#	list of data VLAN, the first one is untagged (pvid)
+#--------------------------------------------------------------------------------
+	print 'Please enter the untagged data VLAN id (pvid)'
+	data_vlan = []
+	data_vlan.append (get_valid_input_choice('VLAN id <1-4094>:', str(range(1,4095))))
+	print 'Do you want to add tagged data VLAN ?'
+	trunk = get_valid_input_choice('Yes(Y) or No(N): ', ['Y','N'])
+	if trunk == 'Y':
+		i = 1
+		vlan_choice = 5000
+		while (vlan_choice != 0):
+			print 'Please enter tagged data VLAN id or type 0 to Quit'
+			vlan_choice = get_valid_input_choice('VLAN id <1-4094> or 0 to quit:', range(0,4095))
+			if vlan_choice != 0:
+				data_vlan[i] = vlan_choice
+				i = i + 1
+	#ensure that VLANs exist
+	create_vlan(data_vlan)
+	return data_vlan
+
+def create_bagg_server(id, description, mode):
+#--------------------------------------------------------------------------------
+# Procedure that creates bridge-aggregation interface for server
+#
+# parameters:
+#	bagg_id of the BAGG
+#	description of the interface
+#	mode of the BAGG (dynamic or static)
+# return:
+#	none
+#--------------------------------------------------------------------------------
+	bagg_command_set = ('system-view ;'
+						'interface bridge-aggregation ' + id + ' ;'
+						'description "' + description + '" ;'
+	)
+	if mode == 'dynamic':
+		bagg_command_set += 'link-aggregation mode dynamic ;'
+		bagg_command_set += 'lacp edge-port'
+	print 'Configuring Bridge-Aggregation ...\n'
+	cli_session = comware.CLI(bagg_command_set, False)
+
+def configure_server_interface(server_interface_id, intf, server_id, bagg_id):
+#--------------------------------------------------------------------------------
+# Procedure that configures physical interface for server
+#
+# parameters:
+#	server_interface_id: id of the server interface (1 or 2) 
+#	intf: physical interface connected to the server
+# 	server_id: used for interface description
+#	bagg_id:   bridge-aggregation id used for that interface
+# return:
+#	none
+#--------------------------------------------------------------------------------
+	server_link_command_set = ('system-view ;'
+								'interface ten-gigabitethernet ' + intf + ' ;'
+								'description "To_server ' + server_id + '" ;'
+								'port link-aggregation group ' + bagg_id + ' ;'
+								'lldp enable ;'
+								'lldp tlv-enable dot1-tlv dcbx ;'
+								'qos apply policy DCBX outbound ;'
+								'priority-flow-control auto ;'
+								'priority-flow-control no-drop dot1p 3 ;'
+								'qos trust dot1p ;'
+								'qos wrr byte-count ;'
+								'qos wrr af1 group 1 byte-count ' + ETS_AF1 + ' ;'
+								'qos wrr be group 1 byte-count ' + ETS_BE + ' ;'
+								'qos wrr af2 group sp ;'
+								'qos wrr af3 group sp ;'
+								'qos wrr af4 group sp ;'
+								'qos wrr ef group sp ;'
+								'qos wrr cs6 group sp ;'
+								'qos wrr cs7 group sp ;'
+								'quit ;'
+								'interface vfc ' + server_interface_id + server_id + ' ;'
+								'fc mode f ;'
+								'bind interface ten-gigabitethernet ' + intf + ' ;'
+								'description "To_server ' + server_id + '" ;'
+	)
+	if server_interface_id == '1':
+		server_link_command_set += 'port trunk vsan ' + VSAN_A
+	elif server_interface_id == '2':
+		server_link_command_set += 'port trunk vsan ' + VSAN_B
+	print 'Configuring physical interface ' + intf + '...\n'
+	cli_session = comware.CLI(server_link_command_set, False)
+
+def configure_server_bagg(bagg_id, vlan_list):
+#--------------------------------------------------------------------------------
+# Procedure that configures BAGG interface for server
+#
+# parameters:
+#	bagg_id:   bridge-aggregation id used for that interface
+#	vlan_list: list of data vlan for this server interface (first one is pvid) 
+# return:
+#	none
+#--------------------------------------------------------------------------------
+	bagg_link_command_set = ('system-view ;'
+							'interface bridge-aggregation ' + bagg_id + ' ;'
+							'port link-type trunk ;'
+							'port trunk permit vlan ' + vlan_list[0] + ' ' + VLAN_A + ' ' + VLAN_B + ' ;'
+							'port trunk pvid vlan ' + vlan_list[0] + ' ;'
+							'undo port trunk permit vlan 1 ;'
+	)
+	if len(vlan_list) > 1:
+		i = 1
+		while i < len(vlan_list):
+			server_link_command_set += 'port trunk permit vlan ' + vlan_list[i] + ' ;'
+			i += 1
+	cli_session = comware.CLI(bagg_link_command_set, False)
+
+def create_server_links():
+#--------------------------------------------------------------------------------
+# Procedure that asks user for server port configuration (limited to 10gbE port)
+# Use a loop to configure multiple servers (up to 40)
+# Uses BAGG auto-numbering starting from id SERVER_BAGG_STARTING_ID
+# Each server should have 2x NIC
+#
+# parameters:
+#	none
+# return:
+#	none
+#--------------------------------------------------------------------------------
+	print 'How many physical server do you want to connect ?'
+	server_number = int(get_valid_input_choice('<1-40> ', str(range(1,41))))
+	bulk_vlan_config = 'N'
+	bulk_lacp_config = 'S'
+	#ask for storage bandwidth percentage
+	set_storage_ets_bandwidth('server')
+	#bulk configuration for multiple servers
+	if server_number > 1:
+		print 'Do you want to use the same data VLAN for all these servers ?'
+		bulk_vlan_config = get_valid_input_choice('Yes(Y) or No(N): ', ['Y','N'])
+		if bulk_vlan_config == 'Y': 
+			data_vlan_list = get_server_data_vlan()
+		print 'Do you want to use LACP with these servers ?'
+		bulk_lacp_config = get_valid_input_choice('All(A), None(N), Some(S): ', ['A','N','S'])
+	#server links configuration	
+	for i in range(1,server_number + 1):
+		print 'Configuring ports for server ' + str(i)
+		if bulk_vlan_config == 'N':
+			data_vlan_list = get_server_data_vlan()
+		#get physical interface to the server
+		print 'Please enter the 1st physical port connected to this server'
+		nic1 = get_valid_input_choice('<1-2>/0/<1-48>: ', INTERFACE_RANGE_LIST)
+		print 'Please enter the 2nd physical port connected to this server'
+		nic2 = get_valid_input_choice('<1-2>/0/<1-48>: ', INTERFACE_RANGE_LIST)
+		#configure bridge aggregation
+		if bulk_lacp_config == 'A':
+			lacp_mode = 'dynamic'
+		elif bulk_lacp_config == 'N':
+			lacp_mode = 'static'
+		elif bulk_lacp_config == 'S':
+			print 'Do you want to activate LACP for this server ?'
+			if (get_valid_input_choice('Yes(Y) or No(N): ', ['Y','N'])) == 'Y':
+				lacp_mode = 'dynamic'
+			else :
+				lacp_mode = 'static'
+		create_bagg_server(str(SERVER_BAGG_STARTING_ID + i), 'To_server_' + str(i), lacp_mode)
+		configure_server_interface('1',nic1,str(i),str(SERVER_BAGG_STARTING_ID + i))
+		configure_server_interface('2',nic2,str(i),str(SERVER_BAGG_STARTING_ID + i))
+		configure_server_bagg(str(SERVER_BAGG_STARTING_ID + i), data_vlan_list)
+
+def configure_npv_server_interface(server_interface_id, intf, server_id, bagg_id, port_type):
+#--------------------------------------------------------------------------------
+# Procedure that configures physical interface for server
+#
+# parameters:
+#	server_interface_id: id of the server interface (1 or 2) 
+#	intf: physical interface connected to the server
+# 	server_id: used for interface description
+#	bagg_id:   bridge-aggregation id used for that interface
+#	port_type: SAN port type can be FC or FCoE
+# return:
+#	none
+#--------------------------------------------------------------------------------
+
+
+
+	server_npv_link_command_set = ('system-view ;'
+								'interface ten-gigabitethernet ' + intf + ' ;'
+								'description To_server ' + server_id + ' ;'
+								'port link-aggregation group ' + bagg_id + ' ;'
+								'lldp enable ;'
+								'lldp tlv-enable dot1-tlv dcbx ;'
+								'qos apply policy DCBX outbound ;'
+								'priority-flow-control auto ;'
+								'priority-flow-control no-drop dot1p 3 ;'
+								'qos trust dot1p ;'
+								'qos wrr byte-count ;'
+								'qos wrr af1 group 1 byte-count ' + ETS_AF1 + ' ;'
+								'qos wrr be group 1 byte-count ' + ETS_BE + ' ;'
+								'qos wrr af2 group sp ;'
+								'qos wrr af3 group sp ;'
+								'qos wrr af4 group sp ;'
+								'qos wrr ef group sp ;'
+								'qos wrr cs6 group sp ;'
+								'qos wrr cs7 group sp ;'
+								'quit ;'
+								'interface vfc ' + server_interface_id + server_id + ' ;'
+								'fc mode f ;'
+								'bind interface ten-gigabitethernet ' + intf + ' ;'
+								'description To_server ' + server_id + ' ;'
+	)
+	if server_interface_id == '1':
+		server_npv_link_command_set += 'port trunk vsan ' + VSAN_A + ' ;'
+		server_npv_link_command_set += 'vsan ' + VSAN_A + ' ;'
+		if port_type == 'fc':
+			server_npv_link_command_set += 'npv traffic-map server-interface vfc ' + server_interface_id + server_id + ' external-interface Fc' + FC_SAN_A_PORT + ' ;'
+		elif port_type == 'fcoe':
+			server_npv_link_command_set += 'npv traffic-map server-interface vfc ' + server_interface_id + server_id + ' external-interface vfc' + FCOE_SAN_A_VFC + ' ;'
+	elif server_interface_id == '2':
+		server_npv_link_command_set += 'port trunk vsan ' + VSAN_B + ' ;'
+		server_npv_link_command_set += 'vsan ' + VSAN_B + ' ;'
+		if port_type == 'fc':
+			server_npv_link_command_set += 'npv traffic-map server-interface vfc ' + server_interface_id + server_id + ' external-interface Fc' + FC_SAN_B_PORT + ' ;'		
+		elif port_type == 'fcoe':
+			server_npv_link_command_set += 'npv traffic-map server-interface vfc ' + server_interface_id + server_id + ' external-interface vfc' + FCOE_SAN_B_VFC + ' ;'
+	print 'Configuring physical interface ' + intf + '...\n'
+	cli_session = comware.CLI(server_npv_link_command_set, False)
+	
+def create_npv_server_links(port_type):
+#--------------------------------------------------------------------------------
+# Procedure that asks user for server port configuration (limited to 10gbE port)
+# Use a loop to configure multiple servers (up to 40)
+# Uses BAGG auto-numbering starting from id SERVER_BAGG_STARTING_ID
+# Each server should have 2x NIC
+#
+# parameters:
+#	port_type: SAN port type can be FC or FCoE
+# return:
+#	none
+#--------------------------------------------------------------------------------
+
+	# check for already created servers
+	# current_servers = int (database_file('read', 1, position, 'none'))
+
+	print 'How many physical server do you want to connect ?'
+	server_number = int(get_valid_input_choice('<1-40> ', str(range(1,41))))
+	bulk_vlan_config = 'N'
+	bulk_lacp_config = 'S'
+	#ask for storage bandwidth percentage
+	set_storage_ets_bandwidth('server')
+	#bulk configuration for multiple servers
+	if server_number > 1:
+		print 'Do you want to use the same data VLAN for all these servers ?'
+		bulk_vlan_config = get_valid_input_choice('Yes(Y) or No(N): ', ['Y','N'])
+		if bulk_vlan_config == 'Y': 
+			data_vlan_list = get_server_data_vlan()
+		print 'Do you want to use LACP with these servers ?'
+		bulk_lacp_config = get_valid_input_choice('All(A), None(N), Some(S): ', ['A','N','S'])
+	#server links configuration	
+	for i in range(1,server_number + 1):
+		print 'Configuring ports for server ' + str(i)
+		if bulk_vlan_config == 'N':
+			data_vlan_list = get_server_data_vlan()
+		#get physical interface to the server
+		print 'Please enter the 1st physical port connected to this server'
+		nic1 = get_valid_input_choice('<1-2>/0/<1-48>: ', INTERFACE_RANGE_LIST)
+		print 'Please enter the 2nd physical port connected to this server'
+		nic2 = get_valid_input_choice('<1-2>/0/<1-48>: ', INTERFACE_RANGE_LIST)
+		#configure bridge aggregation
+		if bulk_lacp_config == 'A':
+			lacp_mode = 'dynamic'
+		elif bulk_lacp_config == 'N':
+			lacp_mode = 'static'
+		elif bulk_lacp_config == 'S':
+			print 'Do you want to activate LACP for this server ?'
+			if (get_valid_input_choice('Yes(Y) or No(N): ', ['Y','N'])) == 'Y':
+				lacp_mode = 'dynamic'
+			else :
+				lacp_mode = 'static'
+		create_bagg_server(str(SERVER_BAGG_STARTING_ID + i), 'To_server_' + str(i), lacp_mode)
+		configure_npv_server_interface('1',nic1,str(i),str(SERVER_BAGG_STARTING_ID + i),port_type)
+		configure_npv_server_interface('2',nic2,str(i),str(SERVER_BAGG_STARTING_ID + i),port_type)
+		configure_server_bagg(str(SERVER_BAGG_STARTING_ID + i), data_vlan_list)
+		
+	# update number of created servers
+	# database_file('write', 1, position, str(current_servers + server_number))
+		
+def configure_fcoe_storage_interface(storage_interface_id, interface, storage_id, pvid):
+#--------------------------------------------------------------------------------
+# Procedure that configures physical interface for FCoE storage array
+#
+# parameters:
+#	storage_interface_id: id of the storage interface (1 or 2) 
+#	interface: physical interface connected to the storage
+# 	storage_id: used for interface description
+#	pvid: VLAN number used for untagged traffic
+# return:
+#	none
+#--------------------------------------------------------------------------------
+	fcoe_storage_link_command_set = ('system-view ;'
+								'interface ten-gigabitethernet ' + interface + ' ;'
+								'description "To_FCoE_Storage "' + storage_id + ' ;'
+								'port link-type trunk ;'
+								'undo port trunk permit vlan 1 ;'
+								'port trunk permit vlan ' + pvid + ' ;'
+								'port trunk pvid vlan ' + pvid + ' ;'
+								'lldp enable ;'
+								'lldp tlv-enable dot1-tlv dcbx ;'
+								'qos apply policy DCBX outbound ;'
+								'priority-flow-control auto ;'
+								'priority-flow-control no-drop dot1p 3 ;'
+								'qos trust dot1p ;'
+								'qos wrr byte-count ;'
+								'qos wrr af1 group 1 byte-count ' + ETS_AF1_STORAGE + ' ;'
+								'qos wrr be group 1 byte-count ' + ETS_BE_STORAGE + ' ;'
+								'qos wrr af2 group sp ;'
+								'qos wrr af3 group sp ;'
+								'qos wrr af4 group sp ;'
+								'qos wrr ef group sp ;'
+								'qos wrr cs6 group sp ;'
+								'qos wrr cs7 group sp ;'
+	)
+	if storage_interface_id == '1':
+		fcoe_storage_link_command_set += 'port trunk permit vlan ' + VLAN_A + ' ;quit ;'
+	elif storage_interface_id == '2':
+		fcoe_storage_link_command_set += 'port trunk permit vlan ' + VLAN_B + ' ;quit ;'
+	#adding vFC configuration
+	fcoe_storage_link_command_set += 'interface vfc 3' + storage_interface_id + storage_id + ' ;fc mode f ;'
+	fcoe_storage_link_command_set += 'bind interface ten-gigabitethernet ' + interface + ' ;'
+	fcoe_storage_link_command_set += 'description "To_FCoE_Storage ' + storage_id + '" ;'
+	if storage_interface_id == '1':
+		fcoe_storage_link_command_set += 'port trunk vsan ' + VSAN_A + ' ;quit ;'
+	elif storage_interface_id == '2':
+		fcoe_storage_link_command_set += 'port trunk vsan ' + VSAN_B + ' ;quit ;'
+	print 'Configuring storage physical port ' + interface + '...\n'
+	cli_session = comware.CLI(fcoe_storage_link_command_set, False)
+	
+def create_fcoe_storage_links():	
+#--------------------------------------------------------------------------------
+# Procedure that asks user for FCoE storage port configuration (limited to 10gbE port)
+# Use a loop to configure multiple storage (up to 8)
+# Each FCoE storage array should have 2x NIC (no BAGG here)
+#
+# parameters:
+#	none
+# return:
+#	none
+#--------------------------------------------------------------------------------	
+	print 'How many storage arrays do you want to connect ?'
+	storage_number = int(get_valid_input_choice('<1-8> ', str(range(1,9))))
+	bulk_vlan_config = 'N'
+	#ask for storage bandwidth percentage
+	set_storage_ets_bandwidth('storage')
+	#bulk configuration for multiple storage arrays
+	if storage_number > 1:
+		print 'Do you want to use the same PVID for all these storage arrays ?'
+		bulk_vlan_config = get_valid_input_choice('Yes(Y) or No(N): ', ['Y','N'])
+		if bulk_vlan_config == 'Y':
+			print 'What is the PVID to use with all these systems ?'
+			storage_pvid = get_valid_input_choice('<1-4094> ', str(range(1,4095)))
+	#storage links configuration
+	for i in range(1,storage_number + 1):
+		print 'Configuring ports for storage array ' + str(i)
+		if bulk_vlan_config == 'N':
+			print 'What is the PVID to use with this system ?'
+			storage_pvid = get_valid_input_choice('<1-4094> ', str(range(1,4095)))
+		#create the PVID VLAN
+		cli_session = comware.CLI('system-view ; vlan ' + storage_pvid, False)
+		#get physical interface to the storage
+		print 'Please enter the 1st physical port connected to this storage array'
+		storage_nic1 = get_valid_input_choice('<1-2>/0/<1-48>: ', INTERFACE_RANGE_LIST)
+		print 'Please enter the 2nd physical port connected to this storage array'
+		storage_nic2 = get_valid_input_choice('<1-2>/0/<1-48>: ', INTERFACE_RANGE_LIST)
+		#configure the interfaces
+		configure_fcoe_storage_interface('1',storage_nic1,str(i),storage_pvid)
+		configure_fcoe_storage_interface('2',storage_nic2,str(i),storage_pvid)
+
+def configure_fcoe_npv_san_interface(san_interface_id, interface):
+#--------------------------------------------------------------------------------
+# Procedure that configures physical interface for FCoE SAN
+#
+# parameters:
+#	san_interface_id: id of the SAN interface (1 or 2) 
+#	interface: physical interface connected to the SAN
+# return:
+#	none
+#--------------------------------------------------------------------------------
+	fcoe_san_link_command_set = ('system-view ;'
+								'interface ten-gigabitethernet ' + interface + ' ;'
+								'description "To_SAN ' + san_interface_id + '" ;'
+								'port link-type access ;'
+								'lldp enable ;'
+								'lldp tlv-enable dot1-tlv dcbx ;'
+								'qos apply policy DCBX outbound ;'
+								'priority-flow-control auto ;'
+								'priority-flow-control no-drop dot1p 3 ;'
+								'qos trust dot1p ;'
+								'qos wrr byte-count ;'
+								'qos wrr af1 group 1 byte-count ' + ETS_AF1_STORAGE + ' ;'
+								'qos wrr be group 1 byte-count ' + ETS_BE_STORAGE + ' ;'
+								'qos wrr af2 group sp ;'
+								'qos wrr af3 group sp ;'
+								'qos wrr af4 group sp ;'
+								'qos wrr ef group sp ;'
+								'qos wrr cs6 group sp ;'
+								'qos wrr cs7 group sp ;'
+	)
+	if san_interface_id == '1':
+		fcoe_san_link_command_set += 'port access vlan ' + VLAN_A + ' ;quit ;'
+	elif san_interface_id == '2':
+		fcoe_san_link_command_set += 'port access vlan ' + VLAN_B + ' ;quit ;'
+	#adding vFC configuration
+	fcoe_san_link_command_set += 'interface vfc 30' + san_interface_id + ' ;fc mode np ;'
+	fcoe_san_link_command_set += 'bind interface ten-gigabitethernet ' + interface + ' ;'
+	fcoe_san_link_command_set += 'description "To_SAN ' + san_interface_id + '" ;'
+	if san_interface_id == '1':
+		fcoe_san_link_command_set += 'port trunk vsan ' + VSAN_A + ' ;quit ;'
+	elif san_interface_id == '2':
+		fcoe_san_link_command_set += 'port trunk vsan ' + VSAN_B + ' ;quit ;'
+	print 'Configuring SAN physical port ' + interface + '...\n'
+	cli_session = comware.CLI(fcoe_san_link_command_set, False)
+
+def create_fcoe_npv_san_links():	
+#--------------------------------------------------------------------------------
+# Procedure that asks user for FCoE SAN port configuration (limited to 10gbE port)
+# 2 links required (1 for SAN A, 1 for SAN B)
+#
+# parameters:
+#	none
+# return:
+#	none
+#--------------------------------------------------------------------------------	
+	print 'Configuring FCoE SAN ports... \n'
+	#get physical interface to the SAN fabric
+	print 'Please enter the 1st physical port, connected to the FCoE SAN fabric A'
+	FCOE_SAN_A_PORT = get_valid_input_choice('<1-2>/0/<1-48>: ', INTERFACE_RANGE_LIST)
+	print 'Please enter the 2nd physical port, connected to the FCoE SAN fabric B'
+	FCOE_SAN_B_PORT = get_valid_input_choice('<1-2>/0/<1-48>: ', INTERFACE_RANGE_LIST)
+	#configure the interfaces
+	configure_fcoe_npv_san_interface('1',FCOE_SAN_A_PORT)
+	configure_fcoe_npv_san_interface('2',FCOE_SAN_B_PORT)
+		
+def configure_fc_storage_interface(storage_interface_id, interface):
+#--------------------------------------------------------------------------------
+# Procedure that configures physical interface for FC storage array
+#
+# parameters:
+#	storage_interface_id: id of the storage interface (1 or 2) 
+#	interface: physical interface connected to the storage
+# return:
+#	none
+#--------------------------------------------------------------------------------
+	fc_storage_link_command_set = ('system-view ;'
+								'interface ten-gigabitethernet ' + interface + ' ;'
+								'port-type fc ;'
+								'fc mode f ;'
+								'speed auto ;'
+								'qos trust dot1p ;'
+	)
+	if storage_interface_id == '1':
+		fc_storage_link_command_set += 'port access vsan ' + VSAN_A + ' ;quit ;'
+	elif storage_interface_id == '2':
+		fc_storage_link_command_set += 'port access vsan ' + VSAN_B + ' ;quit ;'
+	print 'Configuring FC storage port ' + interface + '...\n'
+	cli_session = comware.CLI(fc_storage_link_command_set, False)
+
+def create_fc_storage_links():
+#--------------------------------------------------------------------------------
+# Procedure that asks user for FC storage port configuration (limited to 10gbE port)
+# Use a loop to configure multiple storage (up to 8)
+# Each FC storage array should have 2x HBA
+#
+# parameters:
+#	none
+# return:
+#	none
+#--------------------------------------------------------------------------------	
+	print 'How many storage arrays do you want to connect ?'
+	fc_storage_number = int(get_valid_input_choice('<1-8> ', str(range(1,9))))
+	#storage links configuration
+	for i in range(1,fc_storage_number + 1):
+		print 'Configuring ports for FC storage array ' + str(i)
+		#get physical interface to the storage
+		print 'Please enter the 1st physical port connected to this storage array'
+		fc_storage_nic1 = get_valid_input_choice('<1-2>/0/<1-48>: ', INTERFACE_RANGE_LIST)
+		print 'Please enter the 2nd physical port connected to this storage array'
+		fc_storage_nic2 = get_valid_input_choice('<1-2>/0/<1-48>: ', INTERFACE_RANGE_LIST)
+		#configure the interfaces
+		configure_fc_storage_interface('1',fc_storage_nic1)
+		configure_fc_storage_interface('2',fc_storage_nic2)
+
+def configure_fc_npv_san_interface(san_interface_id, interface):
+#--------------------------------------------------------------------------------
+# Procedure that configures physical interface for FC SAN connection
+#
+# parameters:
+#	san_interface_id: id of the storage interface (1 or 2) 
+#	interface: physical interface connected to the SAN
+# return:
+#	none
+#--------------------------------------------------------------------------------
+	fc_storage_link_command_set = ('system-view ;'
+								'interface ten-gigabitethernet ' + interface + ' ;'
+								'port-type fc ;'
+								'fc mode np ;'
+								'speed auto ;'
+								'qos trust dot1p ;'
+	)
+	if san_interface_id == '1':
+		fc_storage_link_command_set += 'port access vsan ' + VSAN_A + ' ;quit ;'
+	elif san_interface_id == '2':
+		fc_storage_link_command_set += 'port access vsan ' + VSAN_B + ' ;quit ;'
+	print 'Configuring FC storage port ' + interface + '...\n'
+	cli_session = comware.CLI(fc_storage_link_command_set, False)
+	
+def create_fc_npv_san_links():
+#--------------------------------------------------------------------------------
+# Procedure that asks user for FC SAN port configuration (2 links required)
+#
+# parameters:
+#	none
+# return:
+#	none
+#--------------------------------------------------------------------------------	
+	global FC_SAN_A_PORT
+	global FC_SAN_B_PORT
+	print 'Configuring FC SAN ports... \n'
+	#get physical interface to the SAN fabric
+	print 'Please enter the 1st physical port, connected to the FC SAN fabric A'
+	FC_SAN_A_PORT = get_valid_input_choice('<1-2>/0/<1-48>: ', INTERFACE_RANGE_LIST)
+	print 'Please enter the 2nd physical port, connected to the FC SAN fabric B'
+	FC_SAN_B_PORT = get_valid_input_choice('<1-2>/0/<1-48>: ', INTERFACE_RANGE_LIST)
+	#configure the interfaces
+	configure_fc_npv_san_interface('1',FC_SAN_A_PORT)
+	configure_fc_npv_san_interface('2',FC_SAN_B_PORT)	
+
+def get_fcoe_current_configuration():
+#--------------------------------------------------------------------------------
+# Procedure that asks user for current FCoE SAN connection configuration 
+#	
+# parameters:
+#	none
+# return:
+#	none
+#--------------------------------------------------------------------------------
+	global FCOE_SAN_A_PORT
+	global FCOE_SAN_B_PORT
+	global FCOE_SAN_A_VFC
+	global FCOE_SAN_B_VFC
+	print 'Please enter the 1st physical port, connected to the FCoE SAN fabric A'
+	FCOE_SAN_A_PORT = get_valid_input_choice('<1-2>/0/<1-48>: ', INTERFACE_RANGE_LIST)
+	print 'Please enter the 2nd physical port, connected to the FCoE SAN fabric B'
+	FCOE_SAN_B_PORT = get_valid_input_choice('<1-2>/0/<1-48>: ', INTERFACE_RANGE_LIST)
+	print 'What is the vFC interface number attached to FCoE SAN fabric A ?'
+	FCOE_SAN_A_VFC = get_valid_input_choice('<1-399> ', str(range(1,400)))
+	print 'What is the vFC interface number attached to FCoE SAN fabric B ?'
+	FCOE_SAN_B_VFC = get_valid_input_choice('<1-399> ', str(range(1,400)))
+
+def get_fc_current_configuration():
+#--------------------------------------------------------------------------------
+# Procedure that asks user for current FC SAN connection configuration 
+#	
+# parameters:
+#	none
+# return:
+#	none
+#--------------------------------------------------------------------------------
+	global FC_SAN_A_PORT
+	global FC_SAN_B_PORT
+	print 'Please enter the 1st physical port, connected to the FC SAN fabric A'
+	FC_SAN_A_PORT = get_valid_input_choice('<1-2>/0/<1-48>: ', INTERFACE_RANGE_LIST)
+	print 'Please enter the 2nd physical port, connected to the FC SAN fabric B'
+	FC_SAN_B_PORT = get_valid_input_choice('<1-2>/0/<1-48>: ', INTERFACE_RANGE_LIST)
+	
+def main_menu():
+	print '\n'
+	print '############################################################################'
+	print '# This script helps you to configure FC/FCoE configuration on this device. #'
+	print '# You will be able to automatically configure 2 air-gapped SAN Fabrics     #'
+	print '#   connecting you servers to your storage arrays.                         #'
+	print '# Current version of this script supports FCF configuration only.          #'
+	print '# Please ensure you have a backup of your configuration before using       #'
+	print '#   this script.                                                           #'
+	print '############################################################################'
+	print '\n'	
+	print '  - FC/FCoE FCF configuration :     Type 1'
+	print '  - FC/FCoE NPV configuration :     Type 2'
+	print '  - Quit :                          Type Q'
+	choice = get_valid_input_choice('\nYour choice : ', ['Q','1','2'])
+	return choice
+
+		
+#******************************************************************************
+# Main code
+#******************************************************************************
+
+init()
+
+# Check device model (FC capability)
+check_fc_capability()
+
+# Launch Menu
+choice = main_menu()
+print '\n'
+
+# FC/FCoE NPV configuration is requested
+if choice == '1':
+	FCOE_MODE = 'fcf'
+	# Check and set FCoE mode
+	fcoe_ready = check_and_set_fcoe_mode()
+	if fcoe_ready == 'nok':
+		print '\n[End of the script]\n'
+	else:
+		set_global_dcbx()
+		set_ets_mapping()
+		# request for VSAN (including default zoning)
+		create_vsan_with_zone()
+		# request for VLAN (including VSAN mapping)
+		create_fcoe_vlan()
+		# request for server connection
+		create_server_links()
+		print 'Do you want to configure FCoE storage array ?'
+		fcoe_storage = get_valid_input_choice('Yes(Y) or No(N): ', ['Y','N'])
+		if fcoe_storage == 'Y':
+			# request for FCOE storage connection
+			create_fcoe_storage_links()
+		if FC_CAPABILITY == 'yes':
+			print 'Do you want to configure FC storage array ?'
+			fc_storage = get_valid_input_choice('Yes(Y) or No(N): ', ['Y','N'])
+			if fc_storage == 'Y':
+				# request for FC storage connection
+				create_fc_storage_links()
+		save()
+		print '\n[End of the script]\n'
+
+if choice == '2':
+	FCOE_MODE = 'npv'
+	# Check and set FCoE mode
+	fcoe_ready = check_and_set_fcoe_mode()
+	if fcoe_ready == 'nok':
+		print '\n[End of the script]\n'
+	else:
+		set_global_dcbx()
+		set_ets_mapping()
+		# request for VSAN
+		create_vsan()
+		# request for VLAN (including VSAN mapping)
+		create_fcoe_vlan()
+		print 'Do you want to configure connection to the SAN fabric ?'
+		if get_valid_input_choice('Yes(Y) or No(N): ', ['Y','N']) == 'Y':
+			if FC_CAPABILITY == 'yes':
+				print 'Do you want to use FC port?'
+				fc_storage = get_valid_input_choice('Yes(Y) or No(N): ', ['Y','N'])
+				if fc_storage == 'Y':
+					# request for FC storage connection
+					create_fc_npv_san_links()
+					create_npv_server_links('fc')
+			print 'Do you want to use FCoE port?'
+			fcoe_storage = get_valid_input_choice('Yes(Y) or No(N): ', ['Y','N'])
+			if fcoe_storage == 'Y':
+				# request for FCOE storage connection
+				create_fcoe_npv_san_links()
+				create_npv_server_links('fcoe')
+		else:
+			if FC_CAPABILITY == 'yes':
+				print 'Do you want to map your servers to FC SAN fabric?'
+				fc_storage = get_valid_input_choice('Yes(Y) or No(N): ', ['Y','N'])
+				if fc_storage == 'Y':
+					# request for SAN FC configuration
+					get_fc_current_configuration()
+					# request for server connection
+					create_npv_server_links('fc')
+			print 'Do you want to map your server to FCoE SAN fabric?'
+			fcoe_storage = get_valid_input_choice('Yes(Y) or No(N): ', ['Y','N'])
+			if fcoe_storage == 'Y':
+				# request for SAN FCOE configuration
+				get_fcoe_current_configuration()
+				# request for server connection
+				create_npv_server_links('fcoe')
+		save()
+# Quit is requested
+else:
+	print "\nGoodbye !\n"
+
+print '\n[End of the script]\n'
+
