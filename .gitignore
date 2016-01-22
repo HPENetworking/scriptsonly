@@ -6,6 +6,8 @@
 .DS_Store
 HPE RealTime Flask/.idea/.name
 
+.idea/
+
 .idea/encodings.xml
 
 .idea/HPE RealTime Flask.iml
