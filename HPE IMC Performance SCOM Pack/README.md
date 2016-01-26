@@ -8,6 +8,20 @@ If you want to test the script without scom, you can run the script using the fo
 SCOM_iMC_Perf_Integration_v0.3.ps1 <type> <Device IP Address>
 Where <type> is either csv or txt, and <Device IP Address> is an ip address of a device managed in iMC
 
+Before trying the powershell script you have to modify iMC connexion parameters in the # iMC Connection variable and initialization section:
+$imchost = "<iMC IP Address>"
+$imcport = "<iMC Port>"
+$imcprot = "<http or https>"
+$iMCUser = "<iMC user>"
+$iMCPWD = "<iMC Password>"
+
+Also before importing SCOM management pack, you have to modify iMC connexion parameters in the # iMC Connection variable and initialization section of the xml file:
+$imchost = "<iMC IP Address>"
+$imcport = "<iMC Port>"
+$imcprot = "<http or https>"
+$iMCUser = "<iMC user>"
+$iMCPWD = "<iMC Password>"
+
 This sample app is provided under an Apache2 license. 
 
  Copyright 2016 Hewlett Packard Enterprise Development LP.
