@@ -18,6 +18,11 @@ The following scripts were used in this presentation during HPE ETSS 2016 and ar
 only.
 
 They are provided in (iPython){http://jupyter.org/} notebook format.
+
+## Things to be aware of
+
+The file **githubsuser.py** must be modified wtih your username and password if you wish to recreate this in your own lab.
+
  
 Python dependencies can be loaded using
 
