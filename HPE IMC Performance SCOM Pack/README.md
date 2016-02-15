@@ -8,8 +8,8 @@ This performance pack use PowerShell script "SCOM_iMC_Perf_Integration_v0.3.ps1"
 The SCOM performance pack itself (you can import in SCOM) is "perfiMC.integration.xml".
 
 If you want to test the script without scom, you can run the script using the following syntax (and result will be exported in a txt or csv file):<BR>
-<tab>SCOM_iMC_Perf_Integration_v0.3.ps1 &lt;type&gt; &lt;Device IP Address&gt;<br>
-<tab><tab>Where &lt;type&gt; is either csv or txt, and &lt;Device IP Address&gt; is an ip address of a device managed in iMC
+&nbsp;&nbsp;&nbsp;&nbsp;SCOM_iMC_Perf_Integration_v0.3.ps1 &lt;type&gt; &lt;Device IP Address&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Where &lt;type&gt; is either csv or txt, and &lt;Device IP Address&gt; is an ip address of a device managed in iMC
 
 Before trying the powershell script you have to modify iMC connexion parameters in the "# iMC Connection variable and initialization" section:<BR>
 $imchost = "&lt;iMC IP Address&gt;"<BR>
