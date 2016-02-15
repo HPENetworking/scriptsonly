@@ -1,101 +1,3 @@
-﻿<?xml version="1.0" encoding="utf-8"?><ManagementPack ContentReadable="true" SchemaVersion="2.0" OriginalSchemaVersion="1.1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <Manifest>
-    <Identity>
-      <ID>perfiMC.integration</ID>
-      <Version>1.1.0.1</Version>
-    </Identity>
-    <Name>perfiMC integration</Name>
-    <References>
-      <Reference Alias="SCInternal">
-        <ID>Microsoft.SystemCenter.Internal</ID>
-        <Version>7.0.8433.0</Version>
-        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
-      </Reference>
-      <Reference Alias="SC">
-        <ID>Microsoft.SystemCenter.Library</ID>
-        <Version>7.0.8433.0</Version>
-        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
-      </Reference>
-      <Reference Alias="Windows">
-        <ID>Microsoft.Windows.Library</ID>
-        <Version>7.5.8501.0</Version>
-        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
-      </Reference>
-      <Reference Alias="Health">
-        <ID>System.Health.Library</ID>
-        <Version>7.0.8433.0</Version>
-        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
-      </Reference>
-      <Reference Alias="System">
-        <ID>System.Library</ID>
-        <Version>7.5.8501.0</Version>
-        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
-      </Reference>
-      <Reference Alias="Performance">
-        <ID>System.Performance.Library</ID>
-        <Version>7.0.8433.0</Version>
-        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
-      </Reference>
-      <Reference Alias="NetworkLibrary">
-        <ID>System.NetworkManagement.Library</ID>
-        <Version>7.1.10226.0</Version>
-        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
-      </Reference>
-      <Reference Alias="SCDW">
-        <ID>Microsoft.SystemCenter.DataWarehouse.Library</ID>
-        <Version>7.1.10226.0</Version>
-        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
-      </Reference>
-    </References>
-  </Manifest>
-  <TypeDefinitions>
-    <ModuleTypes>
-      <DataSourceModuleType ID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.4.ps1.DataSourceModuleType" Accessibility="Internal" Batching="false">
-        <Configuration>
-          <xsd:element type="xsd:integer" name="TimeoutSeconds" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
-          <xsd:element type="xsd:integer" name="IntervalSeconds" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
-        </Configuration>
-        <OverrideableParameters>
-          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
-          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
-        </OverrideableParameters>
-        <ModuleImplementation Isolation="Any">
-          <Composite>
-            <MemberModules>
-              <DataSource ID="Scheduler" TypeID="System!System.Scheduler">
-                <Scheduler>
-                  <SimpleReccuringSchedule>
-                    <Interval Unit="Seconds">$Config/IntervalSeconds$</Interval>
-                  </SimpleReccuringSchedule>
-                  <ExcludeDates />
-                </Scheduler>
-              </DataSource>
-              <ProbeAction ID="Probe" TypeID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.4.ps1.ProbeActionModuleType">
-                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
-              </ProbeAction>
-            </MemberModules>
-            <Composition>
-              <Node ID="Probe">
-                <Node ID="Scheduler" />
-              </Node>
-            </Composition>
-          </Composite>
-        </ModuleImplementation>
-        <OutputType>System!System.PropertyBagData</OutputType>
-      </DataSourceModuleType>
-      <ProbeActionModuleType ID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.4.ps1.ProbeActionModuleType" Accessibility="Internal" Batching="false" PassThrough="false">
-        <Configuration>
-          <xsd:element type="xsd:integer" name="TimeoutSeconds" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
-        </Configuration>
-        <OverrideableParameters>
-          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
-        </OverrideableParameters>
-        <ModuleImplementation Isolation="Any">
-          <Composite>
-            <MemberModules>
-              <ProbeAction ID="Probe" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagTriggerOnlyProbe">
-                <ScriptName>SCOM_iMC_Perf_Integration_v0.4.ps1</ScriptName>
-                <ScriptBody>
 # Copyright 2016 Hewlett Packard Enterprise Development LP.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -186,7 +88,7 @@ Function imcDeviceLookup
 {  
 param ($itemIP)                    
  
-    $url = $ImcApiBaseUrl + "plat/res/device?" + "ip" + "=" + $itemIP + "&amp;exact=true"
+    $url = $ImcApiBaseUrl + "plat/res/device?" + "ip" + "=" + $itemIP + "&exact=true"
  
     if ($Debug_Activate) {Write-Host "--Debug-- URL: $url"}
  
@@ -255,7 +157,7 @@ $PerfDataList = @()
 
 	foreach ($item in $TaskIDs) {
 		if ($Debug_Activate) {write-host "--Debug-- Task ID: $item"}
-		$url = $ImcApiBaseUrl + "perf/summaryData?" + "taskId" + "=" + $item + "&amp;devId" + "=" + $DevID + "&amp;dataGranularity=1"
+		$url = $ImcApiBaseUrl + "perf/summaryData?" + "taskId" + "=" + $item + "&devId" + "=" + $DevID + "&dataGranularity=1"
 		
 		if ($Debug_Activate) {Write-Host "--Debug-- URL: $url"}
 		
@@ -414,79 +316,3 @@ else {
 if ($outputType -eq "scom") {
 	$api.LogScriptEvent("SCOM_iMC_Perf_integration.ps1",101,1,"Ending get performance data in iMC through rest API for device $deviceIP")
 }
-
-</ScriptBody>
-                <Parameters>
-                  <Parameter>
-                    <Name>outputType</Name>
-                    <Value>scom</Value>
-                  </Parameter>
-                </Parameters>
-                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
-              </ProbeAction>
-            </MemberModules>
-            <Composition>
-              <Node ID="Probe" />
-            </Composition>
-          </Composite>
-        </ModuleImplementation>
-        <OutputType>System!System.PropertyBagData</OutputType>
-        <TriggerOnly>true</TriggerOnly>
-      </ProbeActionModuleType>
-    </ModuleTypes>
-  </TypeDefinitions>
-  <Monitoring>
-    <Rules>
-      <Rule ID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.4.ps1" Comment="&lt;Silect&gt;&lt;Op&gt;Created&lt;/Op&gt;&lt;User&gt;HPINTELCO\fgir&lt;/User&gt;&lt;Previous/&gt;&lt;LastModified&gt;2015-06-01 11:20:56Z&lt;/LastModified&gt;&lt;/Silect&gt;" Enabled="true" Target="SC!Microsoft.SystemCenter.ManagementServer" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
-        <Category>PerformanceCollection</Category>
-        <DataSources>
-          <DataSource ID="DataSource" TypeID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.4.ps1.DataSourceModuleType">
-            <TimeoutSeconds>300</TimeoutSeconds>
-            <IntervalSeconds>120</IntervalSeconds>
-          </DataSource>
-        </DataSources>
-        <ConditionDetection ID="System.Performance.DataGenericMapper" TypeID="Performance!System.Performance.DataGenericMapper">
-          <ObjectName>Network Device</ObjectName>
-          <CounterName>$Data/Property[@Name='Counter']$</CounterName>
-          <InstanceName>$Data/Property[@Name='Instance']$</InstanceName>
-          <Value>$Data/Property[@Name='PerfValue']$</Value>
-        </ConditionDetection>
-        <WriteActions>
-          <WriteAction ID="Microsoft.SystemCenter.CollectPerformanceData" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
-          <WriteAction ID="Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
-        </WriteActions>
-      </Rule>
-    </Rules>
-  </Monitoring>
-  <LanguagePacks>
-    <LanguagePack ID="ENU" IsDefault="true">
-      <DisplayStrings>
-        <DisplayString ElementID="perfiMC.integration">
-          <Name>perfiMC integration</Name>
-          <Description>Integrate iMC perf data in SCOM (CPU, Memory, Reachability and bandwidth</Description>
-        </DisplayString>
-        <DisplayString ElementID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.4.ps1.ProbeActionModuleType">
-          <Name>perfiMC integration Microsoft SystemCenter ManagementServer Rule SCOM iMC Perf Integration v0 4 ps1 ProbeActionModuleType</Name>
-          <Description>Probe Action Module Type for Performance Rule: perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.4.ps1</Description>
-        </DisplayString>
-        <DisplayString ElementID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.4.ps1.ProbeActionModuleType" SubElementID="TimeoutSeconds">
-          <Name>Timeout Seconds</Name>
-        </DisplayString>
-        <DisplayString ElementID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.4.ps1.DataSourceModuleType">
-          <Name>perfiMC integration Microsoft SystemCenter ManagementServer Rule SCOM iMC Perf Integration v0 4 ps1 DataSourceModuleType</Name>
-          <Description>Data Source Module Type for Performance Rule: perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.4.ps1</Description>
-        </DisplayString>
-        <DisplayString ElementID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.4.ps1.DataSourceModuleType" SubElementID="TimeoutSeconds">
-          <Name>Timeout Seconds</Name>
-        </DisplayString>
-        <DisplayString ElementID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.4.ps1.DataSourceModuleType" SubElementID="IntervalSeconds">
-          <Name>Interval Seconds</Name>
-        </DisplayString>
-        <DisplayString ElementID="perfiMC.integration.Microsoft.SystemCenter.ManagementServer.Rule.SCOM_iMC_Perf_Integration_v0.4.ps1">
-          <Name>perfiMC integration Microsoft SystemCenter ManagementServer Rule SCOM iMC Perf Integration v0 4 ps1</Name>
-          <Description>Created by HPINTELCO\fgir at 6/1/2015 1:20:28 PM using MP Author</Description>
-        </DisplayString>
-      </DisplayStrings>
-    </LanguagePack>
-  </LanguagePacks>
-</ManagementPack>
