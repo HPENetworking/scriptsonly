@@ -2,25 +2,28 @@
 
 
 This application primary goal is to add a performance pack in SCOM which get performance data from iMC using eAPI.
+
 This performance pack use PowerShell script "SCOM_iMC_Perf_Integration_v0.3.ps1".
+
 The SCOM performance pack itself (you can import in SCOM) is "perfiMC.integration.xml".
-If you want to test the script without scom, you can run the script using the following syntax (and result will be exported in a txt or csv file):
-SCOM_iMC_Perf_Integration_v0.3.ps1 <type> <Device IP Address>
-Where <type> is either csv or txt, and <Device IP Address> is an ip address of a device managed in iMC
+
+If you want to test the script without scom, you can run the script using the following syntax (and result will be exported in a txt or csv file):<BR>
+SCOM_iMC_Perf_Integration_v0.3.ps1 &lt;type&gt; &lt;Device IP Address&gt;
+Where &lt;type&gt; is either csv or txt, and &lt;Device IP Address&gt; is an ip address of a device managed in iMC
 
 Before trying the powershell script you have to modify iMC connexion parameters in the # iMC Connection variable and initialization section:
-$imchost = "<iMC IP Address>"
-$imcport = "<iMC Port>"
-$imcprot = "<http or https>"
-$iMCUser = "<iMC user>"
-$iMCPWD = "<iMC Password>"
+$imchost = "&lt;iMC IP Address&gt;"
+$imcport = "&lt;iMC Port&gt;"
+$imcprot = "&lt;http or https&gt;"
+$iMCUser = "&lt;iMC user&gt;"
+$iMCPWD = "&lt;iMC Password&gt;"
 
 Also before importing SCOM management pack, you have to modify iMC connexion parameters in the # iMC Connection variable and initialization section of the xml file:
-$imchost = "<iMC IP Address>"
-$imcport = "<iMC Port>"
-$imcprot = "<http or https>"
-$iMCUser = "<iMC user>"
-$iMCPWD = "<iMC Password>"
+$imchost = "&lt;iMC IP Address&gt;"
+$imcport = "&lt;iMC Port&gt;"
+$imcprot = "&lt;http or https&gt;"
+$iMCUser = "&lt;iMC user&gt;"
+$iMCPWD = "&lt;iMC Password&gt;"
 
 --------- New update 02-15-2016 --------------------------------------
 
