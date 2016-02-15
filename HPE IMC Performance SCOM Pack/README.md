@@ -8,25 +8,26 @@ This performance pack use PowerShell script "SCOM_iMC_Perf_Integration_v0.3.ps1"
 The SCOM performance pack itself (you can import in SCOM) is "perfiMC.integration.xml".
 
 If you want to test the script without scom, you can run the script using the following syntax (and result will be exported in a txt or csv file):<BR>
-SCOM_iMC_Perf_Integration_v0.3.ps1 &lt;type&gt; &lt;Device IP Address&gt;
-Where &lt;type&gt; is either csv or txt, and &lt;Device IP Address&gt; is an ip address of a device managed in iMC
+<tab>SCOM_iMC_Perf_Integration_v0.3.ps1 &lt;type&gt; &lt;Device IP Address&gt;<br>
+<tab><tab>Where &lt;type&gt; is either csv or txt, and &lt;Device IP Address&gt; is an ip address of a device managed in iMC
 
-Before trying the powershell script you have to modify iMC connexion parameters in the # iMC Connection variable and initialization section:
-$imchost = "&lt;iMC IP Address&gt;"
-$imcport = "&lt;iMC Port&gt;"
-$imcprot = "&lt;http or https&gt;"
-$iMCUser = "&lt;iMC user&gt;"
+Before trying the powershell script you have to modify iMC connexion parameters in the "# iMC Connection variable and initialization" section:<BR>
+$imchost = "&lt;iMC IP Address&gt;"<BR>
+$imcport = "&lt;iMC Port&gt;"<BR>
+$imcprot = "&lt;http or https&gt;"<BR>
+$iMCUser = "&lt;iMC user&gt;"<BR>
 $iMCPWD = "&lt;iMC Password&gt;"
 
-Also before importing SCOM management pack, you have to modify iMC connexion parameters in the # iMC Connection variable and initialization section of the xml file:
-$imchost = "&lt;iMC IP Address&gt;"
-$imcport = "&lt;iMC Port&gt;"
-$imcprot = "&lt;http or https&gt;"
-$iMCUser = "&lt;iMC user&gt;"
-$iMCPWD = "&lt;iMC Password&gt;"
+Also before importing SCOM management pack, you have to modify iMC connexion parameters in the "# iMC Connection variable and initialization" section of the xml file:<BR>
+$imchost = "&lt;iMC IP Address&gt;"<BR>
+$imcport = "&lt;iMC Port&gt;"<BR>
+$imcprot = "&lt;http or https&gt;"<BR>
+$iMCUser = "&lt;iMC user&gt;"<BR>
+$iMCPWD = "&lt;iMC Password&gt;"<BR>
 
---------- New update 02-15-2016 --------------------------------------
-
+---------------------------------------------------------------------<BR>
+New update 02-15-2016
+---------------------------------------------------------------------<BR>
 Found and correct an issue in the management pack for some systems ...
 Added a new release (0.4) of the script (included in management pack) to also get bandwidth usage and un-reachability from iMC.
 Also added some debug flags in the script.
