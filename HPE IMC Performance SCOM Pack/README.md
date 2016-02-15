@@ -23,9 +23,11 @@ $iMCUser = "<iMC user>"
 $iMCPWD = "<iMC Password>"
 
 --------- New update 02-15-2016 --------------------------------------
+
 Found and correct an issue in the management pack for some systems ...
 Added a new release (0.4) of the script (included in management pack) to also get bandwidth usage and un-reachability from iMC.
 Also added some debug flags in the script.
+
 ----------------------------------------------------------------------
 
 This sample app is provided under an Apache2 license. 
