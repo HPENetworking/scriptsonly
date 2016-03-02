@@ -75,15 +75,28 @@ def locate():
     error = None
     if request.method == "POST":
         auth = requests.auth.HTTPDigestAuth(session['username'],session['password'])
-        location = get_real_time_locate(request.form.get('host'), auth=auth, url=session['url'])
-        if len(location) < 1 :
+        locations = get_real_time_locate(request.form.get('host'), auth=auth, url=session['url'])
+        
+        if len(locations) < 1 :
             error = 'Unable to find host'
             return render_template('realtimelocate.html', error=error)
-        devicedetails = get_dev_details(location['deviceIp'], auth=auth, url=session['url'])
+
+        devicedetailsList=[]
+        locationDataList=[]
+        for location in locations:
+            devicedetails = get_dev_details(location['deviceIp'], auth=auth, url=session['url'])
+            devicedetailsList.append(devicedetails)
+            locationData=dict(location)
+            locationData.update(devicedetails)
+            locationDataList.append(locationData)
+
         flash("Host Located")
         flash("Proof of Concept Real-Time Location App")
-        session['host'] = location
-        session['device'] = devicedetails
+
+        session['hosts'] = locations
+        session['devices'] = devicedetailsList
+        session['locationDataList'] = locationDataList
+
         return redirect(url_for('results'))
     if 'login' not in session:
         error = "User not logged in"
@@ -98,27 +111,31 @@ def results():
         auth = requests.auth.HTTPDigestAuth(session['username'],session['password'])
         #Take Action on Interface Information Section
         if request.form['action'] == 'down':
-            set_inteface_down(devid=session['host']['deviceId'],ifindex=session['host']['ifIndex'],auth=auth,url=session['url'])
-            flash("Port State Changed to Admin Down")
+            for host in session['hosts']:
+                set_inteface_down(devid=host['deviceId'],ifindex=host['ifIndex'],auth=auth,url=session['url'])
+                flash("Port " +  host['ifDesc'] + " State Changed to Admin Down")
             return render_template('results.html', url=session['url'], username=session['username'], password=session['password']
-                           , host=session['host'], device=session['device'])
+                           , hosts=session['hosts'], devices=session['devices'], locationDataList=session['locationDataList'])
         elif request.form['action'] == 'up':
-            set_inteface_up(devid=session['host']['deviceId'],ifindex=session['host']['ifIndex'],auth=auth,url=session['url'])
-            flash('Port State Changed to Admin Up')
+            for host in session['hosts']:
+                set_inteface_up(devid=host['deviceId'],ifindex=host['ifIndex'],auth=auth,url=session['url'])
+                flash('Port ' +  host['ifDesc'] +' State Changed to Admin Up')
             return render_template('results.html', url=session['url'], username=session['username'], password=session['password']
-                           , host=session['host'], device=session['device'])
+                           , hosts=session['hosts'], devices=session['devices'], locationDataList=session['locationDataList'])
         elif request.form['action'] == 'epoe':
-            cmd_list = ['system-view', 'interface '+ session['host']['ifDesc'], 'poe enable']
-            run_dev_cmd(devid=session['host']['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'] )
-            flash("PoE Enabled on Interface" +  session['host']['ifDesc'])
+            for host in session['hosts']:
+                cmd_list = ['system-view', 'interface '+ host['ifDesc'], 'poe enable']
+                run_dev_cmd(devid=host['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'] )
+                flash("PoE Enabled on Interface " +  host['ifDesc'])
             return render_template('results.html', url=session['url'], username=session['username'], password=session['password']
-                           , host=session['host'], device=session['device'])
+                           , hosts=session['hosts'], devices=session['devices'], locationDataList=session['locationDataList'])
         elif request.form['action'] == 'dpoe':
-            cmd_list = ['system-view', 'interface '+session['host']['ifDesc'], 'undo poe enable']
-            run_dev_cmd(devid=session['host']['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'] )
-            flash("PoE Disabled on Interface" +  session['host']['ifDesc'])
+            for host in session['hosts']:
+                cmd_list = ['system-view', 'interface '+host['ifDesc'], 'undo poe enable']
+                run_dev_cmd(devid=host['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'] )
+                flash("PoE Disabled on Interface " +  host['ifDesc'])
             return render_template('results.html', url=session['url'], username=session['username'], password=session['password']
-                           , host=session['host'], device=session['device'])
+                           , hosts=session['hosts'], devices=session['devices'], locationDataList=session['locationDataList'])
 
         #Get Interface Information Section
         elif request.form['action'] == 'macq':
@@ -130,35 +147,48 @@ def results():
                        #    , host=session['host'], device=session['device'],macq = macq )
 
         elif request.form['action'] == 'stats':
-            cmd_list = ['system-view', 'display interface ' + session['host']['ifDesc']]
-            instats = run_dev_cmd(devid=session['host']['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'] )
+            instats = []
+            for host in session['hosts']:
+                cmd_list = ['display interface ' + host['ifDesc']]
+                instats.append(run_dev_cmd(devid=host['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'] ))
             return render_template('intstats.html',url=session['url'], username=session['username'], password=session['password']
-                           , host=session['host'], device=session['device'], intstats=instats)
+                           , hosts=session['hosts'], devices=session['devices'], locationDataList=session['locationDataList'], intstats=instats)
 
         elif request.form['action'] == 'lldp':
-            cmd_list = ['system-view', 'display lldp neigh interface ' + session['host']['ifDesc']]
-            neighbor = run_dev_cmd(devid=session['host']['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'] )
+            neighbors=[]
+            for host in session['hosts']:
+                cmd_list = ['display lldp neigh interface ' + host['ifDesc']]
+                neighbors.append(run_dev_cmd(devid=host['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'] ))
             #if neighbor['success'] is 'true':
             return render_template('lldpneigh.html',url=session['url'], username=session['username'], password=session['password']
-                           , host=session['host'], device=session['device'],neighbor = neighbor )
+                           , hosts=session['hosts'], devices=session['devices'], locationDataList=session['locationDataList'],neighbors = neighbors )
 
         elif request.form['action'] == 'arpq':
-            cmd_list = ['system-view', 'display arp interface ' + session['host']['ifDesc']]
-            arpq = run_dev_cmd(devid=session['host']['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'] )
+            arpq = []
+            for host in session['hosts']:
+                cmd_list = ['display arp interface ' + host['ifDesc']]
+                arpq.append(run_dev_cmd(devid=host['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'] ))
             #if neighbor['success'] is 'true':
             return render_template('arpquery.html',url=session['url'], username=session['username'], password=session['password']
-                           , host=session['host'], device=session['device'],arpq = arpq )
+                           , hosts=session['hosts'], devices=session['devices'], locationDataList=session['locationDataList'],arpq = arpq )
         elif request.form['action'] == 'stpq':
-            cmd_list = ['system-view', 'display stp interface ' + session['host']['ifDesc']]
-            arpq = run_dev_cmd(devid=session['host']['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'] )
+            stpq = []
+            for host in session['hosts']:
+                cmd_list = ['display stp interface ' + host['ifDesc']]
+                stpq.append(run_dev_cmd(devid=host['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'] ))
             #if neighbor['success'] is 'true':
             return render_template('stpquery.html',url=session['url'], username=session['username'], password=session['password']
-                           , host=session['host'], device=session['device'],stpq = arpq )
+                           , hosts=session['hosts'], devices=session['devices'], locationDataList=session['locationDataList'],stpq = stpq )
     if 'login' not in session:
         error = "User not logged in"
         return render_template('login.html', error=error)
+
+#    return render_template('results.html', url=session['url'], username=session['username'], password=session['password']
+#                           , host=session['host'], device=session['device'])
+
     return render_template('results.html', url=session['url'], username=session['username'], password=session['password']
-                           , host=session['host'], device=session['device'])
+                               , hosts=session['hosts'], devices=session['devices'], locationDataList=session['locationDataList'])
+
 
 
 #The following section respond to buttons pushed on the results page
@@ -166,45 +196,55 @@ def results():
 @app.route('/intstats', methods=['GET', 'POST'])
 def instats():
     auth = requests.auth.HTTPDigestAuth(session['username'],session['password'])
-    cmd_list = ['system-view', 'display interface ' + session['host']['ifDesc']]
-    instats = run_dev_cmd(devid=session['host']['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'] )
+    instats = []
+    for host in session['hosts']:
+        cmd_list = ['display interface ' + host['ifDesc']]
+        instats.append(run_dev_cmd(devid=host['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'] ))
     return render_template('intstats.html',url=session['url'], username=session['username'], password=session['password']
-                           , host=session['host'], device=session['device'], intstats=instats)
+                           , hosts=session['hosts'], devices=session['devices'], locationDataList=session['locationDataList'], intstats=instats)
 
 @app.route('/stpinfo', methods=['GET', 'POST'])
 def stpinfo():
     auth = requests.auth.HTTPDigestAuth(session['username'],session['password'])
-    cmd_list = ['system-view', 'display stp interface ' + session['host']['ifDesc']]
-    stpinfo = run_dev_cmd(devid=session['host']['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'] )
+    stpinfo = []
+    for host in session['hosts']:
+        cmd_list = ['display stp interface ' + host['ifDesc']]
+        stpinfo.append(run_dev_cmd(devid=host['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'] ))
     return render_template('stpquery.html',url=session['url'], username=session['username'], password=session['password']
-                           , host=session['host'], device=session['device'],stpq = stpinfo )
+                           , hosts=session['hosts'], devices=session['devices'], locationDataList=session['locationDataList'],stpq = stpinfo )
 
 @app.route('/arpquery', methods = ['GET', 'POST'])
 def arpquery():
     auth = requests.auth.HTTPDigestAuth(session['username'],session['password'])
-    cmd_list = ['system-view', 'display arp interface ' + session['host']['ifDesc']]
-    arpq = run_dev_cmd(devid=session['host']['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'] )
+    arpq = []
+    for host in session['hosts']:
+        cmd_list = ['display arp interface ' + host['ifDesc']]
+        arpq.append(run_dev_cmd(devid=host['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'] ))
     return render_template('arpquery.html',url=session['url'], username=session['username'], password=session['password']
-                           , host=session['host'], device=session['device'],arpq = arpq )
+                           , hosts=session['hosts'], devices=session['devices'], locationDataList=session['locationDataList'],arpq = arpq )
 
 
 @app.route('/macquery', methods=['GET', 'POST'])
 def macquery():
     auth = requests.auth.HTTPDigestAuth(session['username'],session['password'])
-    cmd_list = ['system-view', 'display mac-address interface ' + session['host']['ifDesc']]
-    session['macq'] = run_dev_cmd(devid=session['host']['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'])
-
+    session['macq'] = []
+    for host in session['hosts']:
+        cmd_list = ['display mac-address interface ' + host['ifDesc']]
+        session['macq'].append(run_dev_cmd(devid=host['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url']))
     return render_template('macquery.html',url=session['url'], username=session['username'], password=session['password']
-                           , host=session['host'], device=session['device'],macq = session['macq'] )
+                           , hosts=session['hosts'], devices=session['devices'], locationDataList=session['locationDataList'],macq = session['macq'] )
 
 
 @app.route('/lldpneigh', methods=['GET', 'POST'])
 def lldpneigh():
     auth = requests.auth.HTTPDigestAuth(session['username'],session['password'])
-    cmd_list = ['system-view', 'display lldp neigh interface ' + session['host']['ifDesc']]
-    neighbor = run_dev_cmd(devid=session['host']['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'] )
+    neighbors=[]
+    for host in session['hosts']:
+        cmd_list = ['display lldp neigh interface ' + host['ifDesc']]
+#        cmd_list = ['display lldp neigh list | i ' + host['ifDesc']]
+        neighbors.append(run_dev_cmd(devid=host['deviceId'],cmd_list=cmd_list, auth=auth, url=session['url'] ))
     return render_template('lldpneigh.html',url=session['url'], username=session['username'], password=session['password']
-                           , host=session['host'], device=session['device'],neighbor = neighbor )
+                           , hosts=session['hosts'], devices=session['devices'], locationDataList=session['locationDataList'],neighbors = neighbors )
 
 
 

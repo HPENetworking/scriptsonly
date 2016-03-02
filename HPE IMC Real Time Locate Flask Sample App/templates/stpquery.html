@@ -1,7 +1,7 @@
 {% extends 'bootstrap/base.html' %}
 
 
-{% block title %}Display STP Interface {{ host['ifDesc'] }}{% endblock %}
+{% block title %}Display STP Interface(s) {% for host in hosts %}{{ host['ifDesc'] }} {% endfor %}{% endblock %}
 
 
 {% include 'navbar.html' %}
@@ -9,9 +9,10 @@
 {% block content %}
 
  <div class="jumbotron">
-            <h1>Display STP Interface {{ host['ifDesc'] }}</h1>
-            <p class="lead"></p>
-            </p>
+			{% for host in hosts %}
+				<h1>Display STP Interface {{ host['ifDesc'] }}</h1>
+				<p class="lead"></p>
+			{% endfor %}
  </div>
 <div class="container">
 
@@ -33,13 +34,15 @@
 
 
     </div>
-<div class="container">
-<pre>
-{{stpq.content}}
-</pre>
 
-</div>
+{% for stp in stpq %}
+	<div class="container">
+	<pre>
+	{{stp.content}}
+	</pre>
 
+	</div>
+{% endfor %}
 
 
     <footer class="footer">
