@@ -30,43 +30,56 @@
 
 {% endwith %}
 
+
         <table class='table table-hover table-stripped'>
-            <thead>
-            <tr>
-                <th><h1>Locate Host Results</h1></th>
-                </tr>
-            </thead>
+				<thead>
+				<tr>
+					<th><h1>Locate Host Results</h1></th>
+					</tr>
+				</thead>
+			
             <tbody>
+			
             <tr>
                 <td><b>Host IP Address</b></td>
-                <td>{{ host['locateIp'] }}</td>
+                <td>{{ locationDataList[0]['locateIp'] }}</td>
             </tr>
+
+			{% for locationData in locationDataList %}
+
+            <tr>
+                <td colspan="2" align="center" bgcolor="#FF8D6D"><b>Connection Point</b></td>
+            </tr>
+			
             <tr>
                 <td><b>Connected Interface</b></td>
-                <td> {{ host['ifDesc'] }}</td>
+                <td> {{ locationData['ifDesc'] }}</td>
             </tr>
             <tr>
                 <td><b>Device IP</b></td>
-                <td> {{ host['deviceIp'] }}</td>
+                <td> {{ locationData['deviceIp'] }}</td>
             </tr>
             <tr>
                 <td><b>Device Name</b></td>
-                <td> {{ device['sysName'] }}</td>
+                <td> {{ locationData['sysName'] }}</td>
             </tr>
              <tr>
                 <td><b>Device Type</b></td>
-                <td> {{ device['typeName'] }}</td>
+                <td> {{ locationData['typeName'] }}</td>
             </tr>
             <tr>
                 <td><b>Device Location</b></td>
-                <td> {{ device['location'] }}</td>
+                <td> {{ locationData['location'] }}</td>
             </tr>
             <tr>
                 <td><b>Device Contact</b></td>
-                <td>{{ device['contact'] }}</td>
+                <td>{{ locationData['contact'] }}</td>
             </tr>
+			
+			{% endfor %}
+			</tbody>
         </table>
-
+			
      </div>
 
 <div class="container">

@@ -1,16 +1,18 @@
 {% extends 'bootstrap/base.html' %}
 
 
-{% block title %}Display LLDP Neighbor Interface {{ host['ifDesc'] }}{% endblock %}
+{% block title %}Display LLDP Neighbor Interface(s) {% for host in hosts %}{{ host['ifDesc'] }} {% endfor %}{% endblock %}
 
 {% include 'navbar.html' %}
 
 {% block content %}
 
  <div class="jumbotron">
-            <h1>Display LLDP Neigh Interface {{ host['ifDesc'] }}</h1>
-            <p class="lead"></p>
-            </p>
+			{% for host in hosts %}
+				<h1>Display LLDP Neigh Interface {{ host['ifDesc'] }}</h1>
+				<p class="lead"></p>
+			{% endfor %}
+			</p>
  </div>
 <div class="container">
 
@@ -33,12 +35,14 @@
 
 </div>
 
-<div>
-    <pre>
-{{neighbor.content}}
+{% for neighbor in neighbors %}
+	<div>
+		<pre>
+	{{neighbor.content}}
 
-</pre>
-</div>
+	</pre>
+	</div>
+{% endfor %}
 
 
     <footer class="footer">
