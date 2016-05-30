@@ -4,11 +4,7 @@
   gather_facts: no
   vars:
     ansible_user: root
-  vars_files:
-    - vars/topology.yml
   tasks:
-#    - name: Ensure OpenSwitch hostnames are correct
-#      include: tasks/set-hostnames.yml
+    - name: Ensure OpenSwitch hostnames are correct
+      include: tasks/set-hostnames.yml
 
-    - name: Ensure ports setup is correct
-      include: tasks/set-ports.yml
