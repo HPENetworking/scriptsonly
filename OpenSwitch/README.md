@@ -1,6 +1,6 @@
 # OpenSwitch
 
-This repository is a collection of sample code usages of the public facing APIs for HPE Aruba OS based products.
+This repository is a collection of sample code usages of OpenSwitch project.
 
 Copyright 2016 Hewlett Packard Enterprise Development LP.
 
