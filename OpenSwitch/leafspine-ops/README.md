@@ -70,6 +70,15 @@ Also note that you can use --limit to run this on one group only (leafs or spine
 
 Security notice: in our example we are using root access with no password. This is definitelly not a good practice for real life. You should use key-based authentication only and disable password access. There are hints how to do this initial setup via Ansible or using initial zero touch provisioning of your real switches.
 
+## Automation with Ansible
+
+create.sh script has created hosts file that describes your virtual topology for Ansible.
+
+First step is to ensure switches hostnames match names you have specified in create.sh scripts and which are reflected in generated hosts file. In order to configure hostnames in switches run the following Ansible playbook:
+
+    ansible-playbook -i hosts build-fabric.yml
+
+
 ## Roadmap
 
 I will try to add Ansible Playbook example to do automated BGP-based L3 fabric setup. My plan is the following:
