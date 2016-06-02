@@ -1,0 +1,28 @@
+---
+  - name: Ensure port is routed
+    command: "vtysh -c 'config terminal' -c 'interface {{ item.name }}' -c 'routing'"
+    with_items: "{{switches[hostvars[inventory_hostname].inventory_hostname].interfaces}}"
+
+  - name: Prepare port JSON templates
+    template:
+      src: templates/port.json.j2
+      dest: ./hostname_{{ hostvars[inventory_hostname].inventory_hostname }}_{{ item.name }}.json
+    delegate_to: 127.0.0.1
+    with_items: "{{switches[hostvars[inventory_hostname].inventory_hostname].interfaces}}"
+
+  - name: Ensure port L3 interface is configured and port is up
+    ops_template:
+      host: localhost
+      transport: rest
+      validate_certs: False
+      src: ./hostname_{{ hostvars[inventory_hostname].inventory_hostname }}_{{ item.name }}.json
+      username: root
+      password:
+    with_items: "{{switches[hostvars[inventory_hostname].inventory_hostname].interfaces}}"
+
+  - name: Remove temporaly templates
+    file:
+      path: ./hostname_{{ hostvars[inventory_hostname].inventory_hostname }}_{{ item.name }}.json
+      state: absent
+    delegate_to: 127.0.0.1
+    with_items: "{{switches[hostvars[inventory_hostname].inventory_hostname].interfaces}}"

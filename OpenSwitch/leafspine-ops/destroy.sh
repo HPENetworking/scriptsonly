@@ -26,3 +26,5 @@ done
 echo
 echo Environment destroyed
 
+
+

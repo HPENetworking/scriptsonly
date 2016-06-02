@@ -1,7 +1,7 @@
 switches=(leaf1 leaf2 leaf3 leaf4 spine1 spine2)
 leafs=(leaf1 leaf2 leaf3 leaf4)
 spines=(spine1 spine2)
-dockerimage="cloudsvet/openswitch:0525"
+dockerimage="cloudsvet/openswitch:0601"
 
 echo Create OOB network
 docker network create oob

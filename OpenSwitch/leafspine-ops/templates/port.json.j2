@@ -1,0 +1,22 @@
+{
+"Interface": {
+    "{{ item.name }}": {
+        "name": "{{ item.name }}",
+        "type": "system",
+        "user_config": {
+            "admin": "up"
+        }
+    }
+},
+"Port": {
+  "{{ item.name }}": {
+    "interfaces": [
+      "{{ item.name }}"
+    ],
+    "ip4_address": [
+      "{{ item.ip }}"
+    ],
+    "name": "{{ item.name }}"
+  }
+}
+}
