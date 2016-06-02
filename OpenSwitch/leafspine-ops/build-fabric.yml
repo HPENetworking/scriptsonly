@@ -7,7 +7,6 @@
   vars_files:
     - vars/topology.yml
   tasks:
-    - debug: var={{inventory_hostname}}
     - name: Ensure OpenSwitch hostnames are correct
       include: tasks/set-hostnames.yml
 
