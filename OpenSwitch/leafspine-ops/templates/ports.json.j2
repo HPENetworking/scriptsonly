@@ -1,0 +1,26 @@
+{
+"Interface": {
+  {%- for item in switches.get(inventory_hostname).interfaces -%}
+    "{{ item.name }}": {
+        "name": "{{ item.name }}",
+        "type": "system",
+        "user_config": {
+            "admin": "up"
+        }
+    }{%- if not loop.last -%} , {%- endif -%}
+    {%- endfor -%}
+},
+"Port": {
+  {%- for item in switches.get(inventory_hostname).interfaces -%}
+  "{{ item.name }}": {
+    "interfaces": [
+      "{{ item.name }}"
+    ],
+    "ip4_address": [
+      "{{ item.ip }}"
+    ],
+    "name": "{{ item.name }}"
+} {%- if not loop.last -%} , {%- endif -%}
+{%- endfor -%}
+}
+}

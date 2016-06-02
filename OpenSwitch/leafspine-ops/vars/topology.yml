@@ -3,6 +3,8 @@ switches:
   leaf1:
     as: 65001
     interfaces:
+      - name: lo1
+        ip: 192.168.0.1/32
       - name: 1
         ip: 10.1.0.1/30
       - name: 2
@@ -10,6 +12,8 @@ switches:
   leaf2:
     as: 65002
     interfaces:
+      - name: lo1
+        ip: 192.168.0.2/32
       - name: 1
         ip: 10.1.1.1/30
       - name: 2
@@ -17,6 +21,8 @@ switches:
   leaf3:
     as: 65003
     interfaces:
+      - name: lo1
+        ip: 192.168.0.3/32
       - name: 1
         ip: 10.1.2.1/30
       - name: 2
@@ -24,6 +30,8 @@ switches:
   leaf4:
     as: 65004
     interfaces:
+      - name: lo1
+        ip: 192.168.0.4/32
       - name: 1
         ip: 10.1.3.1/30
       - name: 2
@@ -31,6 +39,8 @@ switches:
   spine1:
     as: 65101
     interfaces:
+      - name: lo1
+        ip: 192.168.1.1/32
       - name: 1
         ip: 10.1.0.2/30
       - name: 2
@@ -42,6 +52,8 @@ switches:
   spine2:
     as: 65102
     interfaces:
+      - name: lo1
+        ip: 192.168.1.2/32
       - name: 1
         ip: 10.2.0.2/30
       - name: 2
@@ -49,4 +61,4 @@ switches:
       - name: 3
         ip: 10.2.2.2/30
       - name: 4
-        ip: 10.2.3.2/30      
+        ip: 10.2.3.2/30

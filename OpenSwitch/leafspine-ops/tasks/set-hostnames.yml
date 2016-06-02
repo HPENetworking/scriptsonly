@@ -1,7 +1,7 @@
 ---
   - name: Prepare host name JSON templates
     template:
-      src: templates/hostname.json.j2
+      src: hostname.json.j2
       dest: ./hostname_{{ hostvars[inventory_hostname].inventory_hostname }}.json
     delegate_to: 127.0.0.1
 
@@ -11,6 +11,7 @@
       transport: rest
       validate_certs: False
       src: ./hostname_{{ hostvars[inventory_hostname].inventory_hostname }}.json
+#      src: hostname.json.j2
       username: root
       password:
 

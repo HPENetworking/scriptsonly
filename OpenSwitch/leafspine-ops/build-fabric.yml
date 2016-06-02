@@ -7,8 +7,13 @@
   vars_files:
     - vars/topology.yml
   tasks:
+    - debug: var={{inventory_hostname}}
     - name: Ensure OpenSwitch hostnames are correct
       include: tasks/set-hostnames.yml
 
     - name: Ensure ports setup is correct
       include: tasks/set-ports.yml
+
+# future
+#    - name: Ensure BGP is configured
+#      include: tasks/set-bgp.yml
