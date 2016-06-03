@@ -1,0 +1,45 @@
+{# OpenSwitch Interface table JSON template file #}
+
+"Interface": {
+  {%- for intf in ops_interfaces -%}
+    "{{- intf.name -}}": {
+      {%- if intf.type is defined -%}
+        "type": "{{- intf.type -}}",
+      {%- endif -%}
+      "user_config": {
+        {%- if intf.autoneg is defined -%}
+          "autoneg": "{{- intf.autoneg -}}",
+        {%- elif ops_intf_autoneg is defined -%}
+          "autoneg": "{{- ops_intf_autoneg -}}",
+        {%- endif -%}
+        {%- if intf.speeds is defined -%}
+          "speeds": {{- intf.speeds -}},
+        {%- elif ops_intf_speeds is defined -%}
+          "speeds": {{- ops_intf_speeds -}},
+        {%- endif -%}
+        {%- if intf.duplex is defined -%}
+          "duplex": "{{- intf.duplex -}}",
+        {%- elif ops_intf_duplex is defined -%}
+          "duplex": "{{- ops_intf_duplex -}}",
+        {%- endif -%}
+        {%- if intf.pause is defined -%}
+          "pause": "{{- intf.pause -}}",
+        {%- elif ops_intf_pause is defined -%}
+          "pause": "{{- ops_intf_pause -}}",
+        {%- endif -%}
+        {%- if intf.mtu is defined -%}
+          "mtu": {{- intf.mtu -}},
+        {%- elif ops_intf_mtu is defined -%}
+          "mtu": {{- ops_intf_mtu -}},
+        {%- endif -%}
+        {%- if intf.lane_split is defined -%}
+          "lane_split": "{{- intf.lane_split -}}",
+        {%- elif ops_intf_lane_split is defined -%}
+          "lane_split": "{{- ops_intf_lane_split -}}",
+        {%- endif -%}
+        "admin": "{{- intf.admin_state|default(ops_intf_admin_state) -}}"
+      },
+      "name": "{{- intf.name -}}"
+    } {%- if not loop.last -%} , {%- endif -%}
+  {%- endfor -%}
+}

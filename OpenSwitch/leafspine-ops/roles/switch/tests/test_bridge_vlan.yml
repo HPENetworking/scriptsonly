@@ -1,0 +1,169 @@
+---
+- name: simple VLAN switch
+  hosts: switches
+  gather_facts: yes
+  vars:
+    ansible_user: admin
+    ops_system_hostname: VlanTestSwitch
+    ops_debug: yes
+    ops_cli_provider:
+      transport: cli
+      username: netop
+      password: netop
+      host: "{{ ansible_host }}"
+      port: "{{ ansible_port }}"
+    ops_rest_provider:
+      transport: rest
+      username: netop
+      password: netop
+      host: "{{ ansible_host }}"
+      port: "{{ ops_rest_port }}"
+      use_ssl: true
+      validate_certs: no
+
+  roles:
+    - role: switch
+      ops_intf_admin_state: up
+      ops_vrfs:
+        - name: vrf_default
+          ports: []
+      ops_bridges:
+        - name: bridge_normal
+          ports: [1, 2, 3, 4, 5, 6, 7, 8]
+          vlans:
+            - name: VLAN2
+              id: 2
+            - name: VLAN10
+              admin: up
+              id: 10
+            - name: VLAN101
+              admin: up
+              id: 101
+            - name: VLAN1002
+              id: 1002
+            - name: VLAN4094
+              admin: up
+              id: 4094
+      ops_ports:
+        - name: 1
+        - name: 2
+          tag: 2
+        - name: 3
+          tag: 10
+        - name: 4
+          tag: 101
+        - name: 5
+          tag: 1002
+        - name: 6
+          tag: 1002
+        - name: 7
+          tag: 4094
+        - name: 8
+          tag: 4094
+      ops_interfaces:
+        - name: 1
+        - name: 2
+        - name: 3
+        - name: 4
+        - name: 5
+        - name: 6
+        - name: 7
+        - name: 8
+
+  tasks:
+    - name: show version CLI
+      connection: local
+      ops_command:
+        provider: "{{ ops_cli_provider }}"
+        commands:
+          - show version
+        interval: 1
+        retries: 2
+      register: show_version_result
+
+    - name: show version result
+      debug: var=show_version_result
+      when: ops_debug
+
+    - name: show vlan CLI
+      connection: local
+      ops_command:
+        provider: "{{ ops_cli_provider }}"
+        commands:
+          - show vlan
+        interval: 3
+        retries: 3
+      register: show_vlan_result
+
+    - name: show vlan result
+      debug: var=show_vlan_result
+      when: ops_debug
+
+    - name: show running-config CLI
+      connection: local
+      ops_command:
+        provider: "{{ ops_cli_provider }}"
+        commands:
+          - show running-config
+        interval: 5
+        retries: 3
+      register: show_running_config_result
+
+    - name: show running-config result
+      debug: var=show_running_config_result
+      when: ops_debug
+
+  post_tasks:
+    - name: check VLAN mappings
+      connection: local
+      ops_command:
+        provider: "{{ ops_cli_provider }}"
+        commands:
+          - show hostname
+          - show vlan 1
+          - show vlan 2
+          - show vlan 10
+          - show vlan 101
+          - show vlan 1002
+          - show vlan 4094
+        waitfor:
+          - "result[0] contains '{{ ops_system_hostname }}'"
+          - "result[1] contains DEFAULT_VLAN_1"
+          - "result[1] contains up"
+          - "result[1] contains ok"
+          - "result[2] contains VLAN2"
+          - "result[2] contains down"
+          - "result[2] contains admin_down"
+          - "result[3] contains VLAN10"
+          - "result[3] contains up"
+          - "result[3] contains ok"
+          - "result[4] contains VLAN101"
+          - "result[4] contains up"
+          - "result[4] contains ok"
+          - "result[5] contains VLAN1002"
+          - "result[5] contains down"
+          - "result[5] contains admin_down"
+          - "result[6] contains VLAN4094"
+          - "result[6] contains up"
+          - "result[6] contains ok"
+        interval: 5
+        retries: 3
+      register: test_result
+
+    - name: debug the test result
+      debug: var=test_result
+      when: ops_debug
+
+    - name: get the system, bridge, and VLAN facts over REST API
+      connection: local
+      ops_facts:
+        provider: "{{ ops_rest_provider }}"
+        endpoints:
+          - /system
+          - /system/bridges
+          - /system/bridges/bridge_normal/vlans
+      register: rest_result
+
+    - name: debug the REST result
+      debug: var=rest_result
+      when: ops_debug

@@ -1,0 +1,13 @@
+{# OpenSwitch JSON main template file #}
+
+{
+  {%- if ops_interfaces is defined -%}
+    {%- include ['ops_intf.j2'] -%},
+  {%- endif -%}
+
+  {%- if ops_ports is defined -%}
+    {%- include ['ops_port.j2'] -%},
+  {%- endif -%}
+
+  {%- include ['ops_system.j2'] -%}
+}

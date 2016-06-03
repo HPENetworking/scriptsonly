@@ -1,18 +1,40 @@
 ---
-- hosts: all
+- name: Configure hostname and interfaces
+  hosts: all
   remote_user: root
   gather_facts: no
-  vars:
-    ansible_user: root
   vars_files:
     - vars/topology.yml
-  tasks:
-    - name: Ensure OpenSwitch hostnames are correct
-      include: tasks/set-hostnames.yml
+    - vars/connections.yml
+  vars:
+    ops_system_hostname: "{{ inventory_hostname }}"
+    ops_interfaces: "{{ switches[inventory_hostname].ops_interfaces }}"
+    ops_ports: "{{ switches[inventory_hostname].ops_ports }}"
+    ops_config_override: no
+    ops_intf_admin_state: up
 
-    - name: Ensure ports setup is correct
-      include: tasks/set-ports.yml
+  pre_tasks:
+    - name: Ensure port is routed
+      command: "vtysh -c 'config terminal' -c 'interface {{ item.name }}' -c 'routing'"
+      with_items: "{{switches[inventory_hostname].ops_interfaces}}"
+      when: item.name != "lo1"
 
-# future
-#    - name: Ensure BGP is configured
-#      include: tasks/set-bgp.yml
+    - name: Touch loopback
+      command: "vtysh -c 'config terminal' -c 'interface loopback 1'"
+
+  roles:
+    - switch
+
+- name: Configure BGP
+  hosts: all
+  remote_user: root
+  gather_facts: no
+  vars_files:
+    - vars/topology.yml
+    - vars/connections.yml
+  vars:
+    ops_config_override: no
+    ops_vrfs: "{{ switches[inventory_hostname].ops_vrfs }}"
+
+  roles:
+    - ops-bgp-role

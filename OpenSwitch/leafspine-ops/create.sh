@@ -14,6 +14,7 @@ do
   docker run --privileged -d -v /tmp:/tmp -v /dev/log:/dev/log -v /sys/fs/cgroup:/sys/fs/cgroup -h ${switch} --name ${switch} --net oob ${dockerimage} /sbin/init
 done
 
+echo
 echo Create networks
 for leaf in "${leafs[@]}"
 do

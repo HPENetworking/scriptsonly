@@ -1,0 +1,16 @@
+ansible_user: root
+ops_debug: no
+ops_cli_provider:
+  transport: cli
+  username: root
+  password:
+  host: "{{ ansible_host }}"
+  port: "{{ ansible_port }}"
+ops_rest_provider:
+  transport: rest
+  username: root
+  password:
+  host: "{{ ansible_host }}"
+  port: 443
+  use_ssl: true
+  validate_certs: no

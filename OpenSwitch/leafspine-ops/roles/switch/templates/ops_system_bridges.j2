@@ -1,0 +1,31 @@
+{# OpenSwitch System.bridges column JSON template file #}
+
+"bridges": {
+  {%- for br in ops_bridges -%}
+    "{{- br.name -}}": {
+      {%- if br.ports is defined -%}
+        "ports": [ {%- for port in br.ports -%}
+          "{{- port -}}" {%- if not loop.last -%} , {%- endif -%}
+        {%- endfor -%} ],
+      {%- endif -%}
+      {%- if br.vlans is defined -%}
+        "vlans": {
+          {%- for vlan in br.vlans -%}
+            "{{- vlan.name -}}": {
+              {%- if vlan.admin is defined -%}
+                "admin": [ "{{- vlan.admin -}}" ],
+              {%- else -%}
+                "admin": [ "down" ],
+              {%- endif -%}
+              {%- if vlan.id is defined -%}
+                "id": {{- vlan.id -}},
+              {%- endif -%}
+              "name": "{{- vlan.name -}}"
+            } {%- if not loop.last -%} , {%- endif -%}
+          {%- endfor -%}
+        },
+      {%- endif -%}
+      "name": "{{- br.name -}}"
+    } {%- if not loop.last -%} , {%- endif -%}
+  {%- endfor -%}
+}

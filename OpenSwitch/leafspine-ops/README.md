@@ -1,4 +1,4 @@
-# OpenSwitch automation environment
+# OpenSwitch automation environment demo
 
 This demo targets creation of leaf-spine OpenSwitch topology in virtualized automated environment within single host OS leveraging Docker and Docker Networking. After environment is created you can connect to switches in topology and test various settings, APIs or web UI. Main purpose is to demo Ansible automated configuration of L3 fabric.
 
@@ -8,10 +8,10 @@ This demo targets creation of leaf-spine OpenSwitch topology in virtualized auto
 2. Chmod +x scripts so you can execute them
 3. Open create.sh and change arrays to fit your needs. By default 4 leafs and 2 spines are created, but you can change this by adding or removing device names from arrays on first three lines.
 4. Run create.sh to create your topology and run containers (see sections bellow for details)
-5. Setup Ansible environment and test connectivity to switches by running test-connection.yml playbook
+5. Setup Ansible environment (make sure you use Ansible 2.1) and test connectivity to switches by running test-connection.yml playbook
 6. Use script to compile your fabric topology file (future)
-7. Execute Ansible playbook build-fabric.yml leveraging your fabric topology file to automate creation of L3 BGP-based fabric configuration (currently setting up hostname and interfaces is ready, BGP to come)
-8. Execute Ansible playbook test-fabric.yml to ensure BGP peering is estabilished and routes are being exchanged (future)
+7. Execute Ansible playbook build-fabric.yml leveraging your fabric topology file to automate creation of L3 BGP-based fabric configuration
+8. Execute Ansible playbook test-fabric.yml to ensure BGP peering is estabilished
 
 ## Topology creation script
 
@@ -74,28 +74,135 @@ Security notice: in our example we are using root access with no password. This 
 
 create.sh script has created hosts file that describes your virtual topology for Ansible.
 
-First step is to ensure switches hostnames match names you have specified in create.sh scripts and which are reflected in generated hosts file.
+This demo is based on switch and bgp Ansible roles prepared by Nohguchi, Kei <kei.nohguchi@hpe.com> (Thanks!). Those are under review to be accepted in ops-ansible project as official roles.
 
-Second step is to define your logical topology model. In order for Ansible to have information about your desired logical topology you need to describe it in vars/topology.yml file. You are listing switches there (identified by hostname) and in YAML structure define their AS number, interfaces and associated IP addresses. In future I would like to provide script to automatically create this initial topology model (it helps with model by automatically assigning AS numbers and IPs in incrementing fashion - good for initial document, but afterwards is better to stick with resulting file to prevent potential unnecessary readresing etc.)
+First step is to define your logical topology model. In order for Ansible to have information about your desired logical topology you need to describe it in vars/topology.yml file. You are listing switches there (identified by hostname) and in YAML structure define their AS number, interfaces and associated IP addresses. In future I would like to provide script to automatically create this initial topology model (it helps with model by automatically assigning AS numbers and IPs in incrementing fashion - good for initial document, but afterwards is better to stick with resulting file to prevent potential unnecessary readresing etc.)
 
-Third step is to configure inter-switch L3 interfaces - setting ports up and configuring IP address.
+Now you are ready to build your fabric.
 
-Fourth step is to configure BGP - this is not yet available.
-
-Execute Playbook to build fabric. Currently it will call Playbooks to set hostnames and setup interfaces.
+Execute Playbook to build fabric.
 
     ansible-playbook -i hosts build-fabric.yml
 
+Now you may want to check that your peering is correctly estabilished (means check not only configuration, but actual control plane state). There is playbook to do just that and report state of BGP neighbors.
+
+    ansible-playbook -i hosts test-fabric.yml
+
+## How to demo
+
+Here is example workflow to demo OpenSwitch, Ansible, ops-ansible roles and desired state principles.
+
+Source Ansible environment variable
+    . envrc
+
+Create virtual network
+    ./create.sh
+
+Wait a moment and execute Playbook to test connectivity and print OpenSwitch version
+    ansible-playbook -i hosts test-connection.yml
+
+Connect to one of devices directly and show that configuration is empty
+docker exec -ti leaf1 vtysh
+    switch# show run
+    Current configuration:
+    !
+    !
+    !
+    !
+    !
+    vlan 1
+        no shutdown
+    switch# exit
+
+Make your fabric come to your desired state
+    ansible-playbook -i hosts build-fabric.yml
+
+Test all peering are in Estabilished state (if not you might just wait for BGP to catch up a re-run)
+    ansible-playbook -i hosts test-fabric.yml
+
+Connect to one of switches and misconfigure remote-as of one of neighbors
+    docker exec -ti leaf1 vtysh
+    leaf1# show run
+    Current configuration:
+    !
+    hostname leaf1
+    !
+    !
+    !
+    !
+    router bgp 65001
+         bgp router-id 192.168.0.1
+         network 192.168.0.1/32
+         neighbor 10.1.0.2 remote-as 65101
+         neighbor 10.2.0.2 remote-as 65102
+    !
+    vlan 1
+        no shutdown
+    interface 1
+        no shutdown
+        ip address 10.1.0.1/30
+    interface 2
+        no shutdown
+        ip address 10.2.0.1/30
+    interface loopback 1
+        ip address 192.168.0.1/32
+
+    leaf1# conf t
+    leaf1(config)# router bgp 65001
+    leaf1(config-router)# neighbor 10.1.0.2 remote-as 65999
+    leaf1(config-router)# end
+    leaf1# exit
+
+Re-run testing Playbook to show that there are non-estabilished peers
+    ansible-playbook -i hosts test-fabric.yml
+    ...
+    TASK [Report switches with failed neighbors] ***********************************
+    skipping: [spine2] => (item=Peering to 10.2.0.1 is Established
+    )
+    skipping: [spine2] => (item=Peering to 10.2.1.1 is Established
+    )
+    failed: [spine1] (item=Peering to 10.1.0.1 is Idle
+    ) => {"failed": true, "item": "Peering to 10.1.0.1 is Idle\n", "msg": "Peering to 10.1.0.1 is Idle\n"}
+    skipping: [spine1] => (item=Peering to 10.1.1.1 is Established
+    )
+    skipping: [spine1] => (item=Peering to 10.1.2.1 is Established
+    )
+    skipping: [spine1] => (item=Peering to 10.1.3.1 is Established
+    )
+    skipping: [spine2] => (item=Peering to 10.2.2.1 is Established
+    )
+    skipUkazat, ze mame vsechno znova nahore (muze to az minutu trvat, nez se BGP zase spoji, tak kdyztak ukazat v jakem je aktualping: [leaf2] => (item=Peering to 10.1.1.2 is Established
+    )
+    skipping: [leaf2] => (item=Peering to 10.2.1.2 is Established
+    )
+    skipping: [leaf3] => (item=Peering to 10.1.2.2 is Established
+    )
+    skipping: [leaf3] => (item=Peering to 10.2.2.2 is Established
+    )
+    skipping: [spine2] => (item=Peering to 10.2.3.1 is Established
+    )
+    skipping: [leaf4] => (item=Peering to 10.1.3.2 is Established
+    )
+    failed: [leaf1] (item=Peering to 10.1.0.2 is Deleted
+    ) => {"failed": true, "item": "Peering to 10.1.0.2 is Deleted\n", "msg": "Peering to 10.1.0.2 is Deleted\n"}
+    skipping: [leaf4] => (item=Peering to 10.2.3.2 is Established
+    )
+    skipping: [leaf1] => (item=Peering to 10.2.0.2 is Established
+    )
+
+Re-rub build-fabric Playbook to put network into desired state again
+    ansible-playbook -i hosts build-fabric.yml
+
+You can check switch configuration was repaired
+    docker exec -ti leaf1 vtysh
+    leaf1# show run
+
+You can re-run testing playbook to make sure all neighbours are in Estabilished state (please note that this might take a while)
+    ansible-playbook -i hosts test-fabric.yml
 
 ## Roadmap
 
 I will try to add Ansible Playbook example to do automated BGP-based L3 fabric setup. My plan is the following:
 * Create script to generate topology file for Ansible. You will input parameters such as Leaf-Spine interlinks starting IP addresses, starting BGP AS number for Leafs, starting BGP AS number for spines, starting port number for leaf-spine connections etc. Based on this and hosts file generated by create.sh script will generate fabric topology described as YAML file to be consumed by Ansible playbook
-* Add BGP configuration Playbook
-* Add testing Playbooks to check pings, peering and other network state information
 
 Also at some point I would like to look into setting up real fabric with zero touch provisioning (DHCP server with reservations, web server for accessing OS binary etc.) + generating hosts file for Ansible.
-
-# Contact information
-
-Author and maintainer: Tomas Kubica, tomas.kubica@hpe.com

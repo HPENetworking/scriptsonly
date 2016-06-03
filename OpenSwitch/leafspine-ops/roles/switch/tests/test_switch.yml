@@ -1,0 +1,150 @@
+---
+- name: simple switch with ten ports, five L2 and five L3
+  hosts: switches
+  gather_facts: yes
+  vars:
+    ansible_user: admin
+    ops_system_hostname: SimpleSwitch
+    ops_debug: yes
+    ops_cli_provider:
+      transport: cli
+      username: netop
+      password: netop
+      host: "{{ ansible_host }}"
+      port: "{{ ansible_port }}"
+    ops_rest_provider:
+      transport: rest
+      username: netop
+      password: netop
+      host: "{{ ansible_host }}"
+      port: "{{ ops_rest_port }}"
+      use_ssl: true
+      validate_certs: no
+
+  roles:
+    - role: switch
+      ops_intf_admin_state: up
+      ops_vrfs:
+        - name: vrf_default
+          ports: [1, 2, 3, 4, 5]
+      ops_bridges:
+        - name: bridge_normal
+          ports: [6, 7, 8, 9, 10]
+      ops_interfaces:
+        - name: 1
+        - name: 2
+        - name: 3
+        - name: 4
+        - name: 5
+        - name: 6
+        - name: 7
+        - name: 8
+        - name: 9
+        - name: 10
+      ops_ports:
+        - name: 1
+          ipv4_address: 172.16.1.1/24
+        - name: 2
+          ipv4_address: 172.16.2.1/24
+        - name: 3
+          ipv4_address: 172.16.3.1/24
+        - name: 4
+          ipv4_address: 172.16.4.1/24
+        - name: 5
+          ipv4_address: 172.16.5.1/24
+        - name: 6
+        - name: 7
+        - name: 8
+        - name: 9
+        - name: 10
+
+  tasks:
+    - name: show version CLI
+      connection: local
+      ops_command:
+        provider: "{{ ops_cli_provider }}"
+        commands:
+          - show version
+        interval: 1
+        retries: 2
+      register: show_version_result
+
+    - name: show version result
+      debug: var=show_version_result
+      when: ops_debug
+
+    - name: show ip route CLI
+      connection: local
+      ops_command:
+        provider: "{{ ops_cli_provider }}"
+        commands:
+          - show ip route
+        interval: 3
+        retries: 3
+      register: show_ip_route_result
+
+    - name: show ip route result
+      debug: var=show_ip_route_result
+      when: ops_debug
+
+    - name: show running-config CLI
+      connection: local
+      ops_command:
+        provider: "{{ ops_cli_provider }}"
+        commands:
+          - show running-config
+        interval: 5
+        retries: 3
+      register: show_running_config_result
+
+    - name: show running-config result
+      debug: var=show_running_config_result
+      when: ops_debug
+
+  post_tasks:
+    - name: Check if ports are correctly configured as L2 and L3 ports
+      connection: local
+      ops_command:
+        provider: "{{ ops_cli_provider }}"
+        commands:
+          - show hostname
+          - show interface 1 brief
+          - show interface 2 brief
+          - show interface 9 brief
+          - show interface 10 brief
+          - show ip route
+        waitfor:
+          - "result[0] contains '{{ ops_system_hostname }}'"
+          - "result[1] contains 'routed'"
+          - "result[2] contains 'routed'"
+          - "result[3] contains 'access'"
+          - "result[4] contains 'access'"
+          - "result[5] contains '172.16.1.0/24'"
+          - "result[5] contains '172.16.2.0/24'"
+          - "result[5] contains '172.16.3.0/24'"
+          - "result[5] contains '172.16.4.0/24'"
+          - "result[5] contains '172.16.5.0/24'"
+        interval: 5
+        retries: 3
+      register: test_result
+
+    - name: show the test result
+      debug: var=test_result
+      when: ops_debug
+
+    - name: get the system, bridge, vrf, interface, port, and route facts
+      connection: local
+      ops_facts:
+        provider: "{{ ops_rest_provider }}"
+        endpoints:
+          - /system
+          - /system/bridges
+          - /system/vrfs
+          - /system/interfaces
+          - /system/ports
+          - /system/vrfs/vrf_default/routes
+      register: rest_result
+
+    - name: debug the REST result
+      debug: var=rest_result
+      when: ops_debug
