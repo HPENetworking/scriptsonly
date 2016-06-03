@@ -105,11 +105,7 @@ Connect to one of devices directly and show that configuration is empty
 docker exec -ti leaf1 vtysh
     switch# show run
     Current configuration:
-    !
-    !
-    !
-    !
-    !
+
     vlan 1
         no shutdown
     switch# exit
@@ -124,18 +120,15 @@ Connect to one of switches and misconfigure remote-as of one of neighbors
     docker exec -ti leaf1 vtysh
     leaf1# show run
     Current configuration:
-    !
+
     hostname leaf1
-    !
-    !
-    !
-    !
+
     router bgp 65001
          bgp router-id 192.168.0.1
          network 192.168.0.1/32
          neighbor 10.1.0.2 remote-as 65101
          neighbor 10.2.0.2 remote-as 65102
-    !
+
     vlan 1
         no shutdown
     interface 1
@@ -171,7 +164,7 @@ Re-run testing Playbook to show that there are non-estabilished peers
     )
     skipping: [spine2] => (item=Peering to 10.2.2.1 is Established
     )
-    skipUkazat, ze mame vsechno znova nahore (muze to az minutu trvat, nez se BGP zase spoji, tak kdyztak ukazat v jakem je aktualping: [leaf2] => (item=Peering to 10.1.1.2 is Established
+    skipping: [leaf2] => (item=Peering to 10.1.1.2 is Established
     )
     skipping: [leaf2] => (item=Peering to 10.2.1.2 is Established
     )
