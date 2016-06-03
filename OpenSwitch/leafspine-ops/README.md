@@ -93,16 +93,20 @@ Now you may want to check that your peering is correctly estabilished (means che
 Here is example workflow to demo OpenSwitch, Ansible, ops-ansible roles and desired state principles.
 
 Source Ansible environment variable
+
     . envrc
 
 Create virtual network
+
     ./create.sh
 
 Wait a moment and execute Playbook to test connectivity and print OpenSwitch version
+
     ansible-playbook -i hosts test-connection.yml
 
 Connect to one of devices directly and show that configuration is empty
-docker exec -ti leaf1 vtysh
+
+    docker exec -ti leaf1 vtysh
     switch# show run
     Current configuration:
 
@@ -111,12 +115,15 @@ docker exec -ti leaf1 vtysh
     switch# exit
 
 Make your fabric come to your desired state
+
     ansible-playbook -i hosts build-fabric.yml
 
 Test all peering are in Estabilished state (if not you might just wait for BGP to catch up a re-run)
+
     ansible-playbook -i hosts test-fabric.yml
 
 Connect to one of switches and misconfigure remote-as of one of neighbors
+
     docker exec -ti leaf1 vtysh
     leaf1# show run
     Current configuration:
@@ -147,6 +154,7 @@ Connect to one of switches and misconfigure remote-as of one of neighbors
     leaf1# exit
 
 Re-run testing Playbook to show that there are non-estabilished peers
+
     ansible-playbook -i hosts test-fabric.yml
     ...
     TASK [Report switches with failed neighbors] ***********************************
@@ -184,13 +192,16 @@ Re-run testing Playbook to show that there are non-estabilished peers
     )
 
 Re-rub build-fabric Playbook to put network into desired state again
+
     ansible-playbook -i hosts build-fabric.yml
 
 You can check switch configuration was repaired
+
     docker exec -ti leaf1 vtysh
     leaf1# show run
 
 You can re-run testing playbook to make sure all neighbours are in Estabilished state (please note that this might take a while)
+
     ansible-playbook -i hosts test-fabric.yml
 
 ## Roadmap
