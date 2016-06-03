@@ -1,0 +1,28 @@
+{# OpenSwitch System.vrfs.bgp_routers column JSON template file #}
+
+"bgp_routers": {
+  {%- for bgp in vrf.bgp_routers -%}
+    "{{- bgp.as_number -}}": {
+      {%- if bgp.networks is defined -%}
+        "networks": [ {%- for network in bgp.networks -%}
+          "{{- network -}}"
+        {%- if not loop.last -%} , {%- endif -%} {%- endfor -%} ],
+      {%- endif -%}
+      {%- if bgp.neighbors is defined -%}
+        "bgp_neighbors": { {%- for nbr in bgp.neighbors -%}
+          {%- if nbr.address is defined -%}
+            "{{- nbr.address -}}": {
+              {%- if nbr.remote_as is defined -%}
+                "remote_as": [ {{- nbr.remote_as -}} ],
+              {%- endif -%}
+              "is_peer_group": false
+            }
+          {%- endif -%}
+        {%- if not loop.last -%} , {%- endif -%} {%- endfor -%} },
+      {%- endif -%}
+      {%- if bgp.router_id is defined -%}
+        "router_id": "{{- bgp.router_id -}}"
+      {%- endif -%}
+    } {%- if not loop.last -%} , {%- endif -%}
+  {%- endfor -%}
+}

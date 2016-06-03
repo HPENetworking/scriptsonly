@@ -1,0 +1,8 @@
+{# OpenSwitch System table JSON template file #}
+
+"System": {
+  {# System.vrfs column #}
+  {%- if ops_vrfs is defined -%}
+    {%- include ['ops_system_vrfs.j2'] -%}
+  {%- endif -%}
+}

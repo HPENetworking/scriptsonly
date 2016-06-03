@@ -1,0 +1,63 @@
+---
+- name: configure the BGP network through bgp role
+  hosts: switches@travis
+  gather_facts: no
+  vars:
+    ansible_user: admin
+    ops_debug: yes
+    ops_cli_provider:
+      transport: cli
+      username: netop
+      password: netop
+      host: "{{ ansible_host }}"
+      port: "{{ ansible_port }}"
+    ops_rest_provider:
+      transport: rest
+      username: netop
+      password: netop
+      host: "{{ ansible_host }}"
+      port: "{{ ops_rest_port }}"
+      use_ssl: true
+      validate_certs: no
+
+  roles:
+    - role: bgp
+      ops_vrfs:
+        - name: vrf_default
+          bgp_routers:
+            - as_number: 65000
+              router_id: 172.16.0.1
+              networks: [172.16.0.0/24, 172.16.1.0/24, 172.16.2.0/24]
+
+  post_tasks:
+    - name: check the bgp network on the switch
+      connection: local
+      ops_command:
+        provider: "{{ ops_cli_provider }}"
+        commands:
+          - show running-config
+        waitfor:
+          - "result[0] contains 'router bgp 65000'"
+          - "result[0] contains 'bgp router-id 172.16.0.1'"
+          - "result[0] contains 'network 172.16.0.0/24'"
+          - "result[0] contains 'network 172.16.1.0/24'"
+          - "result[0] contains 'network 172.16.2.0/24'"
+        interval: 1
+        retries: 2
+      register: result
+
+    - name: debug the result
+      debug: var=result
+      when: ops_debug
+
+    - name: get the BGP router facts over REST API
+      connection: local
+      ops_facts:
+        provider: "{{ ops_rest_provider }}"
+        endpoints:
+          - /system/vrfs/vrf_default/bgp_routers/65000
+      register: rest_result
+
+    - name: debug the REST result
+      debug: var=rest_result
+      when: ops_debug
