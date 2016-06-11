@@ -1,0 +1,45 @@
+---
+-   sysname: 7904-1
+    role: spine
+    routerid: 10.10.10.40
+    interfaces:
+    - {description: LoopBack0, ifdesc: LoopBack0, ipaddress: 192.168.1.1, mask: 255.255.255.255}
+    - {description: OOBM Interface, ifdesc: M-GigabitEthernet1/0/0/0, ipaddress: 10.10.10.40, mask: 255.255.255.0}
+    - {description: link to 5930-2, ifdesc: Ten-GigabitEthernet1/2/0/3, ipaddress: 192.168.2.5, mask: 255.255.255.252,
+        portmode: route}
+    - {description: link to 5930-1, ifdesc: Ten-GigabitEthernet1/2/0/4, ipaddress: 192.168.2.1, mask: 255.255.255.252,
+        portmode: route}
+    
+-
+    sysname: 7904-2
+    role: spine
+    routerid: 10.10.10.41
+    interfaces:
+    - {description: LoopBack0, ifdesc: LoopBack0, ipaddress: 192.168.1.2, mask: 255.255.255.255}
+    - {description: OOBM Interface, ifdesc: M-GigabitEthernet1/0/0/0, ipaddress: 10.10.10.41, mask: 255.255.255.0}
+    - {description: link to 5930-2, ifdesc: Ten-GigabitEthernet1/2/0/3, ipaddress: 192.168.2.13, mask: 255.255.255.252,
+        portmode: route}
+    - {description: link to 5930-1, ifdesc: Ten-GigabitEthernet1/2/0/4, ipaddress: 192.168.2.9, mask: 255.255.255.252,
+        portmode: route}
+-
+    sysname: 5930-1
+    role: leaf
+    routerid: 10.10.10.42
+    interfaces:
+    - {description: LoopBack0, ifdesc: LoopBack0, ipaddress: 192.168.1.11, mask: 255.255.255.255}
+    - {description: OOBM Interface, ifdesc: M-GigabitEthernet0/0/0, ipaddress: 10.10.10.42, mask: 255.255.255.0}
+    - {description: link to 7904-2, ifdesc: Ten-GigabitEthernet1/1/1, ipaddress: 192.168.2.10, mask: 255.255.255.252,
+        portmode: route}
+    - {description: link to 7904-1, ifdesc: Ten-GigabitEthernet1/1/2, ipaddress: 192.168.2.2, mask: 255.255.255.252,
+        portmode: route}
+-
+    sysname: 5930-2
+    role: leaf
+    routerid: 10.10.10.43
+    interfaces:
+    - {description: LoopBack0, ifdesc: LoopBack0, ipaddress: 192.168.1.12, mask: 255.255.255.255}
+    - {description: OOBM Interface, ifdesc: M-GigabitEthernet0/0/0, ipaddress: 10.10.10.43, mask: 255.255.255.0}
+    - {description: link to 5930-2, ifdesc: Ten-GigabitEthernet1/1/1, ipaddress: 192.168.2.14, mask: 255.255.255.252,
+        portmode: route}
+    - {description: link to 5930-1, ifdesc: Ten-GigabitEthernet1/1/2, ipaddress: 192.168.2.6, mask: 255.255.255.252,
+        portmode: route}

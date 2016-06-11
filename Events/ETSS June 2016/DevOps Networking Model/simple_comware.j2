@@ -1,0 +1,14 @@
+#sysname config
+sysname {{ simple['hostname'] }}
+#vlan config
+{% for vlan in simple['vlans'] -%}
+vlan {{ vlan['id'] }}
+    name {{ vlan['name'] }}
+    description {{ vlan['description'] }}
+{% endfor %}#snmp_config
+snmp-agent
+snmp-agent community read {{ simple['snmp']['read'] }}
+snmp-agent community write {{ simple['snmp']['write'] }}
+snmp-agent sys-info contact {{ simple['snmp']['syscontact']  }}
+snmp-agent sys-info location {{ simple['snmp']['syslocation'] }}
+snmp-agent sys-info version all

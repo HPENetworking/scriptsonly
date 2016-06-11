@@ -1,0 +1,22 @@
+{% extends "./Templates/cw7_base.j2" %}
+
+
+{% block system %}mdc Admin id 1
+sysname {{ dev.sysname }}
+router id {{  dev.routerid }}
+#
+telnet server enable
+#{%  endblock %}
+{% block irf %}{%  endblock %}
+{% block line %}
+line class aux
+ user-role network-admin
+#
+
+#
+line vty 0 15
+ authentication-mode scheme
+ user-role network-operator
+{% endblock %}
+
+
