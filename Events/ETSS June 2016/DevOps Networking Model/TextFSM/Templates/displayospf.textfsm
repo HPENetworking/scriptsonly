@@ -1,0 +1,11 @@
+Value Filldown Area (\d+.\d+.\d+.\d+)
+Value Router_ID (\d+.\d+.\d+.\d+)
+Value Address (\d+.\d+.\d+.\d+)
+Value Pri (\d+)
+Value Dead_Time (\d+)
+Value State (\S+)
+Value Interface (\S+)
+
+Start
+  ^ Area: ${Area}
+  ^ ${Router_ID}\s+${Address}\s+${Pri}\s+${Dead_Time}\s+${State}\s+${Interface} -> Record
