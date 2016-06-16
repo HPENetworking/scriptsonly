@@ -1,0 +1,8 @@
+Value ChassisID (...-...-.../Mac.address)
+Value RemoteInterface (\S+)
+Value Capabilities (\S+)
+
+Start
+  ^ ChassisID/subtype\s+:${ChassisID}
+  ^ PortID/subtype      :${RemoteInterface}
+  ^ Capabilities        :${Capabilities} -> Record

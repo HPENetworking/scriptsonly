@@ -1,4 +1,4 @@
-
+''' for python 3 reqires for of textFSM avialable at https://github.com/jonathanslenders/textfsm'''
 import jtextfsm as textfsm
 import json
 
