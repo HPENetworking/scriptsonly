@@ -7,7 +7,7 @@ ENV = Environment(loader=FileSystemLoader('./'))
 with open("./Inputs/globalvals.yaml") as inputfile:
     devglobals =  yaml.load(inputfile)
 
-with open('./Inputs/devices2.yaml') as inputfile:
+with open('./Inputs/devices.yaml') as inputfile:
     devs = yaml.load(inputfile)
 
 for dev in devs:

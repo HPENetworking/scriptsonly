@@ -1,8 +1,13 @@
-Value ChassisID (...-...-.../Mac.address)
-Value RemoteInterface (\S+)
-Value Capabilities (\S+)
+Value LocalInterface (\w+-\w+\/\d\/\d+)
+Value ChassisID (....\-....\-..../MAC.address)
+Value RemoteInterface (\w+\/\d+\/\d+\/\w+.\w+)
+Value Capabilities (.+)
 
 Start
-  ^ ChassisID/subtype\s+:${ChassisID}
-  ^ PortID/subtype      :${RemoteInterface}
-  ^ Capabilities        :${Capabilities} -> Record
+  ^LLDP.neighbor-information.of.port.\d+\[${LocalInterface}
+  ^ ChassisID\/subtype\s+:\s+${ChassisID}
+  ^ PortID\/subtype\s+:\s${RemoteInterface}
+  ^ Capabilities\s+:\s+${Capabilities} -> Record
+
+
+

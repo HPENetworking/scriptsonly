@@ -55,9 +55,9 @@ Destination/Mask    Proto  Pre  Cost         NextHop         Interface
 <5900>'''
 
 
-    template = open("./templates/displayiproutingtable.textfsm")
-    re_table = textfsm.TextFSM(template)
-    fsm_results = re_table.ParseText(displayiproute)
+template = open("./templates/displayiproutingtable.textfsm")
+re_table = textfsm.TextFSM(template)
+fsm_results = re_table.ParseText(displayiproute)
 
 
 

@@ -33,4 +33,7 @@ re_table = textfsm.TextFSM(template)
 fsm_results = re_table.ParseText(displaylldpneigh)
 
 
-print (fsm_results)
+print (len(fsm_results))
+
+for neighbor in fsm_results:
+    print (neighbor)
