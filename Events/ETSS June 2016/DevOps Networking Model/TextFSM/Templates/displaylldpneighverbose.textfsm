@@ -1,0 +1,59 @@
+Value LocalInterface (\w+-\w+\/\d\/\d+)
+Value UpdateTime (\d+.days,.\d+.hours,.\d+.minutes,.\d+.seconds)
+Value ChassisType (\w+\s+\w+|w+)
+Value ChassisID (....\-....\-....)
+Value PortIDType (\w+\s+\w+|w+)
+Value RemoteInterface (\w+/\d+/\d+)
+Value SystemName (\w+)
+Value SystemDescription (.+(.+?(?=^\s+System.capabilities.supported)))
+Value SystemCapabilities (.+)
+Value EnabledCapabilities (.+)
+Value MgmtAddressType (\w+)
+Value MgmtAddress (\d+.\d+.\d+.\d+)
+Value MgmtAddressIntType (\w+)
+Value MgmtAddressID (\d+)
+Value LinkAggSupport (\w+)
+Value LinkAggEnabled (\w+)
+Value AutoNegoSupported (\w+)
+Value AutoNegoEnabled (\w+)
+Value Speed (\d+)
+Value Duplex (\w+)
+Value PowerClass (\w+)
+Value PoeSupported (\w+)
+Value PoeEnabled (\w+)
+Value PoePairsControlAbility (\w+)
+Value PowerPairs (\w+)
+Value PortPowerClass (\w+\s+\d+)
+Value MaxFrameSize (\d+)
+
+
+Start
+  ^LLDP.neighbor-information.of.port.\d+\[${LocalInterface}
+  ^ Update.time\s+:\s+${UpdateTime}
+  ^ Chassis.type\s+:.${ChassisType}
+  ^ Chassis.ID\s+:.${ChassisID}
+  ^ Port.ID.type\s+:.${PortIDType}
+  ^ Port.ID\s+:.${RemoteInterface}
+  ^ System.name\s+:.${SystemName}
+  ^ System.description\s+:\s+${SystemDescription}
+  ^ System.capabilities.supported.:\s+${SystemCapabilities}
+  ^ System.capabilities.enabled\s+:\s+${EnabledCapabilities}
+  ^ Management.address.type\s+:\s+${MgmtAddressType}
+  ^ Management.address\s+:\s+${MgmtAddress}
+  ^ Management.address.interface.type\s+:\s+${MgmtAddressIntType}
+  ^ Management.address.interface.ID\s+:\s+${MgmtAddressID}
+  ^ Link.aggregation.supported\s+:\s+${LinkAggSupport}
+  ^ Link.aggregation.enabled\s+:\s+${LinkAggEnabled}
+  ^ Auto-negotiation.supported\s+:\s+${AutoNegoSupported}
+  ^ Auto-negotiation.enabled\s+:\s+${AutoNegoEnabled}
+  ^ OperMau\s+:\s+Speed\(${Speed}\)/Duplex\(${Duplex}
+  ^ Power.port.class\s+:\s+${PowerClass}
+  ^ PSE.power.supported\s+:\s+${PoeSupported}
+  ^ PSE.power.enabled\s+:\s+${PoeEnabled}
+  ^ PSE.pairs.control.ability\s+:\s+${PoePairsControlAbility}
+  ^ Power.pairs\s+:\s+${PowerPairs}
+  ^ Port.power.classification\s+:\s+${PortPowerClass}
+  ^ Maximum.frame.size\s+:\s+${MaxFrameSize} -> Record
+
+
+

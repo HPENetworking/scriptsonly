@@ -1,0 +1,13 @@
+Value MACAddress (\w+-\w+-\w+)
+Value VLAN (\S+|\d+)
+Value State (\w+)
+Value Port (\S+)
+Value Aging (\w+)
+
+Start
+  ^${MACAddress}\s+${VLAN}\s+${State}\s+${Port}\s+${Aging} -> Record
+
+
+
+
+

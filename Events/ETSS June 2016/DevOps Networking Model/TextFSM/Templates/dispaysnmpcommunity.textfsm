@@ -1,0 +1,12 @@
+Value CommunityName (\S+)
+Value GroupName (\S+)
+Value StorageType (\S+)
+
+
+Start
+  ^\s+Community\s+name:\s+${CommunityName}
+  ^\s+Group\s+name:\s+${GroupName}
+  ^\s+Storage-type:\s+${StorageType} -> Record
+
+
+

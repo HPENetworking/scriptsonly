@@ -1,0 +1,56 @@
+{%  block system %}sysname {{ dev.sysname }}
+router id {{  dev.routerid }}
+#
+telnet server enable
+#{%  endblock %}
+{%  block irf %}{% endblock %}{% block ospf %}
+#
+ospf {{ devglobals.ospf.process }}
+ area {{ devglobals.ospf.area }}
+  network {{  devglobals.ospf.network }} {{ devglobals.ospf.wildcard }}{%  endblock %}
+#{%  block system1 %}
+ecmp mode {{  devglobals.ecmpmode }}
+#
+lldp global enable
+#
+reserve-vlan-interface 3000 to 3100
+#
+system-working-mode standard
+password-recovery enable{%  endblock %}
+#{%  block vlans %}
+{% for vlan in devglobals['vlans'] -%}
+vlan {{ vlan['id'] }}
+    name {{ vlan['name'] }}
+    description {{ vlan['description'] }}
+{% endfor %}{%  endblock %}#{%  block interfaces %}
+{%  for interface in dev.interfaces -%}
+interface {{  interface.ifdesc }}{%  if interface.portmode %}
+    port link-mode {{ interface['portmode'] }}
+    ip address {{  interface.ipaddress }} {{  interface.mask }}
+    ospf network-type p2p {% else %}
+    ip address {{  interface.ipaddress }} {{  interface.mask }}{%  endif %}
+{% endfor %}{%  endblock %}#
+scheduler logfile size 16
+#{% block line %}
+{% endblock %}#
+line vty 16 63
+ user-role network-operator
+{% block snmp %}#
+ip route-static 15.0.0.0 8 10.10.10.254
+#
+snmp-agent
+snmp-agent community read {{ devglobals['snmp']['read'] }}
+snmp-agent community write {{ devglobals['snmp']['write'] }}
+snmp-agent sys-info contact {{ devglobals['snmp']['syscontact']  }}
+snmp-agent sys-info location {{ devglobals['snmp']['syslocation'] }}
+snmp-agent sys-info version all
+{%  endblock %}{%  block AAA %}#
+
+
+#{% for user in devglobals.users %}{%  if user.username == 'admin' %}
+local-user {{ user.username }} class manage
+password simple {{ user.password }}
+service-type telnet terminal http
+authorization-attribute user-role network-admin
+authorization-attribute user-role network-operator
+{%  endif %}{%  endfor %}{%  endblock %}#
