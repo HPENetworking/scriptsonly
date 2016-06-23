@@ -1,0 +1,13 @@
+Value Version (.+?(?=,))
+Value Release (\S+)
+Value Uptime (.+)
+Value LastReboot (\S+)
+Value BootImage (\S+)
+Value SystemImage (\S+)
+
+Start
+  ^HP\s+Comware\s+Software,\s+Version\s+${Version},\s+Release\s+${Release}
+  ^.+?(?=uptime)uptime\s+is\s+${Uptime}
+  ^Last\s+reboot\s+reason\s+:\s+${LastReboot}
+  ^Boot\s+image:\s+${BootImage}
+  ^System\s+image:\s+${SystemImage} -> Record
