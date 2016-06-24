@@ -1,0 +1,14 @@
+{# OpenSwitch Bridge table JSON template file #}
+
+"Bridge": {
+  {%- for br in ops_bridges -%}
+    "{{- br.name -}}": {
+      {%- if br.ports is defined -%}
+        "ports": [ {%- for port in br.ports -%}
+          "{{- port -}}" {%- if not loop.last -%} , {%- endif -%}
+        {%- endfor -%} ],
+      {%- endif -%}
+      "name": "{{- br.name -}}"
+    } {%- if not loop.last -%} , {%- endif -%}
+  {%- endfor -%}
+}

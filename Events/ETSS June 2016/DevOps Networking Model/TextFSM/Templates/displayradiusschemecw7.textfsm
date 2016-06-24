@@ -1,0 +1,15 @@
+Value SchemeName (\S+)
+Value Index (\d+)
+Value Hostname (Not.Configured|\w+)
+Value PriAuthServerIP (Not.Configured|\d+.\d+.\d+.\d+)
+
+
+Start
+  ^RADIUS\s+scheme\s+name:\s+${SchemeName}
+  ^\s+Index:\s+${Index}
+  ^\s+Primary.Auth.Server:\n\s+Host.name:\s+${Hostname}\n\s+IP\s+:\s+${PriAuthServerIP}
+  ^(?<=Primary.Auth.Server:\n\s+Host.name:\s+(Not.Configured|\w+))^\s+IP\s+:\s+${PriAuthServerIP}  -> Record
+
+
+
+

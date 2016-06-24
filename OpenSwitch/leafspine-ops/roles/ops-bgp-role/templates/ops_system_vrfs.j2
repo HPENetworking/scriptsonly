@@ -1,0 +1,15 @@
+{# OpenSwitch System.vrfs column JSON template file #}
+
+"vrfs": {
+  {%- for vrf in ops_vrfs -%}
+    "{{- vrf.name -}}": {
+
+      {# System.vrfs.bgp_routers column #}
+      {%- if vrf.bgp_routers is defined -%}
+        {%- include ['ops_system_bgp.j2'] -%},
+      {%- endif -%}
+
+      "name": "{{- vrf.name -}}"
+    } {%- if not loop.last -%} , {%- endif -%}
+  {%- endfor -%}
+}

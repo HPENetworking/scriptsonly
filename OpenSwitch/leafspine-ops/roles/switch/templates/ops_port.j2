@@ -1,0 +1,28 @@
+{# OpenSwitch Port table JSON template file #}
+
+"Port": {
+  {%- for port in ops_ports -%}
+    "{{- port.name -}}": {
+      {%- if port.interfaces is defined -%}
+        "interfaces": [ {%- for intf in port.interfaces -%}
+            "{{- intf -}}"
+          {%- if not loop.last -%} , {%- endif -%} {%- endfor -%} ],
+      {%- else -%}
+        "interfaces": [ "{{- port.name -}}" ],
+      {%- endif -%}
+      {%- if port.ipv4_address is defined -%}
+        "ip4_address": [ "{{- port.ipv4_address -}}" ],
+      {%- endif -%}
+      {%- if port.ipv4_address_secondary is defined -%}
+        "ip4_address_secondary": [ {%- for addr in port.ipv4_address_secondary -%}
+            "{{- addr -}}"
+          {%- if not loop.last -%} , {%- endif -%} {%- endfor -%} ],
+      {%- endif -%}
+      {%- if port.ipv4_address is not defined -%}
+        "vlan_mode": "{{- port.vlan_mode|default(ops_port_vlan_mode) -}}",
+        "tag": {{- port.tag|default(ops_port_tag) -}},
+      {%- endif -%}
+      "name": "{{- port.name -}}"
+    } {%- if not loop.last -%} , {%- endif -%}
+  {%- endfor -%}
+}

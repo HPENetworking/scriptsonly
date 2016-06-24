@@ -1,0 +1,21 @@
+---
+- hosts: all
+  remote_user: root
+  gather_facts: no
+  vars:
+    ansible_user: root
+  tasks:
+    - name: Ping my switches
+      ping:
+    - name: Collect device information
+      ops_facts:
+        host: localhost
+        transport: rest
+        validate_certs: False
+        config: No
+        username: root
+        password:
+    - name: Print OpenSwitch version
+      debug: var=version
+
+

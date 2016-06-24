@@ -1,0 +1,16 @@
+#hostname config
+hostname {{ simple['hostname'] }}
+#vlan config
+{% for vlan in simple['vlans'] -%}
+vlan {{ vlan['id'] }}
+    name {{ vlan['name'] }}
+    description {{ vlan['description'] }}
+{% endfor %}#snmp config
+snmp-server community {{ simple['snmp']['read'] }} RO
+snmp-server community {{ simple['snmp']['write'] }} RW
+snmp-server ifindex persist
+snmp-server location {{ simple['snmp']['syslocation'] }}
+snmp-server contact {{ simple['snmp']['syscontact'] }}
+{% for trap in simple['snmp']['trap'] -%}
+snmp-server host {{ trap['target'] }}  public
+{% endfor %}

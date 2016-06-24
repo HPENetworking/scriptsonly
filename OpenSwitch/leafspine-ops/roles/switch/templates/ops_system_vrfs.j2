@@ -1,0 +1,16 @@
+{# OpenSwitch System.vrfs column JSON template file #}
+
+"vrfs": {
+  {%- for vrf in ops_vrfs -%}
+    "{{- vrf.name -}}": {
+
+      {%- if vrf.ports is defined -%}
+        "ports": [ {%- for port in vrf.ports -%}
+          "{{- port -}}" {%- if not loop.last -%} , {%- endif -%}
+        {%- endfor -%} ],
+      {%- endif -%}
+
+      "name": "{{- vrf.name -}}"
+    } {%- if not loop.last -%} , {%- endif -%}
+  {%- endfor -%}
+}

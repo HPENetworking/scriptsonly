@@ -1,0 +1,5 @@
+vlans:
+- {vlanId: '1', vlanName: default, vlanStatus: '1'}
+- {vlanId: '2', vlanName: TenantABC, vlanStatus: '1'}
+- {vlanId: '3', vlanName: management, vlanStatus: '1'}
+- {vlanId: '10', vlanName: mgmt, vlanStatus: '1'}

@@ -1,0 +1,83 @@
+---
+- name: configure the hostname through switch role
+  hosts: switches
+  gather_facts: yes
+  vars:
+    ansible_user: admin
+    ops_system_hostname: SimpleHostname
+    ops_debug: yes
+    ops_cli_provider:
+      transport: cli
+      username: netop
+      password: netop
+      host: "{{ ansible_host }}"
+      port: "{{ ansible_port }}"
+    ops_rest_provider:
+      transport: rest
+      username: netop
+      password: netop
+      host: "{{ ansible_host }}"
+      port: "{{ ops_rest_port }}"
+      use_ssl: true
+      validate_certs: no
+
+  roles:
+    - role: switch
+
+  tasks:
+    - name: show version CLI
+      connection: local
+      ops_command:
+        provider: "{{ ops_cli_provider }}"
+        commands:
+          - show version
+        interval: 1
+        retries: 2
+      register: show_version_result
+
+    - name: show version result
+      debug: var=show_version_result
+      when: ops_debug
+
+    - name: show running-config CLI
+      connection: local
+      ops_command:
+        provider: "{{ ops_cli_provider }}"
+        commands:
+          - show running-config
+        interval: 5
+        retries: 3
+      register: show_running_config_result
+
+    - name: show running-config result
+      debug: var=show_running_config_result
+      when: ops_debug
+
+  post_tasks:
+    - name: check the hostname on the switch with CLI
+      connection: local
+      ops_command:
+        provider: "{{ ops_cli_provider }}"
+        commands:
+          - show hostname
+        waitfor:
+          - "result[0] contains '{{ ops_system_hostname }}'"
+        interval: 1
+        retries: 2
+      register: cli_result
+
+    - name: debug the CLI result
+      debug: var=cli_result
+      when: ops_debug
+
+    - name: get the system facts over REST API
+      connection: local
+      ops_facts:
+        provider: "{{ ops_rest_provider }}"
+        endpoints:
+          - /system
+      register: rest_result
+
+    - name: debug the REST result
+      debug: var=rest_result
+      when: ops_debug

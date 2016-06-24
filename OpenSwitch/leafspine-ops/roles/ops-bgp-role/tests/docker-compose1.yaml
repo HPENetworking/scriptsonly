@@ -1,0 +1,42 @@
+version: '2'
+services:
+  build_switch:
+    build: .
+    image: openswitch/local_build
+    command: /bin/true
+  build_server:
+    build: ./server
+    image: server/local_build
+    command: /bin/true
+  fab1:
+    image: openswitch/local_build
+    container_name: "fab1"
+    privileged: true
+    ports:
+      - "10022:22"
+      - "10443:443"
+    volumes:
+      - /tmp:/tmp
+      - /dev/log:/dev/log
+      - /sys/fs/cgroup:/sys/fs/cgroup
+    networks:
+      - default
+    command: /sbin/init
+  server1:
+    image: server/local_build
+    container_name: "server1"
+    privileged: true
+    ports:
+      - "21022:22"
+    networks:
+      - default
+    command: /usr/sbin/sshd -D
+  server2:
+    image: server/local_build
+    container_name: "server2"
+    privileged: true
+    ports:
+      - "22022:22"
+    networks:
+      - default
+    command: /usr/sbin/sshd -D

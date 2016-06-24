@@ -1,0 +1,17 @@
+{# OpenSwitch System table JSON template file #}
+
+"System": {
+
+  {# System.bridges column #}
+  {%- if ops_bridges is defined -%}
+    {%- include ['ops_system_bridges.j2'] -%},
+  {%- endif -%}
+
+  {# System.vrfs column #}
+  {%- if ops_vrfs is defined -%}
+    {%- include ['ops_system_vrfs.j2'] -%},
+  {%- endif -%}
+
+  {# System.hostname column #}
+  "hostname": "{{- ops_system_hostname -}}"
+}
