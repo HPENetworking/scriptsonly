@@ -1,0 +1,43 @@
+---
+- name: Configure hostname and interfaces
+  hosts: all
+  remote_user: root
+  gather_facts: no
+  vars_files:
+    - vars/topology.yml
+    - vars/connections.yml
+
+  tasks:
+    - name: Get BGP peering information
+      connection: local
+      ops_facts:
+        provider: "{{ ops_rest_provider }}"
+        endpoints:
+          - "/system/vrfs/vrf_default/bgp_routers/{{item.0.as_number}}/bgp_neighbors/{{item.1.address}}"
+      register: rest_result
+      with_subelements:
+        - "{{switches[inventory_hostname].ops_vrfs.0.bgp_routers}}"
+        - "neighbors"
+      ignore_errors: True
+
+    - name: Prepare output
+      set_fact:
+        peer: "Peering to {{item.item.1.address}} is {{item.ansible_facts.endpoints.0.status.status.bgp_peer_state}}\n"
+      register: peers
+      with_items: "{{rest_result.results}}"
+
+    - name: Transform output
+      set_fact: peer_set="{{ peers.results | map(attribute='ansible_facts.peer') | list }}"
+
+    # - name: Print output
+    #   debug: msg="{{peer_set}}"
+
+    - name: Report switches with failed neighbors
+      fail: msg="{{item}}"
+      when: "'Established' not in item"
+      with_items: "{{peer_set}}"
+
+    # - name: debug the REST result
+    #   debug: msg="spojeni ok"
+    #   with_items: rest_result.results
+    #   when: "'Established' in item.ansible_facts.endpoints.0.status.status.bgp_peer_state"

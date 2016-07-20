@@ -1,0 +1,20 @@
+{% extends "./Templates/cw7_base.j2" %}{% block irf %}{%  endblock %}
+
+{%  block system1 %}
+ecmp mode {{  devglobals.ecmpmode }}
+#
+lldp global enable
+#
+system-working-mode standard
+fan prefer-direction slot 1 port-to-power
+password-recovery enable{%  endblock %}
+
+
+{% block line %}
+
+#
+line vty 0 15
+ authentication-mode scheme
+ user-role network-operator
+
+{% endblock %}

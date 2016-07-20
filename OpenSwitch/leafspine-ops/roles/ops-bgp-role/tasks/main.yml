@@ -1,0 +1,16 @@
+---
+- name: print JSON input for this play
+  debug: >
+    msg="{{ lookup('template', 'main.j2') }}"
+  when: ops_debug
+
+- name: configure the bgp role
+  become: yes
+  ops_template:
+    src: main.j2
+    host: "{{ ops_host }}"
+  register: ops_result
+
+- name: result from the switch
+  debug: var=ops_result
+  when: ops_debug

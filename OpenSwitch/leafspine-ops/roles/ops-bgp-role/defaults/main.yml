@@ -1,0 +1,12 @@
+---
+# defaults file for the bgp role.
+
+# default remote user on the switch
+remote_user: admin
+
+# default host variable, which is required by ops_*.py modules.
+# This variable actually used in in REST transport case.
+ops_host: "{{ ansible_host }}"
+
+# Enable debugging on ops_*.py modules.
+ops_debug: false

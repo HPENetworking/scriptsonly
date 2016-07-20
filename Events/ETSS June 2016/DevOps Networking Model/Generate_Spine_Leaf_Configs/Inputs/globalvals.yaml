@@ -1,0 +1,30 @@
+---
+
+ospf:
+    process: 1
+    area: 0
+    network: 192.168.0.0
+    wildcard: 0.0.255.255
+
+ecmpmode: enhanced
+
+snmp:
+    read: public
+    write: private
+    syscontact: admin.lab.local
+    syslocation: lab
+    trap:
+    - {target: 10.10.10.10}
+
+
+
+
+vlans:
+- {description: management vlan, id: '10', name: management}
+- {description: users vlan, id: '15', name: users}
+- {description: phones vlan, id: '16', name: phones}
+- {description: servers vlan, id: '20', name: servers vlan }
+
+users:
+- {username: admin, password: admin}
+

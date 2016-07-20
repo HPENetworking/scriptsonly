@@ -1,0 +1,83 @@
+---
+- name: noop test with switch role
+  hosts: switches
+  vars:
+    ansible_user: admin
+    ops_debug: yes
+    ops_name: OpenSwitch
+    ops_cli_provider:
+      transport: cli
+      username: netop
+      password: netop
+      host: "{{ ansible_host }}"
+      port: "{{ ansible_port }}"
+    ops_rest_provider:
+      transport: rest
+      username: netop
+      password: netop
+      host: "{{ ansible_host }}"
+      port: "{{ ops_rest_port }}"
+      use_ssl: true
+      validate_certs: no
+
+  roles:
+    - switch
+
+  tasks:
+    - name: show version CLI
+      connection: local
+      ops_command:
+        provider: "{{ ops_cli_provider }}"
+        commands:
+          - show version
+        interval: 1
+        retries: 2
+      register: show_version_result
+
+    - name: show version result
+      debug: var=show_version_result
+      when: ops_debug
+
+    - name: show running-config CLI
+      connection: local
+      ops_command:
+        provider: "{{ ops_cli_provider }}"
+        commands:
+          - show running-config
+        interval: 5
+        retries: 3
+      register: show_running_config_result
+
+    - name: show running-config result
+      debug: var=show_running_config_result
+      when: ops_debug
+
+  post_tasks:
+    - name: check if switch responds to 'show version' CLI
+      connection: local
+      ops_command:
+        provider: "{{ ops_cli_provider }}"
+        commands:
+          - show version
+        waitfor:
+          - "result[0] contains {{ ops_name }}"
+        interval: 1
+        retries: 2
+      register: result
+
+    - name: debug the result
+      debug: var=result
+      when: ops_debug
+
+    - name: get the system and subsystem facts over REST API
+      connection: local
+      ops_facts:
+        provider: "{{ ops_rest_provider }}"
+        endpoints:
+          - /system
+          - /system/subsystems
+      register: rest_result
+
+    - name: debug the REST result
+      debug: var=rest_result
+      when: ops_debug

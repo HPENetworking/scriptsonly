@@ -1,0 +1,161 @@
+---
+switches:
+  leaf1:
+    ops_interfaces:
+      - name: lo1
+      - name: 1
+      - name: 2
+    ops_ports:
+      - name: lo1
+        ipv4_address: 192.168.0.1/32
+      - name: 1
+        ipv4_address: 10.1.0.1/30
+      - name: 2
+        ipv4_address: 10.2.0.1/30
+    ops_vrfs:
+      - name: vrf_default
+        router_id: 192.168.0.1
+        bgp_routers:
+          - as_number: 65001
+            router_id: 192.168.0.1
+            networks: [192.168.0.1/32]
+            neighbors:
+              - address: 10.1.0.2
+                remote_as: 65101
+              - address: 10.2.0.2
+                remote_as: 65102
+  leaf2:
+    ops_interfaces:
+      - name: lo1
+      - name: 1
+      - name: 2
+    ops_ports:
+      - name: lo1
+        ipv4_address: 192.168.0.2/32
+      - name: 1
+        ipv4_address: 10.1.1.1/30
+      - name: 2
+        ipv4_address: 10.2.1.1/30
+    ops_vrfs:
+      - name: vrf_default
+        bgp_routers:
+          - as_number: 65002
+            router_id: 192.168.0.2
+            networks: [192.168.0.2/32]
+            neighbors:
+              - address: 10.1.1.2
+                remote_as: 65101
+              - address: 10.2.1.2
+                remote_as: 65102
+  leaf3:
+    ops_interfaces:
+      - name: lo1
+      - name: 1
+      - name: 2
+    ops_ports:
+      - name: lo1
+        ipv4_address: 192.168.0.3/32
+      - name: 1
+        ipv4_address: 10.1.2.1/30
+      - name: 2
+        ipv4_address: 10.2.2.1/30
+    ops_vrfs:
+      - name: vrf_default
+        bgp_routers:
+          - as_number: 65003
+            router_id: 192.168.0.3
+            networks: [192.168.0.3/32]
+            neighbors:
+              - address: 10.1.2.2
+                remote_as: 65101
+              - address: 10.2.2.2
+                remote_as: 65102
+  leaf4:
+    ops_interfaces:
+      - name: lo1
+      - name: 1
+      - name: 2
+    ops_ports:
+      - name: lo1
+        ipv4_address: 192.168.0.4/32
+      - name: 1
+        ipv4_address: 10.1.3.1/30
+      - name: 2
+        ipv4_address: 10.2.3.1/30
+    ops_vrfs:
+      - name: vrf_default
+        bgp_routers:
+          - as_number: 65004
+            router_id: 192.168.0.4
+            networks: [192.168.0.4/32]
+            neighbors:
+              - address: 10.1.3.2
+                remote_as: 65101
+              - address: 10.2.3.2
+                remote_as: 65102
+  spine1:
+    ops_interfaces:
+      - name: lo1
+      - name: 1
+      - name: 2
+      - name: 3
+      - name: 4
+    ops_ports:
+      - name: lo1
+        ipv4_address: 192.168.1.1/32
+      - name: 1
+        ipv4_address: 10.1.0.2/30
+      - name: 2
+        ipv4_address: 10.1.1.2/30
+      - name: 3
+        ipv4_address: 10.1.2.2/30
+      - name: 4
+        ipv4_address: 10.1.3.2/30
+    ops_vrfs:
+      - name: vrf_default
+        bgp_routers:
+          - as_number: 65101
+            router_id: 192.168.1.1
+            networks: [192.168.1.1/32]
+            neighbors:
+              - address: 10.1.0.1
+                remote_as: 65001
+              - address: 10.1.1.1
+                remote_as: 65002
+              - address: 10.1.2.1
+                remote_as: 65003
+              - address: 10.1.3.1
+                remote_as: 65004
+  spine2:
+    ops_interfaces:
+      - name: lo1
+      - name: 1
+      - name: 2
+      - name: 3
+      - name: 4
+    ops_ports:
+      - name: lo1
+        ipv4_address: 192.168.1.2/32
+      - name: 1
+        ipv4_address: 10.2.0.2/30
+      - name: 2
+        ipv4_address: 10.2.1.2/30
+      - name: 3
+        ipv4_address: 10.2.2.2/30
+      - name: 4
+        ipv4_address: 10.2.3.2/30
+    ops_vrfs:
+      - name: vrf_default
+        bgp_routers:
+          - as_number: 65102
+            router_id: 192.168.1.2
+            networks: [192.168.1.2/32]
+            neighbors:
+              - address: 10.2.0.1
+                remote_as: 65001
+              - address: 10.2.1.1
+                remote_as: 65002
+              - address: 10.2.2.1
+                remote_as: 65003
+              - address: 10.2.3.1
+                remote_as: 65004

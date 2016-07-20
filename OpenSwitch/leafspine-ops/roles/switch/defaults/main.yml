@@ -1,0 +1,129 @@
+---
+# defaults file for the switch role.
+
+# default remote user on the switch
+remote_user: admin
+
+# default host variable, which is required by ops_*.py modules.
+# This variable actually used in in REST transport case.
+ops_host: "{{ ansible_host }}"
+
+# Override the switch configuration.
+#
+# Be cautious to change the following variable to 'yes' as
+# it will override the existing configuration on the switch.
+ops_config_override: no
+
+# Enable debugging on ops_*.py modules.
+ops_debug: false
+
+# System default variables.
+ops_system_hostname: switch
+
+# Interface default variables.
+ops_intf_admin_state: down
+ops_intf_autoneg: default
+ops_intf_duplex: full
+ops_interfaces:
+  - name: 1
+  - name: 2
+  - name: 3
+  - name: 4
+  - name: 5
+  - name: 6
+  - name: 7
+  - name: 8
+  - name: 9
+  - name: 10
+  - name: 11
+  - name: 12
+  - name: 13
+  - name: 14
+  - name: 15
+  - name: 16
+  - name: 17
+  - name: 18
+  - name: 19
+  - name: 20
+  - name: 21
+  - name: 22
+  - name: 23
+  - name: 24
+  - name: 25
+  - name: 26
+  - name: 27
+  - name: 28
+  - name: 29
+  - name: 30
+  - name: 31
+  - name: 32
+  - name: 33
+  - name: 34
+  - name: 35
+  - name: 36
+  - name: 37
+  - name: 38
+  - name: 39
+  - name: 40
+  - name: 41
+  - name: 42
+  - name: 43
+  - name: 44
+  - name: 45
+  - name: 46
+  - name: 47
+  - name: 48
+
+# Port default variables.
+ops_port_tag: 1
+ops_port_vlan_mode: access
+ops_ports:
+  - name: 1
+  - name: 2
+  - name: 3
+  - name: 4
+  - name: 5
+  - name: 6
+  - name: 7
+  - name: 8
+  - name: 9
+  - name: 10
+  - name: 11
+  - name: 12
+  - name: 13
+  - name: 14
+  - name: 15
+  - name: 16
+  - name: 17
+  - name: 18
+  - name: 19
+  - name: 20
+  - name: 21
+  - name: 22
+  - name: 23
+  - name: 24
+  - name: 25
+  - name: 26
+  - name: 27
+  - name: 28
+  - name: 29
+  - name: 30
+  - name: 31
+  - name: 32
+  - name: 33
+  - name: 34
+  - name: 35
+  - name: 36
+  - name: 37
+  - name: 38
+  - name: 39
+  - name: 40
+  - name: 40
+  - name: 41
+  - name: 42
+  - name: 43
+  - name: 44
+  - name: 45
+  - name: 46
+  - name: 47
+  - name: 48
