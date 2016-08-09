@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tools-config xmlns="http://www.h3c.com/device-tools-config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.h3c.com/device-tools-config dev-tools-config_1_0.xsd ">
+  <description>Zenmap network scan tool configuration</description>
+  <resource-bundle>com.h3c.imc.plat.LocalStrings</resource-bundle> 
+  <config id="zenmap">
+    <conditions>
+      <sys-oid>
+        <wildcard-matcher>*</wildcard-matcher>
+      </sys-oid>
+    </conditions>
+    <action>
+        <client-tool>
+        <app.name>Zenmap scan</app.name>
+        <img.url>res/zenmap.png</img.url>
+        <pref.defpath>C:\Program Files (x86)\Nmap\zenmap.exe</pref.defpath>
+        <pref.pathkey>com.h3c.imc.plat.exec.zenmap</pref.pathkey>
+        <download.url>nmap-6.47-setup.exe</download.url>
+        <app.arg>-t ${DEVICE_IP}</app.arg>
+      </client-tool>
+    </action>
+    </config>
+</tools-config>

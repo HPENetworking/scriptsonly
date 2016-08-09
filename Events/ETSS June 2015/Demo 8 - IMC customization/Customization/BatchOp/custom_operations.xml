@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Operations>
+  <Operation id="ComwareNTP" label="Configure NTP" categoryId="custom" devCapability="ComwareNTP" actionId="ComwareNTPaction" actionType="2" operLevel="1">
+    <Asn1Action id="ComwareNTPaction" serviceName="ComwareNTP" actionName="ComwareNTPaction" operType="1" operMode="2" execMode="1">
+      <Parameter name="Authentication" label="Enable MD5 authentication" dataType="boolean" required="true">
+        <View type="Checkbox"/>
+      </Parameter>
+      <Parameter name="keyid" label="Authentication key ID" validateRegEx="[0-9]*"  required="false">
+        <View type="InputText"/>
+      </Parameter>
+      <Parameter name="key" label="Authentication key" required="false">
+        <View type="InputText"/>
+      </Parameter>
+      <Parameter name="server" label="NTP server IP" validateRegEx="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}" required="true">
+        <View type="InputText"/>
+      </Parameter>
+      <Parameter name="Commit" label="Commit to flash" dataType="boolean" required="true">
+        <View type="Checkbox"/>
+      </Parameter>
+    </Asn1Action>
+  </Operation>
+</Operations>

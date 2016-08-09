@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+
+<scripts>
+
+	<command name="if_updown_operate" method="CLI">
+		<error>Failed to create local user by CLI. Command syntax may be incorrect, or prompts may not be what was expected.</error>
+		<require-mode>enable</require-mode>
+		<script>
+            if_updown_operate.tcl
+		</script>
+	</command>	
+	
+	<command name="if_dot1x_operate" method="CLI">
+		<error>Failed to create local user by CLI. Command syntax may be incorrect, or prompts may not be what was expected.</error>
+		<require-mode>enable</require-mode>
+		<script>
+            if_dot1x_operate.tcl
+		</script>
+	</command>
+	
+	<command name="if_macbind_operate" method="CLI">
+		<error>Failed to create local user by CLI. Command syntax may be incorrect, or prompts may not be what was expected.</error>
+		<require-mode>enable</require-mode>
+		<script>
+            if_macbind_operate.tcl
+		</script>
+	</command>
+	
+</scripts>

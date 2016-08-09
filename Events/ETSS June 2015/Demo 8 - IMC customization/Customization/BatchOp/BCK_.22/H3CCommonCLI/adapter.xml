@@ -1,0 +1,35 @@
+
+<adapter name="H3CCommonCLI">
+	<description>H3C series switch and router, include every oem device</description>
+	<version>1.0.0</version>
+	<services>
+		<service name="CLICommon">
+			<item type="common">H3CCommonCLI_Common_CLI.xml</item>
+		</service>
+
+		<service name="CleanupParser">
+			<item type="parser_definition">H3CCommonCLI_Cleanup_Parser.xml</item>
+			<item type="perl_script">H3CCommonCLI_Cleanup_Parser_Script.pl</item>
+		</service>
+
+		<service name="LocalUserConfig">
+			<item type="builder_definition">H3CCommonCLI_LocalUserConfig_Builder.xml</item>
+			<item type="tcl_script">H3CCommonCLI_LocalUserConfig_Builder_Script.xml</item>
+		</service>
+		
+		<service name="SSHConfig">
+			<item type="builder_definition">H3CCommonCLI_SSHConfig_Builder.xml</item>
+			<item type="tcl_script">H3CCommonCLI_SSHConfig_Builder_Script.xml</item>
+		</service>
+		<service name="SNMPConfig">
+			<item type="builder_definition">H3CCommonCLI_SNMPConfig_Builder.xml</item>
+			<item type="tcl_script">H3CCommonCLI_SNMPConfig_Builder_Script.xml</item>
+		</service>
+		
+		<service name="InterfaceConfig">
+			<item type="builder_definition">H3CCommonCLI_InterfaceConfig_Builder.xml</item>
+			<item type="tcl_script">H3CCommonCLI_InterfaceConfig_Builder_Script.xml</item>
+		</service>
+	</services>
+</adapter>
+

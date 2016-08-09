@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+
+<scripts>
+	<command name="query_local_user" method="CLI">
+		<error>Failed to query local user information. Command syntax may be incorrect, or prompts may not be what was expected.</error>		
+		<require-mode>exec</require-mode>		
+		<script>
+            query_local_user.tcl
+		</script>
+	</command>
+
+	<command name="create_local_user" method="CLI">
+		<error>Failed to create local user by CLI. Command syntax may be incorrect, or prompts may not be what was expected.</error>
+		<require-mode>enable</require-mode>
+		<script>
+            create_local_user.tcl
+		</script>
+	</command>	
+	
+	<command name="create_local_user_v7" method="CLI">
+		<error>Failed to create local user by CLI. Command syntax may be incorrect, or prompts may not be what was expected.</error>
+		<require-mode>enable</require-mode>
+		<script>
+            create_local_user_v7.tcl
+		</script>
+	</command>	
+	
+</scripts>
