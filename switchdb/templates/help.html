@@ -1,0 +1,106 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}switchdb help{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+ <div class="jumbotron">
+				<h3>help for switchdb users</h3>
+				<p class="lead"></p>
+        </div>
+
+<div class="container">
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+
+    </div>
+    <div class="form">
+    <form action = "/index">
+        <p> switchdb help information</p>
+        <p>
+          switchdb is a mini-sql database used for tracking switches which are managed by Ansible.
+          The fields in the database hold the minimal variables needed to get a swicth online and ready to be managed by ansible.
+          There are a couple ways of performing the <b>Zero Thouch</b> operation.
+
+          If you are using the process developed by James Delancey then you will want to copy the JSON output to
+          the tftpboot directory on the techops workbench.<br><hr>
+
+          The are two basic ways to get the switches from <b>cardboard</b> to <b>production</b>. One is using a
+          home brewed <b>techops</b> process with a Linux host configured with DHCP option 66 and 67. It is also a tftpserver.
+
+          Comware switches load a python file and execute it locally and create the basic configuration
+          necessary for Ansible management.<br>
+
+          The second way is to use IMC.<br>Using IMC to implement ZTP with this application is currently not possible
+          and scheduled for the next relase.<br><hr>
+
+          <b>Current Behavior</b>
+
+
+          When the application starts it will have 25 test MAC addresses all ready installed. This allows for
+          test driving the tool before using it.
+
+          At this release these are the primary functions.<br><hr>
+
+          <b>Add Switch</b>
+          <p> Fill out the record fields and press the submit button. NOTE: there are three unique fields in the database
+            <b>mac</b>, <b>Mgmt_ip</b> and <b>sysname</b>.</p><br>
+
+          <b>Edit Switch</b>
+          <p> Enter the switch sysname to edit the file </p><br>
+
+          <b>Delete Switch</b>
+          <p> Enter the switch sysname to delete the file </p><br>
+
+          <b>List Switch</b>
+          <p> This is supposed to make a table listing that can be scrolled easier on a tablet  </p><br>
+
+          <b>Generate Ansible Variables</b>
+          <p> This option will generate a list of all switches in an Ansible YAML format.</p><br>
+
+          <b>Generate JSON Variables</b>
+          <p>   This option will generate a list of all switches in an Ansible JSON format.</p><br>
+
+          <b>Clear All Database Records</b>
+          <p> When you are ready clear all the sample records in the database to start fresh </p><br>
+
+          <b>Dump All Database records</b>
+          <p> When you have the datbase perfect, dump is out to a csv file for backup </p><br>
+
+          <b>Bulk Load Database</b>
+          <p> Bulk load the database with a CSV of you choosing. Must follow template </p><br>
+
+          <b>Download CSV Template</b>
+          <p> Download temple for bulk import with csv file </p><br>
+
+       <input type = "submit" value = "Main" />
+
+     </form>
+  </div>
+
+
+
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+
+{% endblock %}
