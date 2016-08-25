@@ -99,7 +99,7 @@ def build_tenant():
         if (' ' in enterprise):
             flash('Spaces are not allowed in Tenant name')
             return render_template('newtenant.html')
-        if (' ' in domain):
+        if (' ' in domain_new):
             flash('Spaces are not allowed in Domain name')
             return render_template('newtenant.html')
 
@@ -214,12 +214,25 @@ def build_tenant():
                     name='Middle Ingress ACL',
                     priority_type='NONE', # Possible values: TOP, NONE, BOTTOM (domain only accepts NONE)
                     priority=100,
-                    default_allow_non_ip=False,
-                    default_allow_ip=False,
+                    default_allow_non_ip=True,
+                    default_allow_ip=True,
                     allow_l2_address_spoof=False,
                     active=True
                     )
                 dom.create_child(ingressacl)
+
+                # Creating a new egressgress ACL
+                # TODO find out what the real element names are
+                egressacl = vsdk.NUEgressACLTemplate(
+                    name='Middle Egress ACL',
+                    priority_type='NONE', # Possible values: TOP, NONE, BOTTOM (domain only accepts NONE)
+                    priority=100,
+                    default_allow_non_ip=True,
+                    default_allow_ip=True,
+                    allow_l2_address_spoof=False,
+                    active=True
+                    )
+                dom.create_child(egressacl)
 
                 # Creating a new Ingress ACL rule to allow database connectivity
                 # from the Web-Tier Zone to the DB-Tier Zone
