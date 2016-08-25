@@ -1,0 +1,59 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}Distributed Cloud Networking{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+ <div class="jumbotron">
+				<h3>Distrubuted Cloud Networking utilities</h3>
+				<p class="lead"></p>
+        </div>
+
+<div class="container">
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+
+    </div>
+
+    {%- for category, message in get_flashed_messages(with_categories = true) %}
+       <div class = "alert alert-danger">
+          {{ message }}
+       </div>
+    {%- endfor %}
+
+
+
+    <form action = "/add_tenant" method = "post">
+       <input type = "submit" value = "Easy Button" />
+
+    </form>
+    <form action = "/add-vms" method = "post">
+       <input type = "submit" value = "Instanitate VMs" />
+
+    </form>
+
+
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+
+{% endblock %}
