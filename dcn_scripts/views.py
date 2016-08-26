@@ -50,15 +50,13 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 bootstrap = Bootstrap(app)
-# Routes
-# Main Menu
-@app.route('/')
-@app.route('/index')
-def show_all():
-    return render_template('main.html')
 
-@app.route('/login', methods = ['GET', 'POST'])
+# Routes
+@app.route('/index', methods=['POST', 'GET'])
+@app.route('/', methods=['POST', 'GET'])
+@app.route('/login', methods=['POST', 'GET'])
 def login():
+    error = None
     if request.method == 'POST':
         global nuage_user
         session['userx'] = request.form.get('user')
@@ -77,8 +75,8 @@ def login():
             return render_template('main.html')
         # Root User
         nuage_user = nc.user
-
-    return render_template('menu.html')
+        return render_template('menu.html', error=error)
+    return render_template('main.html')
 
 # Select record for editing
 @app.route('/add_tenant', methods = ['GET', 'POST'])
@@ -86,6 +84,102 @@ def add_domain():
     if request.method == 'POST':
         pass
     return render_template('newtenant.html')
+
+@app.route('/newacl', methods = ['GET', 'POST'])
+def newinacl():
+    if request.method == 'POST':
+        domain = nuage_user.domains.get()
+        count = 0
+        domlist = []
+        for dom in domain:
+            domlist.append(dom.name)
+            #print type(domain[count])
+            count = count + 1
+        return render_template('new_acl.html', domlist = domlist, count = count)
+
+@app.route('/gathernewacldata', methods = ['POST'])
+def gathernewinacldata():
+    domain = request.form.get('domain')
+    dom = nuage_user.domains.get_first(filter="name == '%s'" % domain)
+    zonelist = []
+    zones = dom.zones.get()
+    for zon in zones:
+        zonelist.append(zon.name)
+    return render_template('gather_new_acl_data.html', domain = domain, zonelist = zonelist)
+
+@app.route('/buildaclrule', methods = ['POST'])
+def buildaclrule():
+    domain = request.form.get('domain')
+    fromzone = request.form.get('fromzone')
+    tozone = request.form.get('tozone')
+    direction = request.form.get('direction')
+    action = request.form.get('action')
+    description  = request.form.get('description')
+    ethertype= request.form.get('ethertype')
+    protocol= request.form.get('protocol')
+    sourceport = request.form.get('sourceport')
+    destinationport = request.form.get('destinationport')
+    dscp = request.form.get('dscp')
+
+    # Creating the job to begin the policy changes
+    job = vsdk.NUJob(command='BEGIN_POLICY_CHANGES')
+    dom.create_child(job)
+    # wait for the job to finish
+    while True:
+        job.fetch()
+        if job.status == 'SUCCESS':
+            # Creating a new Ingress ACL rule to allow database connectivity
+            # from the Web-Tier Zone to the DB-Tier Zone
+
+            from_network = dom.zones.get_first(filter="name == '%s'" % fromzone)
+            to_network = dom.zones.get_first(filter="name == '%s'" % tozone)
+
+            ingressacl = dom.ingress_acl_templates.get():
+            egressacl = dom.egress_acl_templates.get():
+
+
+            if direction == 'Ingress':
+                db_ingressacl_rule = vsdk.NUIngressACLEntryTemplate(
+                    action=action,
+                    description=description,
+                    ether_type=ethertype,
+                    location_type='ZONE',
+                    location_id=from_network.id,
+                    network_type='ZONE',
+                    network_id=to_network.id,
+                    protocol=protocol,
+                    source_port=sourceport,
+                    destination_port=destinationport,
+                    dscp=dscp
+                    )
+                ingressacl.create_child(db_ingressacl_rule)
+            if direction == 'Egress':
+                db_ingressacl_rule = vsdk.NUEgressACLEntryTemplate(
+                    action=action,
+                    description=description,
+                    ether_type=ethertype,
+                    location_type='ZONE',
+                    location_id=from_network.id,
+                    network_type='ZONE',
+                    network_id=to_network.id,
+                    protocol=protocol,
+                    source_port=sourceport,
+                    destination_port=destinationport,
+                    dscp=dscp
+                    )
+                egressacl.create_child(db_egressacl_rule)
+
+                # Applying the changes to the domain
+                job = vsdk.NUJob(command='APPLY_POLICY_CHANGES')
+                dom.create_child(job)
+                break
+
+        if job.status == 'FAILED':
+            return render_template('fail_acls.html', domain = domain)
+            break
+        time.sleep(1)# can be done with a while loop
+
+    return render_template('add_acl_success.html', domain = domain)
 
 # Select record for editing
 @app.route('/build_tenant', methods = ['GET', 'POST'])
@@ -95,6 +189,13 @@ def build_tenant():
         # Get form variable and make them session variable
         enterprise = request.form.get('enterprise')
         domain_new = request.form.get('domain')
+        number_of_zones = request.form.get('zones')
+        number_of_subnets_per_zone = request.form.get('subs')
+        number_of_vports_per_subnet = request.form.get('vports')
+        # set variable as integers
+        number_of_zones = int(number_of_zones)
+        number_of_subnets_per_zone = int(number_of_subnets_per_zone)
+        number_of_vports_per_subnet = int(number_of_vports_per_subnet)
 
         if (' ' in enterprise):
             flash('Spaces are not allowed in Tenant name')
@@ -144,17 +245,8 @@ def build_tenant():
 
                 dom = nuage_user.domains.get_first(filter="name == '%s'" % domain_new)
                 dom.fetch()
-                # Create Zones
-
-                global number_of_zones
-                global number_of_subnets_per_zone
-                global number_of_vports_per_subnet
 
                 # Adjust these numbers as required for differnet use cases
-
-                number_of_zones = 3 # Starts with zero
-                number_of_subnets_per_zone = 1
-                number_of_vports_per_subnet = 2
 
                 is_template = dom.is_template()
                 zone_class = vsdk.NUZoneTemplate if is_template else vsdk.NUZone
