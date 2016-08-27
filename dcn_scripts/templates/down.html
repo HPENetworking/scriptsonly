@@ -1,14 +1,17 @@
 {% extends 'bootstrap/base.html' %}
 
 
-{% block title %}Distributed Cloud Networking{% endblock %}
+{% block title %}download csv template{% endblock %}
 
 
 {% include 'navbar.html' %}
 
 {% block content %}
 
-<h3> Success Tenant Added</h3>
+ <div class="jumbotron">
+				<h3>download csv template</h3>
+				<p class="lead"></p>
+        </div>
 
 <div class="container">
 
@@ -31,16 +34,10 @@
 
     </div>
 
-<div>
-  <h3> Succesfully added a new tenant! </h3>
-  <form action = "/return_to" method = "get">
 
-    <hr>
-
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Back to Main</button>
-    <br>
-
-  </form>
+<div class="container" align="left">
+  <a href="/return-file/" target="blank"><button class='btn btn-default'>
+    download</button></a>
 </div>
 
 

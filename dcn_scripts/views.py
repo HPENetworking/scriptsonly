@@ -75,7 +75,13 @@ def login():
             return render_template('main.html')
         # Root User
         nuage_user = nc.user
-        return render_template('menu.html', error=error)
+        #return nuage_user
+        return render_template('menu.html', error = error)
+    return render_template('main.html')
+
+# Select record for editing
+@app.route('/return_to', methods = ['GET', 'POST'])
+def return_to():
     return render_template('main.html')
 
 # Select record for editing
@@ -120,8 +126,21 @@ def buildaclrule():
     sourceport = request.form.get('sourceport')
     destinationport = request.form.get('destinationport')
     dscp = request.form.get('dscp')
-
-
+    '''
+    return render_template('testvars.html',
+    dom = dom,
+    fromzone = fromzone,
+    tozone = tozone,
+    description = description,
+    direction = direction,
+    action = action,
+    ethertype = ethertype,
+    sourceport = sourceport,
+    destinationport = destinationport,
+    dscp = dscp,
+    protocol = protocol
+    )
+    '''
     #Get the domain
     domain = nuage_user.domains.get_first(filter="name == '%s'" % dom)
     domain.fetch()
@@ -150,7 +169,7 @@ def buildaclrule():
 
     if direction == 'Egress':
         for out_acl in domain.egress_acl_templates.get():
-            db_ingressacl_rule = vsdk.NUEgressACLEntryTemplate(
+            db_egressacl_rule = vsdk.NUEgressACLEntryTemplate(
                 action=action,
                 description=description,
                 ether_type=ethertype,
@@ -163,7 +182,8 @@ def buildaclrule():
                 destination_port=destinationport,
                 dscp=dscp
                 )
-            egressacl.create_child(db_egressacl_rule)
+            out_acl.create_child(db_egressacl_rule)
+
     return render_template('add_acl_success.html')
 
 
@@ -245,7 +265,7 @@ def build_tenant():
                 # create zones
                 for i in range(0, number_of_zones):
 
-                    zone = zone_class(name=enterprise.name + "Zone %d" % i)
+                    zone = zone_class(name=enterprise.name + "Zone%d" % i)
                     dom.create_child(zone)
                     dom.add_child(zone)
 
@@ -258,7 +278,7 @@ def build_tenant():
                         gw = "%s" % subnetwork.hosts().next()
                         nm = "%s" % subnetwork.netmask
 
-                        subnet = subnet_class(name="Subnet %d %d" % (i, j), address=ip, netmask=nm, gateway=gw)
+                        subnet = subnet_class(name="Subnet%d%d" % (i, j), address=ip, netmask=nm, gateway=gw)
                         zone.create_child(subnet)
                         zone.add_child(subnet)
 
@@ -269,7 +289,7 @@ def build_tenant():
                         # Otherwise we create the VPorts
                         for k in range(0, number_of_vports_per_subnet):
 
-                            vport = vsdk.NUVPort(name="VPort %d-%d-%d" % (i, j, k), type="VM", address_spoofing="INHERITED", multicast="INHERITED")
+                            vport = vsdk.NUVPort(name="VPort%d-%d-%d" % (i, j, k), type="VM", address_spoofing="INHERITED", multicast="INHERITED")
                             subnet.create_child(vport)
                             subnet.add_child(vport)
                 # Now add the default ACCESS Contol Lists for Ingress/egress
@@ -314,11 +334,11 @@ def build_tenant():
 
                 # Creating a new Ingress ACL rule to allow database connectivity
                 # from the Web-Tier Zone to the DB-Tier Zone
-                from_network = dom.zones.get_first(filter='name == "WEB Zone2"')
-                to_network = dom.zones.get_first(filter='name == "DB Zone2"')
+                from_network = dom.zones.get_first(filter='name == "WEBZone2"')
+                to_network = dom.zones.get_first(filter='name == "DBZone2"')
                 db_ingressacl_rule = vsdk.NUIngressACLEntryTemplate(
                     action='FORWARD',
-                    description='Allow MySQL DB connections from Web Zone2',
+                    description='Allow MySQL DB connections from WebZone2',
                     ether_type='0x0800',
                     location_type='ZONE',
                     location_id=from_network.id,

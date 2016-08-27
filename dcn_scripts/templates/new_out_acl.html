@@ -8,7 +8,7 @@
 
 {% block content %}
 
-<h3> Success Tenant Added</h3>
+<h3> Auto Domain Deploy</h3>
 
 <div class="container">
 
@@ -32,12 +32,13 @@
     </div>
 
 <div>
-  <h3> Succesfully added a new tenant! </h3>
-  <form action = "/return_to" method = "get">
+  <h3> Enter New Tenant Information </h3>
+  <form action = "/build_tenant" method = "post">
 
     <hr>
-
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Back to Main</button>
+    <p>Tenant Name: <input type=text  id="dcnTenant" class="form-control" placeholder="New Tenant"  name="enterprise"></p>
+    <p>Domain: <input type=text  id="dcnDomain" class="form-control" placeholder="Domina"  name="domain"></p>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Add New Tenant</button>
     <br>
 
   </form>

@@ -8,7 +8,7 @@
 
 {% block content %}
 
-<h3> Success Tenant Added</h3>
+
 
 <div class="container">
 
@@ -28,16 +28,21 @@
 
 {% endwith %}
 
-
-    </div>
-
 <div>
-  <h3> Succesfully added a new tenant! </h3>
-  <form action = "/return_to" method = "get">
+  <h3> Set Domain for New ACL </h3>
+  <form action = "/gathernewacldata" method = "post">
+
+  </div>
+  <form action = "{{ request.path }}" method = "post">
+       Choose the domain you want to apply this ACl to:
+     <select name ="domain">
+             {% for dom in domlist %}
+                <option value={{dom}}>{{dom}}</option>
+             {% endfor %}
+     </select>
 
     <hr>
-
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Back to Main</button>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Set domain</button>
     <br>
 
   </form>
@@ -47,5 +52,5 @@
     <footer class="footer">
             <p>&copy; Wookieware 2016</p>
         </footer>
-
+</div>
 {% endblock %}

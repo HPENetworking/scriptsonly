@@ -14,6 +14,14 @@
         </div>
 
 <div class="container">
+  <!-- Single button -->
+
+  <ul class="nav nav-pills">
+    <li role="presentation" class="active"><a href="#">Main Menu</a></li>
+    <li role="presentation"><a href="#">Profile</a></li>
+    <li role="presentation"><a href="#">Messages</a></li>
+  </ul>
+  <hr>
 
 {% with messages = get_flashed_messages() %}
 
@@ -32,26 +40,24 @@
 {% endwith %}
 
 
-    </div>
-
     {%- for category, message in get_flashed_messages(with_categories = true) %}
        <div class = "alert alert-danger">
           {{ message }}
        </div>
     {%- endfor %}
 
-
+  <div>
 
     <form action = "/add_tenant" method = "post">
-       <input type = "submit" value = "Easy Button" />
-
-    </form>
-    <form action = "/add-vms" method = "post">
-       <input type = "submit" value = "Instanitate VMs" />
-
+       <button class="btn btn-lg btn-primary btn-block" type="submit">Easy Button</button>
     </form>
 
+    <form action = "/newacl" method = "post">
+       <button class="btn btn-lg btn-primary btn-block" type="submit">New ACL Rule</button>
 
+
+  </div>
+</div>
     <footer class="footer">
             <p>&copy; Wookieware 2016</p>
         </footer>
