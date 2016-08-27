@@ -109,7 +109,7 @@ def gathernewinacldata():
 
 @app.route('/buildaclrule', methods = ['POST'])
 def buildaclrule():
-    domain = request.form.get('domain')
+    dom = request.form.get('domain')
     fromzone = request.form.get('fromzone')
     tozone = request.form.get('tozone')
     direction = request.form.get('direction')
@@ -121,65 +121,51 @@ def buildaclrule():
     destinationport = request.form.get('destinationport')
     dscp = request.form.get('dscp')
 
-    # Creating the job to begin the policy changes
-    job = vsdk.NUJob(command='BEGIN_POLICY_CHANGES')
-    dom.create_child(job)
-    # wait for the job to finish
-    while True:
-        job.fetch()
-        if job.status == 'SUCCESS':
-            # Creating a new Ingress ACL rule to allow database connectivity
-            # from the Web-Tier Zone to the DB-Tier Zone
 
-            from_network = dom.zones.get_first(filter="name == '%s'" % fromzone)
-            to_network = dom.zones.get_first(filter="name == '%s'" % tozone)
+    #Get the domain
+    domain = nuage_user.domains.get_first(filter="name == '%s'" % dom)
+    domain.fetch()
 
-            ingressacl = dom.ingress_acl_templates.get():
-            egressacl = dom.egress_acl_templates.get():
+    from_network = domain.zones.get_first(filter="name == '%s'" % fromzone)
+    #print from_network.id
+    to_network = domain.zones.get_first(filter="name == '%s'" % tozone)
+    #print to_network.id
 
+    if direction == 'Ingress':
+        for in_acl in domain.ingress_acl_templates.get():
+            db_ingressacl_rule = vsdk.NUIngressACLEntryTemplate(
+                action=action,
+                description=description,
+                ether_type=ethertype,
+                location_type='ZONE',
+                location_id=from_network.id,
+                network_type='ZONE',
+                network_id=to_network.id,
+                protocol=protocol,
+                source_port=sourceport,
+                destination_port=destinationport,
+                dscp=dscp
+                )
+            in_acl.create_child(db_ingressacl_rule)
 
-            if direction == 'Ingress':
-                db_ingressacl_rule = vsdk.NUIngressACLEntryTemplate(
-                    action=action,
-                    description=description,
-                    ether_type=ethertype,
-                    location_type='ZONE',
-                    location_id=from_network.id,
-                    network_type='ZONE',
-                    network_id=to_network.id,
-                    protocol=protocol,
-                    source_port=sourceport,
-                    destination_port=destinationport,
-                    dscp=dscp
-                    )
-                ingressacl.create_child(db_ingressacl_rule)
-            if direction == 'Egress':
-                db_ingressacl_rule = vsdk.NUEgressACLEntryTemplate(
-                    action=action,
-                    description=description,
-                    ether_type=ethertype,
-                    location_type='ZONE',
-                    location_id=from_network.id,
-                    network_type='ZONE',
-                    network_id=to_network.id,
-                    protocol=protocol,
-                    source_port=sourceport,
-                    destination_port=destinationport,
-                    dscp=dscp
-                    )
-                egressacl.create_child(db_egressacl_rule)
+    if direction == 'Egress':
+        for out_acl in domain.egress_acl_templates.get():
+            db_ingressacl_rule = vsdk.NUEgressACLEntryTemplate(
+                action=action,
+                description=description,
+                ether_type=ethertype,
+                location_type='ZONE',
+                location_id=from_network.id,
+                network_type='ZONE',
+                network_id=to_network.id,
+                protocol=protocol,
+                source_port=sourceport,
+                destination_port=destinationport,
+                dscp=dscp
+                )
+            egressacl.create_child(db_egressacl_rule)
+    return render_template('add_acl_success.html')
 
-                # Applying the changes to the domain
-                job = vsdk.NUJob(command='APPLY_POLICY_CHANGES')
-                dom.create_child(job)
-                break
-
-        if job.status == 'FAILED':
-            return render_template('fail_acls.html', domain = domain)
-            break
-        time.sleep(1)# can be done with a while loop
-
-    return render_template('add_acl_success.html', domain = domain)
 
 # Select record for editing
 @app.route('/build_tenant', methods = ['GET', 'POST'])
