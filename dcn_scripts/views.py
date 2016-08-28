@@ -49,6 +49,10 @@ ALLOWED_EXTENSIONS = set(['csv'])
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
 bootstrap = Bootstrap(app)
 
 # Routes
@@ -82,7 +86,7 @@ def login():
 # Select record for editing
 @app.route('/return_to', methods = ['GET', 'POST'])
 def return_to():
-    return render_template('main.html')
+    return render_template('menu.html')
 
 # Select record for editing
 @app.route('/add_tenant', methods = ['GET', 'POST'])
@@ -112,6 +116,100 @@ def gathernewinacldata():
     for zon in zones:
         zonelist.append(zon.name)
     return render_template('gather_new_acl_data.html', domain = domain, zonelist = zonelist)
+
+# Bulk import from file selector
+@app.route('/bulk', methods = ['GET', 'POST'])
+def bulk():
+    if request.method == 'POST':
+        file = request.files['file']
+        filename = secure_filename(file.filename)
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return render_template('chooser.html')
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file.filename == '':
+            flash('No selected file')
+            return render_template('chooser.html')
+        #if file and allowed_file(file.filename):
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        vars = {}
+        cr ='\n'
+        filex = open(os.path.join(APP_STATIC, 'testdata.txt'), 'w')
+        with open(os.path.join(APP_STATIC, filename)) as f:
+            line = f.readline().strip('/t')
+            while line:
+                vars = str.split(line, ',')
+                # assign the variables from the linf of the csv file
+                dom = vars[0]
+                fromzone = vars[1]
+                tozone = vars[2]
+                direction = vars[3]
+                action = vars[4]
+                description = vars[5]
+                ethertype = vars[6]
+                protocol = vars[7]
+                sourceport = vars[8]
+                destinationport = vars[9]
+                dscp = vars[10]
+                #Get the domain
+                if dom == 'eof':
+                    break
+
+                msg = 'In the loop'
+                filex.write(line)
+                filex.write(cr)
+
+                domain = nuage_user.domains.get_first(filter="name == '%s'" % dom)
+                domain.fetch()
+
+                from_network = domain.zones.get_first(filter="name == '%s'" % fromzone)
+                #print from_network.id
+                to_network = domain.zones.get_first(filter="name == '%s'" % tozone)
+                #print to_network.id
+
+                if direction == 'Ingress':
+                    for in_acl in domain.ingress_acl_templates.get():
+                        db_ingressacl_rule = vsdk.NUIngressACLEntryTemplate(
+                            action=action,
+                            description=description,
+                            ether_type=ethertype,
+                            location_type='ZONE',
+                            location_id=from_network.id,
+                            network_type='ZONE',
+                            network_id=to_network.id,
+                            protocol=protocol,
+                            source_port=sourceport,
+                            destination_port=destinationport,
+                            dscp=dscp
+                            )
+                        in_acl.create_child(db_ingressacl_rule)
+
+                if direction == 'Egress':
+                    for out_acl in domain.egress_acl_templates.get():
+                        db_egressacl_rule = vsdk.NUEgressACLEntryTemplate(
+                            action=action,
+                            description=description,
+                            ether_type=ethertype,
+                            location_type='ZONE',
+                            location_id=from_network.id,
+                            network_type='ZONE',
+                            network_id=to_network.id,
+                            protocol=protocol,
+                            source_port=sourceport,
+                            destination_port=destinationport,
+                            dscp=dscp
+                            )
+                        out_acl.create_child(db_egressacl_rule)
+                line = f.readline().strip('/t')
+                #time.sleep(5)
+
+        f.close()
+        filex.close()
+        flash('Records processed')
+        return render_template('bulk.html')
+    return render_template('chooser.html')
 
 @app.route('/buildaclrule', methods = ['POST'])
 def buildaclrule():
@@ -363,6 +461,60 @@ def build_tenant():
 
 
     return render_template('add_tenant_success.html')
+
+# Generate Ansible file
+@app.route('/inventory', methods = ['GET', 'POST'])
+def inventory():
+    counter = 0
+    cr ='\n'
+    f = open(os.path.join(APP_STATIC, 'dcn_inventory.txt'), 'w')
+    for cur_ent in nuage_user.enterprises.get():
+        line = 'VMs inside Enterprise ' + cur_ent.name
+        f.write(line)
+        f.write(cr)
+        for cur_vm in cur_ent.vms.get():
+            line = '|- ' + cur_vm.name
+            f.write(line)
+            f.write(cr)
+
+        line = 'Domains inside Enterprise ' + cur_ent.name
+        f.write(line)
+        f.write(cr)
+        for cur_domain in cur_ent.domains.get():
+            line = '|- Domain: ' + cur_domain.name
+            f.write(line)
+            f.write(cr)
+            for cur_zone in cur_domain.zones.get():
+                line = '    |- Zone: ' + cur_zone.name
+                f.write(line)
+                f.write(cr)
+                for cur_subnet in cur_domain.subnets.get():
+                    line = '        |- Subnets: ' + '' + cur_subnet.name + '' + cur_subnet.address + '' + cur_subnet.netmask
+                    f.write(line)
+                    f.write(cr)
+            for cur_acl in cur_domain.ingress_acl_templates.get():
+                line = '    |- Ingress ACL: ' + cur_acl.name
+                f.write(line)
+                f.write(cr)
+                for cur_rule in cur_acl.ingress_acl_entry_templates.get():
+                    line = '        |- Rule: ' + cur_rule.description
+                    f.write(line)
+                    f.write(cr)
+
+            for cur_acl in cur_domain.egress_acl_templates.get():
+                line = '    |- Egress ACL: ' + cur_acl.name
+                f.write(line)
+                f.write(cr)
+                for cur_rule in cur_acl.egress_acl_entry_templates.get():
+                    line = '        |- Rule: ' + cur_rule.description
+                    f.write(line)
+                    f.write(cr)
+    f.close()
+    f = open(os.path.join(APP_STATIC, 'dcn_inventory.txt'), 'r')
+    file = f.read()
+    f.close()
+    flash('DCN inventory file has been created in /static/dcn_inventory.txt')
+    return render_template('inventory.html', file = file)
 
 
 @app.route('/logout')
