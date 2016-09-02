@@ -1,0 +1,57 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}switchdb help{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+ <div class="jumbotron">
+				<h3>help for switchdb users</h3>
+				<p class="lead"></p>
+        </div>
+
+<div class="container">
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+
+    </div>
+
+
+  <p> filename: {{ file }}</p>
+    <p> contents: {{ content }}</p>
+      dom:  {{ dom }}
+      fromzone:  {{ fromzone }}
+      tozone: {{ tozone }}
+      description: {{ description }}
+      direction: {{ direction }}
+      action:  {{ action }}
+      ethertype: {{ ethertype }}
+      sourceport: {{ sourceport }}
+      destinationport: {{ destinationport }}
+      dscp: {{ dscp }}
+      protocol:  {{ protocol }}
+
+
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+
+{% endblock %}

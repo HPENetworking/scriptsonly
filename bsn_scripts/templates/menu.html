@@ -1,0 +1,66 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}Bigswitch Cloud Fabric SDN{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+ <div class="jumbotron">
+				<h3>Bigswitch Cloud Fabric SDN</h3>
+				<p class="lead"></p>
+        </div>
+
+<div class="container">
+  <!-- Single button -->
+
+  <ul class="nav nav-pills">
+    <li role="presentation" class="active"><a href="add_switch">Add Switch</a></li>
+    <li role="presentation"><a href="bulk">CSV Import</a></li>
+    <li role="presentation"><a href="inventory">Switch Report</a></li>
+    <li role="presentation"><a href="logout">Logout</a></li>
+  </ul>
+  <hr>
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+
+    {%- for category, message in get_flashed_messages(with_categories = true) %}
+       <div class = "alert alert-danger">
+          {{ message }}
+       </div>
+    {%- endfor %}
+
+  <div>
+
+    <form action = "/something" method = "post">
+       <button class="btn btn-primary btn-block" type="submit">Do Something</button>
+    </form>
+
+    <form action = "/newacl" method = "post">
+       <button class="btn btn-lg btn-primary btn-block" type="submit">Config Controller</button>
+
+
+  </div>
+</div>
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+
+{% endblock %}
