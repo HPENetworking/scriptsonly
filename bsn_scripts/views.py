@@ -63,6 +63,8 @@ def login():
     error = None
     if request.method == 'POST':
         global session_cookie
+        global cookie
+        global controller_url
         user = request.form.get('user')
         password = request.form.get('passwd')
         host= request.form.get('host')
@@ -70,7 +72,6 @@ def login():
 
         # Actively connecting ot the VSD API
         try:
-            global session_cookie
             ##################################
             # Login
             ##################################
@@ -102,27 +103,111 @@ def return_to():
     return render_template('menu.html')
 
 # Select record for editing
-@app.route('/add_switch', methods = ['GET', 'POST'])
-def add_swicth():
+@app.route('/show_switch', methods = ['GET'])
+def show_switch():
     error = None
-    if request.method == 'POST':
-        try:
-            bcf = pybsn.connect(args.host, args.user, args.password)
-            bcf.root.core.switch_config.put({
-                'name': name,
-                'dpid': dpid,
-                'fabric-role': fabric_role,
-                'leaf-group': args.leaf_group,
-            })
-        except Exception as e:
-            raise
-        return render_template('success.html')
-    return render_template('add_switch.html')
+    count = 0
+    switches = []
+    switch = []
+    try:
+        # path is set to substring "/api/v1/data/controller/applications/bcf/info/fabric/switch" from the above url
+        path = '/api/v1/data/controller/applications/bcf/info/fabric/switch'
+        # we append this "show switch" path to the controller url to obtain a full url
+        url = controller_url + path
 
+        # There is no data to pass in for this GET request
+        data = ''
+        # the headers will contain the session cookie we obtained above via the POST request
+        headers = {"content-type": "application/json", 'Cookie': session_cookie}
+
+        response = requests.request('GET', url, data=data, headers=headers, verify=False)
+    except Exception as e:
+        raise
+        return render_template('sys_error.html', error = error)
+    reply = json.loads(response.content)
+    for items in reply:
+        ipadress = reply[count]['inet-address']['ip']
+        name = reply[count]['name']
+        dpid = reply[count]['dpid']
+        state = reply[count]['fabric-connection-state']
+        role = reply[count]['fabric-role']
+        group = reply[count]['leaf-group']
+        switch = [ipadress, name, dpid, state, role, group]
+        switches.append(switch)
+        count = count + 1
+    return render_template('show_switch.html', switches = switches)
+
+@app.route('/show_link', methods = ['GET'])
+def show_link():
+    error = None
+    try:
+        # path is set to substring "/api/v1/data/controller/applications/bcf/info/fabric/switch" from the above url
+        path = '/api/v1/data/controller/applications/bcf/info/fabric?select=link'
+        # we append this "show switch" path to the controller url to obtain a full url
+        url = controller_url + path
+
+        # There is no data to pass in for this GET request
+        data = ''
+        # the headers will contain the session cookie we obtained above via the POST request
+        headers = {"content-type": "application/json", 'Cookie': session_cookie}
+
+        response = requests.request('GET', url, data=data, headers=headers, verify=False)
+    except Exception as e:
+        raise
+        return render_template('sys_error.html', error = error)
+    return render_template('show_link.html', response = response.content)
+
+@app.route('/show_portgroup', methods = ['GET'])
+def show_portgroup():
+    error = None
+    try:
+        # path is set to substring "/api/v1/data/controller/applications/bcf/info/fabric/switch" from the above url
+        path = '/api/v1/data/controller/applications/bcf/info/fabric/port-group'
+        # we append this "show switch" path to the controller url to obtain a full url
+        url = controller_url + path
+
+        # There is no data to pass in for this GET request
+        data = ''
+        # the headers will contain the session cookie we obtained above via the POST request
+        headers = {"content-type": "application/json", 'Cookie': session_cookie}
+
+        response = requests.request('GET', url, data=data, headers=headers, verify=False)
+    except Exception as e:
+        raise
+        return render_template('sys_error.html', error = error)
+    return render_template('show_group.html', response = response.content)
+
+@app.route('/show_tenant', methods = ['GET'])
+def show_tenant():
+    error = None
+    try:
+        # path is set to substring "/api/v1/data/controller/applications/bcf/info/fabric/switch" from the above url
+        path = '/api/v1/data/controller/applications/bcf/info/endpoint-manager/tenant'
+        # we append this "show switch" path to the controller url to obtain a full url
+        url = controller_url + path
+
+        # There is no data to pass in for this GET request
+        data = ''
+        # the headers will contain the session cookie we obtained above via the POST request
+        headers = {"content-type": "application/json", 'Cookie': session_cookie}
+
+        response = requests.request('GET', url, data=data, headers=headers, verify=False)
+    except Exception as e:
+        raise
+        return render_template('sys_error.html', error = error)
+    return render_template('show_tenant.html', response = response.content)
 
 @app.route('/logout')
 def logout():
     error = None
+    ##################################
+    # Logout
+    ##################################
+    path = '/api/v1/data/controller/core/aaa/session[auth-token="'+cookie+'"]'
+    url = controller_url + path
+    headers = {"content-type": "application/json", 'Cookie': session_cookie}
+    # DELETE request made on the Big Cloud Fabric controller
+    response = requests.request('DELETE', url, headers=headers, verify=False)
     flash('You are now logged out of the applcation')
     return render_template('main.html', error = error)
 

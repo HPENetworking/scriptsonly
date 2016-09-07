@@ -1,0 +1,77 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}Switch Inventory{% endblock %}
+
+
+
+
+{% block content %}
+
+<h3> Switch Inventory</h3>
+
+<div class="container">
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+
+
+    <form action = "{{ request.path }}" method = "post">
+       <input type = "submit" value = "Return to Main" />
+
+       <p> The total amount of switches is {{ switches|length }}
+
+    <table class="table table-responsive">
+       <thead>
+          <tr>
+             <th>mac</th>
+             <th>sysname</th>
+             <th>mgmt_ip</th>
+             <th>mgmt_sub</th>
+             <th>gateway</th>
+             <th>fan</th>
+             <th>local user</th>
+             <th>tftpserver</th>
+             <th>role</th>
+          </tr>
+       </thead>
+
+       <tbody>
+          {% for switch in switches %}
+             <tr>
+                <td> {{ switch.mac }}</td>
+                <td> {{ switch.sysname }} </td>
+                <td> {{ switch.mgmt_ip }} </td>
+                <td> {{ switch.mgmt_sub }} </td>
+                <td> {{ switch.gateway }} </td>
+                <td> {{ switch.fanDirection }} </td>
+                <td> {{ switch.localuser }} </td>
+                <td> {{ switch.tftpserver }} </td>
+                <td> {{ switch.rolex }} </td>
+             </tr>
+          {% endfor %}
+       </tbody>
+    </table>
+
+
+       </form>
+  </div>
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+
+{% endblock %}

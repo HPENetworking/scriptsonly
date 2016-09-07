@@ -17,9 +17,10 @@
   <!-- Single button -->
 
   <ul class="nav nav-pills">
-    <li role="presentation" class="active"><a href="add_switch">Add Switch</a></li>
-    <li role="presentation"><a href="bulk">CSV Import</a></li>
-    <li role="presentation"><a href="inventory">Switch Report</a></li>
+    <li role="presentation" class="active"><a href="show_tenant">Tenants</a></li>
+    <li role="presentation"><a href="show_link">Link List</a></li>
+    <li role="presentation"><a href="show_portgroup">Port Groups</a></li>
+    <li role="presentation"><a href="show_switch">Switches</a></li>
     <li role="presentation"><a href="logout">Logout</a></li>
   </ul>
   <hr>
@@ -49,12 +50,8 @@
 
   <div>
 
-    <form action = "/something" method = "post">
-       <button class="btn btn-primary btn-block" type="submit">Do Something</button>
-    </form>
-
-    <form action = "/newacl" method = "post">
-       <button class="btn btn-lg btn-primary btn-block" type="submit">Config Controller</button>
+    <form action = "/csv_loader" method = "post">
+       <button class="btn btn-lg btn-primary btn-block" type="submit">CSV Config Controller</button>
 
 
   </div>
