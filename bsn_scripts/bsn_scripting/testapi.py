@@ -37,12 +37,12 @@ requests.packages.urllib3.disable_warnings()
 # diagram and select "Device Information"
 
 # Set the IP address of your Big Cloud Fabric controller, e.g. controller_ip = "54.198.84.132"
-controller_ip = "10.132.0.127"
+controller_ip = "54.145.82.202"
 
 controller_url = "https://" + controller_ip + ":8443"
 
 user = 'admin'
-password = 'siesta3'
+password = 'bsn123'
 
 ##################################
 # Login
@@ -77,6 +77,11 @@ switches = []
 
 # path is set to substring "/api/v1/data/controller/applications/bcf/info/fabric/switch" from the above url
 path = '/api/v1/data/controller/applications/bcf/info/fabric/switch'
+path = '/api/v1/data/controller/applications/bcf/info/fabric?select=link'
+path = '/api/v1/data/controller/applications/bcf/info/endpoint-manager/tenant'
+path = '/api/v1/data/controller/applications/bcf/info/fabric/port-group'
+path = '/api/v1/data/controller/applications/bcf/info/endpoint-manager/segment'
+
 # we append this "show switch" path to the controller url to obtain a full url
 url = controller_url + path
 
@@ -87,26 +92,11 @@ headers = {"content-type": "application/json", 'Cookie': session_cookie}
 
 response = requests.request('GET', url, data=data, headers=headers, verify=False)
 reply = json.loads(response.content)
-count = 0
-print "show switch response\n", response.content
-print len(response.content)
-print type(reply)
-print reply[0]
-for items in reply:
-    ipadress = reply[count]['inet-address']['ip']
-    name = reply[count]['name']
-    dpid = reply[count]['dpid']
-    state = reply[count]['fabric-connection-state']
-    role = reply[count]['fabric-role']
-    group = reply[count]['leaf-group']
-    switch = [ipadress, name, dpid, state, role, group]
-    print switch
-    print '------------------------------------------------------'
-    switches.append(switch)
-    print switches
-    print '------------------------------------------------------'
-    print switches[0]
-    count = count + 1
+
+print reply
+print len(reply)
+print reply[0]['name']
+
 
 
 ##################################
