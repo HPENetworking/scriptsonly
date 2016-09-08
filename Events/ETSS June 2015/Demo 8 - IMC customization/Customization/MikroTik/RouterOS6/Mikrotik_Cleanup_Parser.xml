@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<parser>
+        <perlfile>Mikrotik_Cleanup_Parser_Script.pl</perlfile>
+        <script name="cleanupConfiguration">
+                <callfunction name="cleanupConfiguration">
+                        <parameterspec name="0" type="data_string"/>
+                        <result type="single">configuration</result>
+                </callfunction>
+        </script>
+</parser>

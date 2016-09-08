@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<definition>
+    <action name="backup_startup_config">
+      <step>
+         <command name="backup_startup_config_cli" description="Backup startup via CLI">
+              <result name="startup_configuration">
+                   <parser parserName="CleanupParser" parserRet="configuration" parserScript="cleanupConfiguration"/>
+              </result>
+         </command>
+       </step>
+    </action>
+</definition>

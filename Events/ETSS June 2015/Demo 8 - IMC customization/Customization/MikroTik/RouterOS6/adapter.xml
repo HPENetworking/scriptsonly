@@ -1,0 +1,19 @@
+<adapter name="RouterOS6">
+        <version>1.0.0</version>
+        <services>
+                <service name="CLICommon">
+                        <item type="common">Mikrotik_Common_CLI.xml</item>
+                </service>
+
+                <service name="ConfigBackup">
+                        <item type="builder_definition">Mikrotik_Config_Backup_Builder.xml</item>
+                        <item type="tcl_script">Mikrotik_Config_Backup_Builder_Script.xml</item>
+                </service>
+
+                <service name="CleanupParser">
+                        <item type="parser_definition">Mikrotik_Cleanup_Parser.xml</item>
+                        <item type="perl_script">Mikrotik_Cleanup_Parser_Script.pl</item>
+                </service>
+
+        </services>
+</adapter>

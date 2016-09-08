@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<definition>
+	<action name="set_snmp_param_v1_or_v2c">		  					
+		<step>
+			<command name="set_snmp_param_v1_or_v2c" description="Set snmp param v1 or v2c">
+			</command>
+		</step>
+	</action>
+	<action name="set_snmp_param_v3">		  					
+		<step>
+			<command name="set_snmp_param_v3" description="Set snmp param v3">
+			</command>
+		</step>
+	</action>
+</definition>

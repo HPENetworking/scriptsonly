@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<scripts>
+        <command name="setup_ntp" method="CLI">
+                <error>Failed to setup ntp.</error>
+                <require-mode>enable</require-mode>
+                <script>
+            setup_ntp.tcl
+                </script>
+        </command>
+
+</scripts>

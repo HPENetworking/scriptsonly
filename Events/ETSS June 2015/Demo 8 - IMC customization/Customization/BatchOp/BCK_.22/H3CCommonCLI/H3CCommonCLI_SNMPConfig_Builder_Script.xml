@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<scripts>
+	
+	<command name="set_snmp_param_v1_or_v2c" method="CLI">
+		<error>Failed to config Set snmp param v1 or v2c by CLI. Command syntax may be incorrect, or prompts may not be what was expected.</error>
+		<require-mode>enable</require-mode>
+		<script>
+            set_snmp_param_v1_or_v2c.tcl
+		</script>
+	</command>
+
+  <command name="set_snmp_param_v3" method="CLI">
+		<error>Failed to config Set snmp param v3 by CLI. Command syntax may be incorrect, or prompts may not be what was expected.</error>
+		<require-mode>enable</require-mode>
+		<script>
+            set_snmp_param_v3.tcl
+		</script>
+	</command>
+</scripts>

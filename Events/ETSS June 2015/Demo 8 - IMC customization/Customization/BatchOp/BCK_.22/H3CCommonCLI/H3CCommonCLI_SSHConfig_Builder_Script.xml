@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+
+<scripts>
+	<command name="query_ssh_global" method="CLI">
+		<error>Failed to query local user information. Command syntax may be incorrect, or prompts may not be what was expected.</error>		
+		<require-mode>exec</require-mode>		
+		<script>
+            query_ssh_global.tcl
+		</script>
+	</command>
+
+	<command name="set_ssh_global" method="CLI">
+		<error>Failed to create local user by CLI. Command syntax may be incorrect, or prompts may not be what was expected.</error>
+		<require-mode>enable</require-mode>
+		<script>
+            set_ssh_global.tcl
+		</script>
+	</command>	
+	
+	<command name="query_ssh_user" method="CLI">
+		<error>Failed to query local user information. Command syntax may be incorrect, or prompts may not be what was expected.</error>		
+		<require-mode>exec</require-mode>		
+		<script>
+            query_ssh_user.tcl
+		</script>
+	</command>
+
+	<command name="set_ssh_user" method="CLI">
+		<error>Failed to create local user by CLI. Command syntax may be incorrect, or prompts may not be what was expected.</error>
+		<require-mode>enable</require-mode>
+		<script>
+            set_ssh_user.tcl
+		</script>
+	</command>			
+
+	<command name="set_ssh_user_v7" method="CLI">
+		<error>Failed to create local user by CLI. Command syntax may be incorrect, or prompts may not be what was expected.</error>
+		<require-mode>enable</require-mode>
+		<script>
+            set_ssh_user_v7.tcl
+		</script>
+	</command>					
+</scripts>
