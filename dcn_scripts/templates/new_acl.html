@@ -1,0 +1,56 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}Distributed Cloud Networking{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+
+
+<div class="container">
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+<div>
+  <h3> Set Domain for New ACL </h3>
+  <form action = "/gathernewacldata" method = "post">
+
+  </div>
+  <form action = "{{ request.path }}" method = "post">
+       Choose the domain you want to apply this ACl to:
+     <select name ="domain">
+             {% for dom in domlist %}
+                <option value={{dom}}>{{dom}}</option>
+             {% endfor %}
+     </select>
+
+    <hr>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Set domain</button>
+    <br>
+
+  </form>
+</div>
+
+
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+</div>
+{% endblock %}

@@ -1,0 +1,496 @@
+VMs inside Enterprise American-Airlines
+Domains inside Enterprise American-Airlines
+|- Domain: dc1
+    |- Zone: American-AirlinesZone 0
+        |- Subnets: Subnet 0 010.0.0.0255.255.255.0
+        |- Subnets: Subnet 0 110.0.1.0255.255.255.0
+        |- Subnets: Subnet 1 010.0.2.0255.255.255.0
+        |- Subnets: Subnet 1 110.0.3.0255.255.255.0
+        |- Subnets: Subnet 2 010.0.4.0255.255.255.0
+        |- Subnets: Subnet 2 110.0.5.0255.255.255.0
+    |- Zone: American-AirlinesZone 1
+        |- Subnets: Subnet 0 010.0.0.0255.255.255.0
+        |- Subnets: Subnet 0 110.0.1.0255.255.255.0
+        |- Subnets: Subnet 1 010.0.2.0255.255.255.0
+        |- Subnets: Subnet 1 110.0.3.0255.255.255.0
+        |- Subnets: Subnet 2 010.0.4.0255.255.255.0
+        |- Subnets: Subnet 2 110.0.5.0255.255.255.0
+    |- Zone: American-AirlinesZone 2
+        |- Subnets: Subnet 0 010.0.0.0255.255.255.0
+        |- Subnets: Subnet 0 110.0.1.0255.255.255.0
+        |- Subnets: Subnet 1 010.0.2.0255.255.255.0
+        |- Subnets: Subnet 1 110.0.3.0255.255.255.0
+        |- Subnets: Subnet 2 010.0.4.0255.255.255.0
+        |- Subnets: Subnet 2 110.0.5.0255.255.255.0
+    |- Zone: APP Zone2
+        |- Subnets: Subnet 0 010.0.0.0255.255.255.0
+        |- Subnets: Subnet 0 110.0.1.0255.255.255.0
+        |- Subnets: Subnet 1 010.0.2.0255.255.255.0
+        |- Subnets: Subnet 1 110.0.3.0255.255.255.0
+        |- Subnets: Subnet 2 010.0.4.0255.255.255.0
+        |- Subnets: Subnet 2 110.0.5.0255.255.255.0
+    |- Zone: DB Zone2
+        |- Subnets: Subnet 0 010.0.0.0255.255.255.0
+        |- Subnets: Subnet 0 110.0.1.0255.255.255.0
+        |- Subnets: Subnet 1 010.0.2.0255.255.255.0
+        |- Subnets: Subnet 1 110.0.3.0255.255.255.0
+        |- Subnets: Subnet 2 010.0.4.0255.255.255.0
+        |- Subnets: Subnet 2 110.0.5.0255.255.255.0
+    |- Zone: WEB Zone2
+        |- Subnets: Subnet 0 010.0.0.0255.255.255.0
+        |- Subnets: Subnet 0 110.0.1.0255.255.255.0
+        |- Subnets: Subnet 1 010.0.2.0255.255.255.0
+        |- Subnets: Subnet 1 110.0.3.0255.255.255.0
+        |- Subnets: Subnet 2 010.0.4.0255.255.255.0
+        |- Subnets: Subnet 2 110.0.5.0255.255.255.0
+    |- Ingress ACL: Middle Ingress ACL
+        |- Rule: Allow MySQL DB connections from Web Zone2
+        |- Rule: Allow me
+    |- Ingress ACL: Middle Ingress ACL
+        |- Rule: Allow MySQL DB connections from Web Zone2
+        |- Rule: Allow me
+    |- Egress ACL: Middle Egress ACL
+        |- Rule: Allow me
+    |- Egress ACL: Middle Egress ACL
+VMs inside Enterprise cardinals
+Domains inside Enterprise cardinals
+|- Domain: carson
+    |- Zone: APPZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet0210.0.2.0255.255.255.0
+        |- Subnets: Subnet1010.0.3.0255.255.255.0
+        |- Subnets: Subnet1110.0.4.0255.255.255.0
+        |- Subnets: Subnet1210.0.5.0255.255.255.0
+        |- Subnets: Subnet2010.0.6.0255.255.255.0
+        |- Subnets: Subnet2110.0.7.0255.255.255.0
+        |- Subnets: Subnet2210.0.8.0255.255.255.0
+    |- Zone: cardinalsZone0
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet0210.0.2.0255.255.255.0
+        |- Subnets: Subnet1010.0.3.0255.255.255.0
+        |- Subnets: Subnet1110.0.4.0255.255.255.0
+        |- Subnets: Subnet1210.0.5.0255.255.255.0
+        |- Subnets: Subnet2010.0.6.0255.255.255.0
+        |- Subnets: Subnet2110.0.7.0255.255.255.0
+        |- Subnets: Subnet2210.0.8.0255.255.255.0
+    |- Zone: cardinalsZone1
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet0210.0.2.0255.255.255.0
+        |- Subnets: Subnet1010.0.3.0255.255.255.0
+        |- Subnets: Subnet1110.0.4.0255.255.255.0
+        |- Subnets: Subnet1210.0.5.0255.255.255.0
+        |- Subnets: Subnet2010.0.6.0255.255.255.0
+        |- Subnets: Subnet2110.0.7.0255.255.255.0
+        |- Subnets: Subnet2210.0.8.0255.255.255.0
+    |- Zone: cardinalsZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet0210.0.2.0255.255.255.0
+        |- Subnets: Subnet1010.0.3.0255.255.255.0
+        |- Subnets: Subnet1110.0.4.0255.255.255.0
+        |- Subnets: Subnet1210.0.5.0255.255.255.0
+        |- Subnets: Subnet2010.0.6.0255.255.255.0
+        |- Subnets: Subnet2110.0.7.0255.255.255.0
+        |- Subnets: Subnet2210.0.8.0255.255.255.0
+    |- Zone: DBZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet0210.0.2.0255.255.255.0
+        |- Subnets: Subnet1010.0.3.0255.255.255.0
+        |- Subnets: Subnet1110.0.4.0255.255.255.0
+        |- Subnets: Subnet1210.0.5.0255.255.255.0
+        |- Subnets: Subnet2010.0.6.0255.255.255.0
+        |- Subnets: Subnet2110.0.7.0255.255.255.0
+        |- Subnets: Subnet2210.0.8.0255.255.255.0
+    |- Zone: WEBZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet0210.0.2.0255.255.255.0
+        |- Subnets: Subnet1010.0.3.0255.255.255.0
+        |- Subnets: Subnet1110.0.4.0255.255.255.0
+        |- Subnets: Subnet1210.0.5.0255.255.255.0
+        |- Subnets: Subnet2010.0.6.0255.255.255.0
+        |- Subnets: Subnet2110.0.7.0255.255.255.0
+        |- Subnets: Subnet2210.0.8.0255.255.255.0
+    |- Ingress ACL: Middle Ingress ACL
+        |- Rule: Allow MySQL DB connections from WebZone2
+    |- Egress ACL: Middle Egress ACL
+        |- Rule: drop this
+VMs inside Enterprise R-D_World_Wide_Shippiong
+Domains inside Enterprise R-D_World_Wide_Shippiong
+|- Domain: Data_Center_2
+    |- Zone: APP Zone2
+        |- Subnets: Subnet 0 010.0.0.0255.255.255.0
+        |- Subnets: Subnet 1 010.0.1.0255.255.255.0
+        |- Subnets: Subnet 2 010.0.2.0255.255.255.0
+    |- Zone: DB Zone2
+        |- Subnets: Subnet 0 010.0.0.0255.255.255.0
+        |- Subnets: Subnet 1 010.0.1.0255.255.255.0
+        |- Subnets: Subnet 2 010.0.2.0255.255.255.0
+    |- Zone: R-D_World_Wide_ShippiongZone 0
+        |- Subnets: Subnet 0 010.0.0.0255.255.255.0
+        |- Subnets: Subnet 1 010.0.1.0255.255.255.0
+        |- Subnets: Subnet 2 010.0.2.0255.255.255.0
+    |- Zone: R-D_World_Wide_ShippiongZone 1
+        |- Subnets: Subnet 0 010.0.0.0255.255.255.0
+        |- Subnets: Subnet 1 010.0.1.0255.255.255.0
+        |- Subnets: Subnet 2 010.0.2.0255.255.255.0
+    |- Zone: R-D_World_Wide_ShippiongZone 2
+        |- Subnets: Subnet 0 010.0.0.0255.255.255.0
+        |- Subnets: Subnet 1 010.0.1.0255.255.255.0
+        |- Subnets: Subnet 2 010.0.2.0255.255.255.0
+    |- Zone: WEB Zone2
+        |- Subnets: Subnet 0 010.0.0.0255.255.255.0
+        |- Subnets: Subnet 1 010.0.1.0255.255.255.0
+        |- Subnets: Subnet 2 010.0.2.0255.255.255.0
+    |- Ingress ACL: Middle Ingress ACL
+        |- Rule: Allow MySQL DB connections from Web Zone2
+VMs inside Enterprise rick-five
+Domains inside Enterprise rick-five
+|- Domain: test1
+    |- Zone: APPZone2
+    |- Zone: DBZone2
+    |- Zone: WEBZone2
+VMs inside Enterprise rick-teo
+Domains inside Enterprise rick-teo
+|- Domain: rc1
+    |- Zone: APPZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+    |- Zone: DBZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+    |- Zone: rick-teoZone0
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+    |- Zone: WEBZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+    |- Ingress ACL: Middle Ingress ACL
+        |- Rule: Allow MySQL DB connections from WebZone2
+    |- Egress ACL: Middle Egress ACL
+VMs inside Enterprise rick7
+Domains inside Enterprise rick7
+|- Domain: seven
+    |- Zone: APPZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+    |- Zone: DBZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+    |- Zone: rick7Zone0
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+    |- Zone: rick7Zone1
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+    |- Zone: rick7Zone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+    |- Zone: WEBZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+    |- Ingress ACL: Middle Ingress ACL
+        |- Rule: Allow MySQL DB connections from WebZone2
+        |- Rule: 
+        |- Rule: 
+    |- Egress ACL: Middle Egress ACL
+        |- Rule: yes
+        |- Rule: Test acl
+        |- Rule: Test acl
+        |- Rule: 
+        |- Rule: 
+        |- Rule: 
+        |- Rule: 
+VMs inside Enterprise rickOne
+Domains inside Enterprise rickOne
+|- Domain: backup
+    |- Zone: APP Zone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+    |- Zone: DB Zone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+    |- Zone: rickOneZone0
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+    |- Zone: rickOneZone1
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+    |- Zone: rickOneZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+    |- Zone: WEB Zone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+    |- Ingress ACL: Middle Ingress ACL
+        |- Rule: Allow MySQL DB connections from Web Zone2
+    |- Egress ACL: Middle Egress ACL
+VMs inside Enterprise rickthree
+Domains inside Enterprise rickthree
+|- Domain: super
+    |- Zone: APPZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet1010.0.2.0255.255.255.0
+        |- Subnets: Subnet1110.0.3.0255.255.255.0
+        |- Subnets: Subnet2010.0.4.0255.255.255.0
+        |- Subnets: Subnet2110.0.5.0255.255.255.0
+    |- Zone: DBZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet1010.0.2.0255.255.255.0
+        |- Subnets: Subnet1110.0.3.0255.255.255.0
+        |- Subnets: Subnet2010.0.4.0255.255.255.0
+        |- Subnets: Subnet2110.0.5.0255.255.255.0
+    |- Zone: rickthreeZone0
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet1010.0.2.0255.255.255.0
+        |- Subnets: Subnet1110.0.3.0255.255.255.0
+        |- Subnets: Subnet2010.0.4.0255.255.255.0
+        |- Subnets: Subnet2110.0.5.0255.255.255.0
+    |- Zone: rickthreeZone1
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet1010.0.2.0255.255.255.0
+        |- Subnets: Subnet1110.0.3.0255.255.255.0
+        |- Subnets: Subnet2010.0.4.0255.255.255.0
+        |- Subnets: Subnet2110.0.5.0255.255.255.0
+    |- Zone: rickthreeZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet1010.0.2.0255.255.255.0
+        |- Subnets: Subnet1110.0.3.0255.255.255.0
+        |- Subnets: Subnet2010.0.4.0255.255.255.0
+        |- Subnets: Subnet2110.0.5.0255.255.255.0
+    |- Zone: WEBZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet1010.0.2.0255.255.255.0
+        |- Subnets: Subnet1110.0.3.0255.255.255.0
+        |- Subnets: Subnet2010.0.4.0255.255.255.0
+        |- Subnets: Subnet2110.0.5.0255.255.255.0
+    |- Ingress ACL: Middle Ingress ACL
+        |- Rule: Allow MySQL DB connections from WebZone2
+        |- Rule: Access ACL 1
+        |- Rule: Access ACL 3
+    |- Egress ACL: Middle Egress ACL
+        |- Rule: Access ACL 2
+VMs inside Enterprise ricktwo
+Domains inside Enterprise ricktwo
+|- Domain: standard
+    |- Zone: APPZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet1010.0.2.0255.255.255.0
+        |- Subnets: Subnet1110.0.3.0255.255.255.0
+        |- Subnets: Subnet2010.0.4.0255.255.255.0
+        |- Subnets: Subnet2110.0.5.0255.255.255.0
+    |- Zone: DBZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet1010.0.2.0255.255.255.0
+        |- Subnets: Subnet1110.0.3.0255.255.255.0
+        |- Subnets: Subnet2010.0.4.0255.255.255.0
+        |- Subnets: Subnet2110.0.5.0255.255.255.0
+    |- Zone: ricktwoZone0
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet1010.0.2.0255.255.255.0
+        |- Subnets: Subnet1110.0.3.0255.255.255.0
+        |- Subnets: Subnet2010.0.4.0255.255.255.0
+        |- Subnets: Subnet2110.0.5.0255.255.255.0
+    |- Zone: ricktwoZone1
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet1010.0.2.0255.255.255.0
+        |- Subnets: Subnet1110.0.3.0255.255.255.0
+        |- Subnets: Subnet2010.0.4.0255.255.255.0
+        |- Subnets: Subnet2110.0.5.0255.255.255.0
+    |- Zone: ricktwoZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet1010.0.2.0255.255.255.0
+        |- Subnets: Subnet1110.0.3.0255.255.255.0
+        |- Subnets: Subnet2010.0.4.0255.255.255.0
+        |- Subnets: Subnet2110.0.5.0255.255.255.0
+    |- Zone: WEBZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet1010.0.2.0255.255.255.0
+        |- Subnets: Subnet1110.0.3.0255.255.255.0
+        |- Subnets: Subnet2010.0.4.0255.255.255.0
+        |- Subnets: Subnet2110.0.5.0255.255.255.0
+    |- Ingress ACL: Middle Ingress ACL
+    |- Egress ACL: Middle Egress ACL
+VMs inside Enterprise Sears
+Domains inside Enterprise Sears
+|- Domain: dc2
+    |- Zone: APPZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+        |- Subnets: Subnet3010.0.3.0255.255.255.0
+    |- Zone: DBZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+        |- Subnets: Subnet3010.0.3.0255.255.255.0
+    |- Zone: SearsZone0
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+        |- Subnets: Subnet3010.0.3.0255.255.255.0
+    |- Zone: SearsZone1
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+        |- Subnets: Subnet3010.0.3.0255.255.255.0
+    |- Zone: SearsZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+        |- Subnets: Subnet3010.0.3.0255.255.255.0
+    |- Zone: SearsZone3
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+        |- Subnets: Subnet3010.0.3.0255.255.255.0
+    |- Zone: WEBZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+        |- Subnets: Subnet3010.0.3.0255.255.255.0
+    |- Ingress ACL: Middle Ingress ACL
+        |- Rule: Allow MySQL DB connections from WebZone2
+    |- Egress ACL: Middle Egress ACL
+VMs inside Enterprise Test2
+Domains inside Enterprise Test2
+|- Domain: Test2
+    |- Zone: APPZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+        |- Subnets: Subnet3010.0.3.0255.255.255.0
+    |- Zone: DBZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+        |- Subnets: Subnet3010.0.3.0255.255.255.0
+    |- Zone: Test2Zone0
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+        |- Subnets: Subnet3010.0.3.0255.255.255.0
+    |- Zone: Test2Zone1
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+        |- Subnets: Subnet3010.0.3.0255.255.255.0
+    |- Zone: Test2Zone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+        |- Subnets: Subnet3010.0.3.0255.255.255.0
+    |- Zone: Test2Zone3
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+        |- Subnets: Subnet3010.0.3.0255.255.255.0
+    |- Zone: WEBZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet1010.0.1.0255.255.255.0
+        |- Subnets: Subnet2010.0.2.0255.255.255.0
+        |- Subnets: Subnet3010.0.3.0255.255.255.0
+    |- Ingress ACL: Middle Ingress ACL
+        |- Rule: Allow MySQL DB connections from WebZone2
+    |- Egress ACL: Middle Egress ACL
+        |- Rule: 
+VMs inside Enterprise tonyromo
+Domains inside Enterprise tonyromo
+|- Domain: cowboys
+    |- Zone: APPZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet1010.0.2.0255.255.255.0
+        |- Subnets: Subnet1110.0.3.0255.255.255.0
+        |- Subnets: Subnet2010.0.4.0255.255.255.0
+        |- Subnets: Subnet2110.0.5.0255.255.255.0
+        |- Subnets: Subnet3010.0.6.0255.255.255.0
+        |- Subnets: Subnet3110.0.7.0255.255.255.0
+    |- Zone: DBZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet1010.0.2.0255.255.255.0
+        |- Subnets: Subnet1110.0.3.0255.255.255.0
+        |- Subnets: Subnet2010.0.4.0255.255.255.0
+        |- Subnets: Subnet2110.0.5.0255.255.255.0
+        |- Subnets: Subnet3010.0.6.0255.255.255.0
+        |- Subnets: Subnet3110.0.7.0255.255.255.0
+    |- Zone: tonyromoZone0
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet1010.0.2.0255.255.255.0
+        |- Subnets: Subnet1110.0.3.0255.255.255.0
+        |- Subnets: Subnet2010.0.4.0255.255.255.0
+        |- Subnets: Subnet2110.0.5.0255.255.255.0
+        |- Subnets: Subnet3010.0.6.0255.255.255.0
+        |- Subnets: Subnet3110.0.7.0255.255.255.0
+    |- Zone: tonyromoZone1
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet1010.0.2.0255.255.255.0
+        |- Subnets: Subnet1110.0.3.0255.255.255.0
+        |- Subnets: Subnet2010.0.4.0255.255.255.0
+        |- Subnets: Subnet2110.0.5.0255.255.255.0
+        |- Subnets: Subnet3010.0.6.0255.255.255.0
+        |- Subnets: Subnet3110.0.7.0255.255.255.0
+    |- Zone: tonyromoZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet1010.0.2.0255.255.255.0
+        |- Subnets: Subnet1110.0.3.0255.255.255.0
+        |- Subnets: Subnet2010.0.4.0255.255.255.0
+        |- Subnets: Subnet2110.0.5.0255.255.255.0
+        |- Subnets: Subnet3010.0.6.0255.255.255.0
+        |- Subnets: Subnet3110.0.7.0255.255.255.0
+    |- Zone: tonyromoZone3
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet1010.0.2.0255.255.255.0
+        |- Subnets: Subnet1110.0.3.0255.255.255.0
+        |- Subnets: Subnet2010.0.4.0255.255.255.0
+        |- Subnets: Subnet2110.0.5.0255.255.255.0
+        |- Subnets: Subnet3010.0.6.0255.255.255.0
+        |- Subnets: Subnet3110.0.7.0255.255.255.0
+    |- Zone: WEBZone2
+        |- Subnets: Subnet0010.0.0.0255.255.255.0
+        |- Subnets: Subnet0110.0.1.0255.255.255.0
+        |- Subnets: Subnet1010.0.2.0255.255.255.0
+        |- Subnets: Subnet1110.0.3.0255.255.255.0
+        |- Subnets: Subnet2010.0.4.0255.255.255.0
+        |- Subnets: Subnet2110.0.5.0255.255.255.0
+        |- Subnets: Subnet3010.0.6.0255.255.255.0
+        |- Subnets: Subnet3110.0.7.0255.255.255.0
+    |- Ingress ACL: Middle Ingress ACL
+        |- Rule: Allow MySQL DB connections from WebZone2
+    |- Egress ACL: Middle Egress ACL
+        |- Rule: drop this
+VMs inside Enterprise VSPK Enterprise
+Domains inside Enterprise VSPK Enterprise
+|- Domain: Default Domain
+    |- Zone: APPZone2
+    |- Zone: DBZone2
+    |- Zone: WEBZone2

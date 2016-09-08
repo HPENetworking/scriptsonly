@@ -1,0 +1,55 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}Distributed Cloud Networking{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+<h3> Auto Domain Deploy</h3>
+
+<div class="container">
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+
+
+
+<div>
+  <h3> Enter DCN Credentials </h3>
+  <form action = "/login" method = "post">
+
+    <hr>
+    <p>DCN Organization: <input type=text  id="dcnUser" class="form-control" placeholder="Organization"  name="org"></p>
+    <p>DCN IP Address: <input type=text  id="dcnUser" class="form-control" placeholder="IP Address"  name="ipaddress"></p>
+    <p>DCN User: <input type=text  id="dcnUser" class="form-control" placeholder="DCN user"  name="user"></p>
+    <p>DCN Password: <input type="password" id="dcnPassword" class="form-control" placeholder="Password" required name="passwd"></p>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+    <br>
+
+  </form>
+</div>
+
+</div>
+
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+
+{% endblock %}

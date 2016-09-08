@@ -1,0 +1,86 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}Add New Switch{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+ <div class="jumbotron">
+				<h3>Add a new switch to the database</h3>
+				<p class="lead"></p>
+        </div>
+
+<div class="container">
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+
+    </div>
+
+    {%- for category, message in get_flashed_messages(with_categories = true) %}
+       <div class = "alert alert-danger">
+          {{ message }}
+       </div>
+    {%- endfor %}
+
+    <form action = "{{ request.path }}" method = "post">
+
+       <label for = "mac">mac</label>
+       <input type = "text" name = "mac" placeholder = "00-00-00-00-00-00" />
+
+       <label for = "sysname">system name</label>
+       <input type = "text" name = "sysname" placeholder = "system name" /><br><hr>
+
+       <label for = "mgmt_ip">mangement IP address</label>
+       <input type = "text" name = "mgmt_ip" placeholder = "192.168.1.1" />
+
+       <label for = "mgmt_sub">management mask</label>
+       <input type = "text" name = "mgmt_sub" placeholder = "255.255.255.0" /><br><hr>
+
+       <label for = "gateway">gateway IP address</label>
+       <input type = "text" name = "gateway" placeholder = "192.168.1.254" />
+
+       <label for = "tftpserver">tftp server IP address</label>
+       <input type = "text" name = "tftpserver" placeholder = "10.132.0.109" /><br><hr>
+
+       <label for = "localuser">SSH User</label>
+       <input type = "text" name = "localuser" placeholder = "10.132.0.109" />
+
+       <label for= "passwd">SSH Password</label>
+       <input type="password" placeholder="SSH Pass" required name="passwd" /></p><br>
+
+       <label for = "fanDirection">Fan Direction</label>
+       <select name="fanDirection"><option value="port-to-power">port-to-power</option>
+         <option value="power-to-port">power-to-port</option></select>
+
+      <label for = "rolex">Role</label>
+      <select name="rolex"><option value="super-spine">super-spine</option>
+           <option value="spine">spine</option><option value="leaf">leaf</option></select><br><br>
+
+       <input type = "submit" value = "Submit" />
+
+    </form>
+
+
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+
+{% endblock %}

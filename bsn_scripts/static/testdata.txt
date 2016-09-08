@@ -1,0 +1,6 @@
+super,rickthreeZone0,APPZone2,Ingress,FORWARD,Access ACL 1,0x0800,6,8080,8085,*
+
+super,rickthreeZone1,DBZone2,Egress,DROP,Access ACL 2,0x0800,6,8081,8085,*
+
+super,rickthreeZone2,WEBZone2,Ingress,DROP,Access ACL 3,0x0800,6,8082,8085,*
+

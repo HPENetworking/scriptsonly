@@ -1,0 +1,48 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}download csv template{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+ <div class="jumbotron">
+				<h3>download csv template</h3>
+				<p class="lead"></p>
+        </div>
+
+<div class="container">
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+
+    </div>
+
+
+<div class="container" align="left">
+  <a href="/return-file/" target="blank"><button class='btn btn-default'>
+    download</button></a>
+</div>
+
+
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+
+{% endblock %}

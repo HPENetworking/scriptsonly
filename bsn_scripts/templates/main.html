@@ -1,0 +1,52 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}Bigswitch Cloud Fabric SDN{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+<div class="container">
+  <h3>Enter Login Credentials</h3>
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+
+
+
+<div>
+  <form action = "/login" method = "post">
+
+    <hr>
+    <p>BSN IP Address: <input type=text  id="bsnUser" class="form-control" placeholder="Controller Address"  name="host"></p>
+    <p>BSN User: <input type=text  id="bsnUser" class="form-control" placeholder="BCN user"  name="user"></p>
+    <p>BSN Password: <input type="password" id="bsnPassword" class="form-control" placeholder="Password" required name="passwd"></p>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+    <br>
+
+  </form>
+</div>
+
+</div>
+
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+
+{% endblock %}

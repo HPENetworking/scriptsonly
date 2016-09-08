@@ -1,0 +1,81 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}Edit Switch Record{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+ <div class="jumbotron">
+				<h3>Edit Switch Record</h3>
+				<p class="lead"></p>
+        </div>
+
+<div class="container">
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+</div>
+<form action = /editsave method = "post">
+
+   <label for = "mac">mac</label>
+   <input type = "text" name = "mac" value = {{ switch[0].mac }} />
+
+   <label for = "sysname">system name</label>
+   <input type = "text" name = "sysname" value = {{ switch[0].sysname }} /><br><hr>
+
+   <label for = "mgmt_ip">mangement IP address</label>
+   <input type = "text" name = "mgmt_ip" value = {{ switch[0].mgmt_ip }} />
+
+   <label for = "mgmt_sub">management mask</label>
+   <input type = "text" name = "mgmt_sub" value = {{ switch[0].mgmt_sub }} /><br><hr>
+
+   <label for = "gateway">gateway IP address</label>
+   <input type = "text" name = "gateway" value = {{ switch[0].gateway }} />
+
+   <label for = "tftpserver">tftp server IP address</label>
+   <input type = "text" name = "tftpserver" value = {{ switch[0].tftpserver }} /><br><hr>
+
+   <label for = "localuser">SSH User</label>
+   <input type = "text" name = "localuser" value = {{ switch[0].localuser }} />
+
+   <label for= "passwd">SSH Password</label>
+   <input type="password" value = {{ switch[0].passwd }} required name="passwd" /></p><br>
+
+   <h4>Note: Please verify fan and role selections are correct!</h4>
+
+   <label for = "fanDirection">Fan Direction</label>
+   <select name="fanDirection"><option value="port-to-power">port-to-power</option>
+     <option value="power-to-port">power-to-port</option></select>
+
+  <label for = "rolex">Role</label>
+  <select name="rolex"><option value="super-spine">super-spine</option>
+       <option value="spine">spine</option><option value="leaf">leaf</option></select><br><br>
+
+   <input type = "submit" value = "Submit" />
+
+</form>
+
+
+
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+
+{% endblock %}
