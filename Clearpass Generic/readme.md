@@ -1,4 +1,4 @@
-#ArubaOS Generic Scripts
+#ClearPass Generic Scripts
 
 This repository is a collection of sample code usages of the public facing APIs for HPE Aruba Clearpass product.
 
