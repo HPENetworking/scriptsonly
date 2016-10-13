@@ -25,7 +25,6 @@ for x in tin:
     net_connect = ConnectHandler(**x)
     output = net_connect.send_command("display arp")
     name = net_connect.find_prompt() + x['ip']
-#    print "\n\n>>>>>>>>>>>>>>>{0}<<<<<<<<<<<<<<<<<<<<".format(x['ip'])
     print "\n\n>>>>>>>>>>>>>>>{0}<<<<<<<<<<<<<<<<<<<<".format(name)
     print output
     if '10.150.0.254' in output:
