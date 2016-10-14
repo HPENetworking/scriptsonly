@@ -9,6 +9,6 @@ A3810_1 = {
 
 net_connect = ConnectHandler(**A3810_1)
 
-output = net_connect.send_command("display clock")
+output = net_connect.send_command("show version")
 
 print output
