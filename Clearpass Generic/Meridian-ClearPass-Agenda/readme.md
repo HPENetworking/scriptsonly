@@ -38,6 +38,12 @@ These instructions will get you a copy of the project up and running on your loc
 ### Installation: 
 Copy/Paste everything in /var/www/ directory of your Linux Apache Server and give access to cgi-bin, html and pictures to the Apache web.
 
+## Authors
+
+* Fabien GIRAUD
+
+## License
+
  Copyright 2016 Hewlett Packard Enterprise Development LP.
 
    Licensed under the Apache License, Version 2.0 (the "License");
