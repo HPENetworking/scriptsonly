@@ -1,9 +1,5 @@
-#ClearPass Generic Scripts
-
-This repository is a collection of sample code usages of the public facing APIs for HPE Aruba Clearpass product.
-
-
-
+#!/usr/bin/env python3
+'''
  Copyright 2016 Hewlett Packard Enterprise Development LP.
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,3 +13,24 @@ This repository is a collection of sample code usages of the public facing APIs 
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+
+__author__ = "@netmanfabe"
+__copyright__ = "Copyright 2016, Hewlett Packard Enterprise Development LP."
+__credits__ = ["Fabien GIRAUD"]
+__license__ = "Apache2"
+__version__ = "2.0.0"
+__maintainer__ = "Fabien GIRAUD"
+__email__ = "fabien_giraud@me.com"
+__status__ = "Prototype"
+
+'''
+# script to test agenda_v2.py (and only to test, not used in real life)
+# syntax agenda_loader_v2.py <Agenda ID>
+
+import agenda_v2
+import sys
+
+
+agenda_v2.load_agenda(sys.argv[1])
+

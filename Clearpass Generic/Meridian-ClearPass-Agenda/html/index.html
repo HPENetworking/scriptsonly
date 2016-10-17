@@ -1,0 +1,280 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+        <head>
+                <title>Innovation Center Meridian / Guest</title>
+                <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+                <!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous" />
+		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.min.css" />
+		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker3.min.css" />
+        </head>
+        <body>
+
+
+        <div class="container">
+        <div class="page-header text-center">
+                <h1>Innovation Center Guest / Meridian Client Creation</h1>
+        </div>
+
+
+        <fieldset id="auth">
+        <form class="form-horizontal">
+
+        <!-- Form Name -->
+        <legend>Authentication</legend>
+         <div style="display:none" class="alert alert-danger" role="alert">Authentication Failed</div>
+        <!-- Text input-->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="username">Username</label>
+          <div class="col-md-4">
+          <input id="username" name="username" type="text" placeholder="HPE email address" class="form-control input-md">
+
+          </div>
+        </div>
+
+        <!-- Password input-->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="password">Password</label>
+          <div class="col-md-4">
+            <input id="password" name="password" type="password" placeholder="password" class="form-control input-md">
+
+          </div>
+        </div>
+
+        <!-- Button -->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="submit"></label>
+          <div class="col-md-4">
+            <input data-loading-text="Loading..." id="submit" type="submit" class="btn btn-default" value="Submit" />
+          </div>
+        </div>
+        </form>
+        </fieldset>
+
+
+   <div id="creation" style="display:none">
+   <fieldset>
+
+    <!-- Form Name -->
+    <legend>Client Informations</legend>
+    <form  class="form-horizontal" action="/cgi-bin/create_client_v2.py" method="post" enctype="multipart/form-data">
+
+     <div>
+          <div style="display:none" class="alert alert-danger" role="alert"><span class="error-message"></span>. </div>
+          <div style="display:none" class="alert alert-success" role="alert">User(s) and agenda successfully added. </div>
+     </div>
+
+
+     <div id="input1" class="clonedInputClient">
+        <!-- Text input-->
+        <div class="form-group">
+          <label class="col-xs-1 col-sm-1 col-md-1 col-lg-1 control-label" for="visitor_name">Name</label>
+          <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+          <input id="name1" name="visitor_name-1" type="text" placeholder="client full name" class="form-control input-md" required="">
+
+          </div>
+
+        <!-- Text input-->
+	<!-- We'll use email as username. If you want to specify username, uncomment and remove the username=email in python script
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="username">Username</label>
+          <div class="col-md-4">
+          <input id="username1" name="username-1" type="text" placeholder="username" class="form-control input-md" required="">
+
+          </div>
+        </div>
+	-->
+
+        <!-- Text input-->
+          <label class="col-xs-1 col-sm-1 col-md-1 col-lg-1 control-label" for="email">Email</label>
+          <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+          <input id="email1" name="email-1" type="text" placeholder="email" class="form-control input-md" required="">
+
+          </div>
+
+        <!-- Password input-->
+	<!-- Password will be auto generated. if you want to specify one, uncomment.
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="password">Password</label>
+          <div class="col-md-4">
+            <input id="password1" name="password-1" type="password" placeholder="password" class="form-control input-md" required="">
+
+          </div>
+        </div>
+	-->
+
+
+        <!-- Text input-->
+          <label class="col-xs-1 col-sm-1 col-md-1 col-lg-1 control-label" for="company">Company</label>
+          <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+          <input id="company1" name="visitor_company-1" type="text" placeholder="company" class="form-control input-md">
+
+          </div>
+
+
+        <!-- Text input-->
+          <label class="col-xs-1 col-sm-1 col-md-1 col-lg-1 control-label" for="picture">Picture</label>
+          <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+          <input id="picture1" name="visitor_picture-1" type="text" placeholder="e.g. http:// ... .jpg" class="form-control input-md">
+          </div>
+
+        </div>
+
+    </div>
+
+    <!-- Button -->
+    <div>
+        <div class="form-group">
+          <label class="col-xs-4 col-sm-4 col-md-4 col-lg-2 control-label" for="btnAddClient"></label>
+          <div class="col-xs-4 col-sm-4 col-md-4 col-lg-2">
+            <input type="button" id="btnAddClient" value="add another customer" class="btn btn-default"/>
+          </div>
+          <label class="col-xs-4 col-sm-4 col-md-4 col-lg-2 control-label" for="btnDelClient"></label>
+          <div class="col-xs-4 col-sm-4 col-md-4 col-lg-2">
+            <input type="button" id="btnDelClient" value="remove last customer" class="btn btn-default"/>
+          </div>
+        </div>
+    </div>
+
+
+    <input type="hidden" name="token" id="token" />
+
+    <!-- Employees to associate to the agenda -->
+    <legend>HPE Aruba Account Manager / SE</legend>
+
+      <!-- Text input -->
+      <div id="input2" class="form-group">
+        <label class="col-xs-4 col-sm-4 col-md-4 col-lg-2 control-label" for="corpEmail">Corporate Emails</label>
+        <div class="col-xs-4 col-sm-4 col-md-4 col-lg-2">
+          <input id="corpEmails" name="corpEmails" type="text" placeholder="Email of the employees (comma separated)" class="form-control input-md">
+        </div>
+
+      </div>
+
+
+
+    <!-- Agenda -->
+    <legend>Agenda</legend>
+
+    <!-- Text input -->
+    <div class="form-group">
+      <label class="col-xs-4 col-sm-4 col-md-4 col-lg-2 control-label" for="title">Title</label>
+      <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+        <input id="title" name="title" type="text" placeholder="Title" class="form-control input-md">
+      </div>
+
+    </div>
+    <!-- Text input -->
+    <div class="form-group">
+      <label class="col-xs-4 col-sm-4 col-md-4 col-lg-2 control-label" for="location">Location</label>
+      <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+        <input id="location" name="location" type="location" placeholder="Location (room)" class="form-control input-md">
+      </div>
+
+    </div>
+    <!-- Text input -->
+    <div class="form-group">
+      <label class="col-xs-4 col-sm-4 col-md-4 col-lg-2 control-label" for="date">Date</label>
+      <div class="col-xs-4 col-sm-4 col-md-4 col-lg-2 date">
+        <div class="input-group input-append date" id="datePicker">
+          <input id="date" name="date" type="text" placeholder="MM/DD/YYYY" class="form-control input-md" required="">
+          <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-xs-4 col-sm-4 col-md-4 col-lg-2 control-label" for="logo">Company Logo</label>
+      <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+        <input id="logo" name="logo" type="text" placeholder="URL to the company logo (e.g. http:// ... .jpg)" class="form-control input-md">
+      </div>
+    </div>
+
+
+    <hr style="border-top: 3px dotted #eeeeee !important; " />
+
+    <div id="TimeSlot1" class="clonedInputTimeSlot">
+        <!-- Text input-->
+        <div class="form-group">
+          <label class="col-xs-1 col-sm-1 col-md-1 col-lg-1 control-label" for="begin">When?</label>
+          <div class="col-xs-2 col-sm-2 col-md-1 col-lg-1">
+          <input id="begin1" name="begin-1" type="text" placeholder="hh:mm" class="form-control input-md" required="">
+
+          </div>
+
+        <!-- Text input-->
+	<!-- We don't use the end time, only the begin one (to make it lighter)
+		you can uncomment to use it
+          <label class="col-md-1 col-lg-1 control-label" for="end">End</label>
+          <div class="col-md-1 col-lg-1">
+          <input id="end1" name="end-1" type="text" placeholder="hh:mm" class="form-control input-md" required="">
+
+          </div>
+	-->
+
+
+        <!-- Text input-->
+          <label class="col-xs-1 col-sm-1 col-md-1 col-lg-1 control-label" for="pres">Presenter</label>
+          <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+          <input id="pres1" name="pres-1" type="text" placeholder="Name" class="form-control input-md">
+
+          </div>
+
+        <!-- Text input-->
+          <label class="col-xs-1 col-sm-1 col-md-1 col-lg-1 control-label" for="Content">Content</label>
+          <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+          <input id="content" name="content-1" type="text" placeholder="Content" class="form-control input-md" required="">
+
+          </div>
+
+        <!-- Text input-->
+          <label class="col-xs-1 col-sm-1 col-md-1 col-lg-1 control-label" for="day">Day</label>
+          <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+          <input id="day1" name="day-1" type="text" placeholder="#" class="form-control input-md">
+          <span class="help-block"></span>
+
+          </div>
+
+        </div>
+
+    <hr style="margin-left: 10%; margin-right=10%">
+    </div>
+
+    <!-- Button -->
+    <div>
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="btnAddTimeSlot"></label>
+          <div class="col-md-4">
+            <input type="button" id="btnAddTimeSlot" value="add another Time Slot" class="btn btn-default"/>
+          </div>
+          <label class="col-md-4 control-label" for="btnDelTimeSlot"></label>
+          <div class="col-md-4">
+            <input type="button" id="btnDelTimeSlot" value="remove last Time Slot" class="btn btn-default"/>
+          </div>
+        </div>
+    </div>
+
+
+
+        <!-- Button -->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="submit"></label>
+          <div class="col-md-4">
+            <button data-loading-text="Loading..." id="submit" name="submit" class="btn btn-default">Submit</button>
+          </div>
+        </div>
+
+
+     </form>
+    </fieldset>
+    </div>
+
+
+        <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.min.js"></script>
+<!--	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
+        <script type="text/javascript" src="js/dynamicForm.js"></script>
+
