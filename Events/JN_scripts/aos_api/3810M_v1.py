@@ -14,7 +14,12 @@ login_payload = {'userName': 'ctrask', 'password': 'timshel'}
 #login
 #l = requests.post(login_url, json=login_payload)
 #print l.text
+system_url = 'http://10.150.0.1:80/rest/v1/system/status'
+system_get = requests.get(system_url)
+system_result = system_get.json()
 
+#print device name
+print "DEVICE:", system_result['name']
 #url to get vlans
 vlan_url = 'http://10.150.0.1:80/rest/v1/vlans'
 
@@ -30,7 +35,7 @@ vlan_dict = vlan_result.values()[1]
 #loop over list to scrap vlan and name
 for x in vlan_dict:
     print "VLAN:", x['vlan_id']
-    print "NAME:", x['name']
+    print "VLAN NAME:", x['name']
     print "----------------"
 
 
