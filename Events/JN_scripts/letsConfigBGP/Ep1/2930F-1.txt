@@ -1,0 +1,46 @@
+Running configuration:
+
+; JL259A Configuration Editor; Created on release #WC.16.02.0012
+; Ver #0e:01.b3.ef.7c.5f.fc.6b.fb.9f.fc.f3.ff.37.ef:ab
+
+hostname "2930F-1"
+module 1 type jl259a
+snmp-server community "public" unrestricted
+aaa authentication ssh login public-key
+vlan 1
+   name "DEFAULT_VLAN"
+   no untagged 1-3,10
+   untagged 4-9,11-28
+   no ip address
+   exit
+vlan 2
+   name "mgmt"
+   untagged 10
+   tagged 1-3
+   ip address dhcp-bootp
+   exit
+vlan 10
+   name "VLAN10"
+   tagged 1-2
+   no ip address
+   exit
+vlan 11
+   name "VLAN11"
+   tagged 1,3
+   no ip address
+   exit
+vlan 12
+   name "VLAN12"
+   tagged 2-3
+   no ip address
+   exit
+no tftp server
+no autorun
+no dhcp config-file-update
+no dhcp image-file-update
+no dhcp tr69-acs-url
+device-profile name "default-ap-profile"
+   cos 0
+   exit
+activate provision disable
+password manager
