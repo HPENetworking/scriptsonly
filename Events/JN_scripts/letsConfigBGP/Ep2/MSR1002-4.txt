@@ -1,0 +1,168 @@
+ version 7.1.059, Release 0306P07
+#
+ sysname MSR1K_1
+#
+ospf 1 router-id 1.1.1.1
+ area 0.0.0.0
+#
+ password-recovery enable
+#
+vlan 1
+#
+controller Cellular0/0
+#
+interface Aux0
+#
+interface Serial0/0
+#
+interface NULL0
+#
+interface LoopBack0
+ ip address 1.1.1.1 255.255.255.255
+ ospf 1 area 0.0.0.0
+#
+interface LoopBack1
+ ip address 172.16.1.254 255.255.255.0
+#
+interface GigabitEthernet0/0
+ port link-mode route
+#
+interface GigabitEthernet0/0.2
+ ip address 192.168.1.229 255.255.255.0
+ vlan-type dot1q vid 2
+#
+interface GigabitEthernet0/0.10
+ ip address 10.150.10.1 255.255.255.252
+ ospf network-type p2p
+ ospf 1 area 0.0.0.0
+ vlan-type dot1q vid 10
+#
+interface GigabitEthernet0/0.11
+ ip address 192.168.11.1 255.255.255.252
+ vlan-type dot1q vid 11
+#
+interface GigabitEthernet0/5
+ port link-mode route
+#
+interface GigabitEthernet0/1
+ port link-mode bridge
+#
+interface GigabitEthernet0/2
+ port link-mode bridge
+#
+interface GigabitEthernet0/3
+ port link-mode bridge
+#
+interface GigabitEthernet0/4
+ port link-mode bridge
+#
+bgp 65001
+ router-id 1.1.1.1
+ peer 2.2.2.2 as-number 65001
+ peer 2.2.2.2 connect-interface LoopBack0
+ peer 192.168.11.2 as-number 65002
+ #
+ address-family ipv4 unicast
+  network 172.16.1.0 255.255.255.0
+  peer 2.2.2.2 enable
+  peer 192.168.11.2 enable
+#
+ scheduler logfile size 16
+#
+line class aux
+ user-role network-admin
+#
+line class tty
+ user-role network-operator
+#
+line class vty
+ user-role network-operator
+#
+line aux 0
+ user-role network-admin
+#
+line vty 0 15
+ authentication-mode scheme
+ user-role network-operator
+ idle-timeout 0 0
+#
+line vty 16 63
+ user-role network-operator
+#
+ ssh server enable
+ ssh user ctrask service-type all authentication-type publickey assign publickey aruba1
+#
+ arp static 10.150.0.254 0800-2773-d334
+#
+domain system
+#
+ domain default enable system
+#
+role name level-0
+ description Predefined level-0 role
+#
+role name level-1
+ description Predefined level-1 role
+#
+role name level-2
+ description Predefined level-2 role
+#
+role name level-3
+ description Predefined level-3 role
+#
+role name level-4
+ description Predefined level-4 role
+#
+role name level-5
+ description Predefined level-5 role
+#
+role name level-6
+ description Predefined level-6 role
+#
+role name level-7
+ description Predefined level-7 role
+#
+role name level-8
+ description Predefined level-8 role
+#
+role name level-9
+ description Predefined level-9 role
+#
+role name level-10
+ description Predefined level-10 role
+#
+role name level-11
+ description Predefined level-11 role
+#
+role name level-12
+ description Predefined level-12 role
+#
+role name level-13
+ description Predefined level-13 role
+#
+role name level-14
+ description Predefined level-14 role
+#
+user-group system
+#
+local-user ctrask class manage
+ password hash $h$6$Zn6x8RgBvk0NfMZb$0zmxl5aVrS+Sw7Aqk9QXvQmTyTm8moq1Ppu6Y4FCnJjxe9LyJJfotbm8ZAfV+aFmdlq6jlVLjnvWmsqHSDUcpQ==
+ service-type ssh
+ authorization-attribute user-role network-admin
+ authorization-attribute user-role network-operator
+#
+public-key peer aruba1
+ public-key-code begin
+   30820120300D06092A864886F70D01010105000382010D00308201080282010100AFEBEB18
+   0D522BE1A51A9D13883FD31956D412311E871D2F19A6B22E447EBAC8EB45330121AA79B3CE
+   FC50F298D2342D00A93FE4C6BE57357BA0D209CD95F9D5C1D391B7441D1FCEED653FAC6E2A
+   B7E5AF8EBCD90B8211277D5E78B93672A3738EBD8BC178A53A73B0D71A1C772FA70867F178
+   9BA924B4C5F2F49DDAEA343CEE45B4B87FC989CA753BAB340AAD270DCD375C53A445ACB9E0
+   23FC870B737C29F615BFC9950DB95A39B0A29CD748092DE678B28F624784A21E831DD77473
+   496A8593304F6E98CC9B28DCAB084ED59DF8E8A414422848E6DFD76F894E00DA08DD34EA2B
+   2718F971E945399B36CD0B8FF4709AF3F9FDF0AE3B54C0EA49DEB295C6EF020125
+ public-key-code end
+ peer-public-key end
+#
+cwmp
+ cwmp enable
