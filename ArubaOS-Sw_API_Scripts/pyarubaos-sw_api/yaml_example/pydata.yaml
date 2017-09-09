@@ -1,0 +1,4 @@
+ip_addr: 192.168.2.1
+username: admin
+password: admin
+command: show ip route
