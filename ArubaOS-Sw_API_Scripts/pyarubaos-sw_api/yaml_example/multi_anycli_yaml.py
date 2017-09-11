@@ -1,3 +1,8 @@
+"""A script to demonstrate using the anycli feature on multiple devices.
+This example utilises import of data from a local YAML file.
+This script is aimed at those with little python experience, the lack of functions is intentional.
+Example YAML file for import: multi_anycli_yaml.yaml
+"""
 import requests
 import json
 import base64
@@ -16,8 +21,6 @@ with open("multi_anycli_yaml.yaml", 'r') as stream:
         print(exc)
 
 
-
-
 for switch in ip_addr:
     url = 'http://' + switch + '/rest/v3/'
     creds = {'userName': username, 'password': password}
@@ -27,11 +30,9 @@ for switch in ip_addr:
     if r.status_code != 201:
         print('Login error, status code {}'.format(r.status_code))
 
-
     cookie = {'cookie': cookie_response}
     c = {'cmd': command}
     post_command = requests.post(url + 'cli', headers=cookie, data=json.dumps(c), timeout=1)
-
 
     if post_command.status_code != 200:
         print(('Error, status code {}'.format(post_command.status_code)))

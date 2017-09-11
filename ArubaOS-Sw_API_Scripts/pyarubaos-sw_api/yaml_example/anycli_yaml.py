@@ -1,3 +1,8 @@
+"""A script to demonstrate using the anycli feature in ArubaOS-Switch 16.04.
+This example utilises import of data from a local YAML file
+This script is aimed at those with little python experience, the lack of functions is intentional.
+Example YAML file for import: anycli_yaml.yaml
+"""
 import requests
 import json
 import base64

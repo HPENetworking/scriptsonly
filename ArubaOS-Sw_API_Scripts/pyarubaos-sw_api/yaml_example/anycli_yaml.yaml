@@ -1,3 +1,5 @@
+#Example YAML file for local anycli_yaml.py script
+
 username: admin
 password: admin
 ip_addr: 192.168.2.1
