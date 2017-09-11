@@ -5,22 +5,22 @@ import yaml
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-with open("pydata.yaml", 'r') as stream:
+with open("anycli_yaml.yaml", 'r') as stream:
     try:
-        pydata = yaml.load(stream)
-        ip_addr = pydata['ip_addr']
-        username = pydata['username']
-        password = pydata['password']
-        command = pydata['command']
+        yaml_data = yaml.load(stream)
+        ip_addr = yaml_data['ip_addr']
+        username = yaml_data['username']
+        password = yaml_data['password']
+        command = yaml_data['command']
     except yaml.YAMLERROR as exc:
         print(exc)
 
 
-url = 'https://' + ip_addr + '/rest/v3/'
+url = 'http://' + ip_addr + '/rest/v3/'
 creds = {'userName': username, 'password': password}
 
 s = requests.Session()
-r = s.post(url + 'login-sessions', data=json.dumps(creds), timeout=1, verify=False)
+r = s.post(url + 'login-sessions', data=json.dumps(creds), timeout=1)
 cookie_response = r.json()['cookie']
 if r.status_code != 201:
     print('Login error, status code {}'.format(r.status_code))
@@ -28,7 +28,7 @@ if r.status_code != 201:
 
 cookie = {'cookie': cookie_response}
 c = {'cmd': command}
-post_command = requests.post(url + 'cli', headers=cookie, data=json.dumps(c), timeout=1, verify=False)
+post_command = requests.post(url + 'cli', headers=cookie, data=json.dumps(c), timeout=1)
 
 
 
