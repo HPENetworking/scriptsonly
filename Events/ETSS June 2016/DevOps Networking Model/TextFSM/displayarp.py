@@ -77,4 +77,7 @@ re_table = textfsm.TextFSM(template)
 fsm_results = re_table.ParseText(displayarpCW5)
 
 for i in fsm_results:
+
+
+for i in fsm_results:
     print (i)
