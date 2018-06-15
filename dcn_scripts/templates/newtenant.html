@@ -1,0 +1,99 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}Distributed Cloud Networking{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+<h3> Auto Domain Deploy</h3>
+
+<div class="container">
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+
+<div>
+  <h3> Enter New Tenant Information </h3>
+  <form action = "/build_tenant" method = "post">
+
+    <hr>
+    <p>Tenant Name: <input type=text  id="dcnTenant" class="form-control" placeholder="New Tenant"  name="enterprise"></p>
+    <p>Domain: <input type=text  id="dcnDomain" class="form-control" placeholder="Domain"  name="domain"></p>
+    <hr>
+    <table class="table table-condensed">
+        <tbody>
+              <tr>
+                <td>
+                <p> Number of Zones </p>
+                <select name ="zones">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                </select>
+              </td>
+              <td>
+              <p> Number of Subnets per Zone </p>
+              <select name ="subs">
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                      <option value="6">6</option>
+                      <option value="7">7</option>
+                      <option value="8">8</option>
+                      <option value="9">9</option>
+              </select>
+            </td>
+            <td>
+            <p> Number of vPorts per subnet </p>
+            <select name ="vports">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+            </select>
+          </td>
+        </tr>
+        </tbody>
+    </table>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Add New Tenant</button>
+    <br>
+
+  </form>
+</div>
+</div>
+
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+
+{% endblock %}

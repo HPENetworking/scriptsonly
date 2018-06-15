@@ -1,0 +1,60 @@
+		Adding config management
+
+
+1) Adapter-index.xml
+2) Adapter.xml: Global method
+3) Initialization:
+	- initialize.tcl=Global parameters
+	- Mikrotik_Common_Cli : script to use to initialize and enter exec 
+and exit exec
+	- enter_exec script ad exit exec
+4) Backup:
+	- Mikrot...Builder.xml : method used for backup (backup_startup, 
+cleanupParser ..)
+	- Mikrot...Builder_Script.xml: exec level + script to use
+	- Mikrot...cleanup_parser.xml: script to use
+	- backup tcl file
+	- CleanupParser tcl file
+5) Restart imccfgbck...
+
+
+
+		Adding tool
+1) Put Icon in .../client/web/apps/imc/resources/images/.../res/
+2) Put exec file in .../client/web/apps/imc/plat/exec
+3) Write xml file in ..../client/web/apps/imc/WEB-INF/
+4) Restart jserver
+
+
+		Adding Batch op
+1) Create .../client/web/apps/imc/gencfg/register/custom
+2) Create 3 files in it:
+	- CustomDevCapabilities (restrict devices)
+	- CustomOp : operation def
+We will now quickly introduce to structure of this file. We are defining 
+Operation here. There is id, label (how operation is visible in GUI), devCapability
+ (as explained previously) and some other IDs. Very important is operLevel – if you
+ set this to 1 this wizard will be based on devices. If you set 2, GUI will select
+ interfaces (so your adapter will be called for selected ports which might span 
+multiple devices). Next critical item is actionType. We are using 2 here, which 
+indicates CLI operation (adapter is called as we will explain later), but zou can 
+also use 1 that is REST action (basically you can leverage iMC eAPI to do things).
+Next definition is action (Asn1Action). serviceName and actionName are very 
+important as this is how adapter is called (strings will need to match what we 
+will do later in adapters). operMode 1 indicates CLI (SNMP adapters are also 
+possible, but not documented), operType is 1 (deploying configuration changes) and
+ execMode is 1 (synchronous operation).
+Last definitions are about parameters which will be passed to your adapter. You can
+ pass built-in variables to your scripts, for example when dealing with interface 
+wizards you will most likely define something like this: 
+<Parameter name="ifDesc" value="${IF_DESC}" />
+So your script will get ifDesc variable where interface will be submitted (so 
+your script can do things like send “interface $ifDesc\r”).
+
+3) Add an adapter in .../server/conf/adapters/GenericConfig/
+(in our case /H3C/H3CConfig/adapter.xml)
+	- Adapter.xml edit
+	- H3CCommonCLI_NTP_Builder.xml
+	- H3CCommonCLI_NTP_Builder_Script.xml
+	- Setup_ntp.tcl
+

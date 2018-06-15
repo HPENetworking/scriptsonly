@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<scripts>
+        <command name="backup_startup_config_cli" method="CLI">
+                <error>Failed to backup configuration</error>
+                <require-mode>exec</require-mode>
+                <script>
+            backup_startup_config_cli.tcl
+                </script>
+        </command>
+</scripts>

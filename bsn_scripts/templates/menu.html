@@ -1,0 +1,85 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}Bigswitch Cloud Fabric SDN{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+ <div class="jumbotron">
+				<h3>Bigswitch Cloud Fabric SDN</h3>
+				<p class="lead"></p>
+        </div>
+
+<div class="container">
+  <!-- Single button -->
+
+  <ul class="nav nav-tabs">
+  <li class="active"><a href="return_to">Home</a></li>
+  <li class="dropdown">
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Lists
+    <span class="caret"></span></a>
+    <ul class="dropdown-menu">
+      <li><a href="show_tenant">Tenants</a></li>
+      <li><a href="show_link">Links</a></li>
+      <li><a href="show_portgroup">Port Groups</a></li>
+      <li><a href="show_switch">Switches</a></li>
+      <li><a href="show_segment">Segments</a></li>
+    </ul>
+  </li>
+  <li class="dropdown">
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Add
+    <span class="caret"></span></a>
+    <ul class="dropdown-menu">
+      <li><a href="add_tenant">Tenants</a></li>
+      <li><a href="add_portgroup">Port Group</a></li>
+      <li><a href="add_segment">Segment</a></li>
+      <li><a href="add_int2pg">Interface to PG</a></li>
+      <li><a href="add_ints2pg">Interfaces to Port Group</a></li>
+      <li><a href="add_pg2seg">PG to Segment</a></li>
+      <li><a href="add_pgs2seg">Add PGs to segment</a></li>
+
+    </ul>
+  </li>
+  <li><a href="#">Show Config</a></li>
+  <li><a href="logout">Logout</a></li>
+</ul>
+<br><hr>
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+
+    {%- for category, message in get_flashed_messages(with_categories = true) %}
+       <div class = "alert alert-danger">
+          {{ message }}
+       </div>
+    {%- endfor %}
+
+  <div>
+
+    <form action = "/csv_loader" method = "post">
+       <button class="btn btn-lg btn-primary btn-block" type="submit">CSV Config Controller</button>
+
+
+  </div>
+</div>
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+
+{% endblock %}

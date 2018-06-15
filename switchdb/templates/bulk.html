@@ -1,0 +1,54 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}Bulk Load Switches{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+ <div class="jumbotron">
+				<h3>Bulk load database function</h3>
+				<p class="lead"></p>
+        </div>
+
+<div class="container">
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+
+    </div>
+
+    <form action ="/index">
+
+      switchdb added {{ success }} records to the database
+
+      There were a total of {{ fail }} records that had errors!<br>
+
+       <input type = "submit" value = "Main" />
+
+        <textarea name="varfile" cols=40 rows= 15>{{ filex }}</textarea>
+
+    </form>
+
+
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+
+{% endblock %}

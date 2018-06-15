@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DevCapabilities>
+    <Capability name="ComwareNTP">
+        <Sysoid>1.3.6.1.4.1.25506</Sysoid>
+    </Capability>
+</DevCapabilities>

@@ -1,0 +1,68 @@
+
+; JL076A Configuration Editor; Created on release #KB.16.02.0013
+; Ver #0e:01.b3.ff.7c.5f.fc.7b.ff.ff.fc.ff.ff.3f.ef:cb
+
+hostname "3810M-1"
+module 1 type jl076x
+module 2 type jl076y
+module 3 type jl076z
+ip router-id 1.1.1.1
+ip routing
+interface loopback 0
+   ip address 1.1.1.1
+   ip ospf 1.1.1.1 area backbone
+   exit
+snmp-server community "public" unrestricted
+aaa authentication ssh login public-key
+oobm
+   ip address dhcp-bootp
+   exit
+router ospf
+   area backbone
+   enable
+   exit
+router bgp 65001
+   enable
+   network 172.16.1.0 255.255.255.0
+   neighbor 2.2.2.2 remote-as 65001
+   neighbor 2.2.2.2 update-source 1.1.1.1
+   neighbor 192.168.11.2 remote-as 65002
+   exit
+vlan 1
+   name "DEFAULT_VLAN"
+   no untagged 1
+   untagged 2-48
+   no ip address
+   disable layer3
+   exit
+vlan 2
+   name "mgmt"
+   tagged 1
+   ip address 192.168.1.217 255.255.255.0
+   exit
+vlan 10
+   name "VLAN10"
+   tagged 1
+   ip address 10.150.10.1 255.255.255.252
+   ip ospf 10.150.10.1 area backbone
+   ip ospf 10.150.10.1 network-type point-to-point
+   exit
+vlan 11
+   name "VLAN11"
+   tagged 1
+   ip address 192.168.11.1 255.255.255.252
+   exit
+vlan 100
+   name "VLAN100"
+   tagged 1
+   ip address 172.16.1.254 255.255.255.0
+   exit
+no tftp server
+no autorun
+no dhcp config-file-update
+no dhcp image-file-update
+device-profile name "default-ap-profile"
+   cos 0
+   exit
+activate provision disable
+password manager

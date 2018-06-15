@@ -53,11 +53,11 @@ param ($outputType,$deviceIP)
 
  # iMC Connection variable and initialization
  
-$imchost = "10.10.105.21"
+$imchost = "10.10.105.2"
 $imcport = "8080"
 $imcprot = "http"
 $iMCUser = "imcrs"
-$iMCPWD = "imcrs@hpisc14"
+$iMCPWD = "imcrs"
 
 $ImcApiBaseUrl = $imcprot + "://" + $imchost + ":" + $imcport + "/imcrs/" 
 

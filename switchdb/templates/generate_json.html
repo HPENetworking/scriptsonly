@@ -1,0 +1,51 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}Generate JSON vars file{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+ <div class="jumbotron">
+				<h3>Generate json vars file</h3>
+				<p class="lead"></p>
+        </div>
+
+<div class="container">
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+
+    </div>
+
+    <form action ="/index">
+
+      Copy this file over to your techops project folder!<br>
+      <textarea name="varfile" cols=40 rows= 15>{{ file }}</textarea>
+
+       <input type = "submit" value = "Main" />
+
+    </form>
+
+
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+
+{% endblock %}

@@ -1,0 +1,42 @@
+
+
+{% block navbar %}
+
+<nav class="navbar navbar-inverse navbar-fixed-top ">
+  <div class="container-fluid">
+
+      <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar"> </button>
+      <a class="navbar-brand" href="#">switchdb</a>
+      </div>
+
+      <div class="dropdown">
+          <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">actions
+              <span class="caret"></span></button>
+          <ul class="dropdown-menu">
+              <li><a href="new">add switch</a></li>
+              <li><a href="edit">edit switch</a></li>
+              <li><a href="delete">delete switch</a></li>
+              <li><a href="list">list switches</a></li>
+              <li><a href="generate">generate ansible vars</a></li>
+              <li><a href="genjson">generate JSON vars</a></li>
+          </ul>
+      </div>
+      <div class="dropdown">
+          <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">database tools
+              <span class="caret"></span></button>
+          <ul class="dropdown-menu">
+              <li><a href="dbdelete">clear all database records</a></li>
+              <li><a href="dbdump">dump all records</a></li>
+              <li><a href="bulk">bulk load database</a></li>
+              <li><a href="filedownloads">download csv template</a></li>
+          </ul>
+      </div>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="help">Help with this App</a></li>
+            <li><a href="about">About</a></li>
+          </ul>
+      </div>
+  </div>
+</nav>
+{% endblock %}

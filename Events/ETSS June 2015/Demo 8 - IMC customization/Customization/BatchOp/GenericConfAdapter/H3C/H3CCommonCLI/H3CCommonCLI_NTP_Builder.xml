@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<definition>
+
+        <action name="ComwareNTPaction">
+            <step>
+                <command name="setup_ntp" description="configure ntp">
+                </command>
+                </step>
+        </action>
+</definition>

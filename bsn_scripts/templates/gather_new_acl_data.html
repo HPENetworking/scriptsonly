@@ -1,0 +1,92 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}Distributed Cloud Networking{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+<div class="jumbotron">
+
+       </div>
+
+
+<div class="container">
+  <h3> Enter New ACL Information </h3>
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+<div>
+
+  <form action = "/buildaclrule" method = "post">
+    <table class="table table-condensed">
+        <tbody>
+          <tr>
+            <td>
+            <p> Choose the Origin Zone </p>
+            <select name ="fromzone">
+                    {% for zon in zonelist %}
+                       <option value={{zon}}>{{zon}}</option>
+                    {% endfor %}
+            </select>
+          </td>
+          <td>
+            <p> Choose the Destination Zone </p>
+            <select name ="tozone">
+                    {% for zon in zonelist %}
+                       <option value={{zon}}>{{zon}}</option>
+                    {% endfor %}
+            </select>
+          </td>
+          <td>
+            <p> Choose the ACL Direction </p>
+            <select name ="direction">
+                    <option value="Ingress">Ingress</option>
+                    <option value="Egress">Egress</option>
+            </select>
+          </td>
+          <td>
+            <p> Choose the ACL Action </p>
+            <select name ="action">
+                    <option value="FORWARD">Allow</option>
+                    <option value="DROP">Drop</option>
+            </select>
+          </td>
+        </tr>
+        </tbody>
+    </table>
+    <hr>
+    <p>Description: <input type=text  id="aclDescription" class="form-control" name="description">
+      <p>Ether Type: <input type=text  id="aclethertype" class="form-control" value="0x0800" name="ethertype">
+        <p>Protocol: <input type=text  id="aclprotocol" class="form-control" value="6" name="protocol">
+          <p>Source Port: <input type=text  id="aclsourceport" class="form-control" value="*" name="sourceport"><p>
+            <p>Destination Port: <input type=text  id="acldestinationport" class="form-control" value="*" name="destinationport">
+              <p>DSCP: <input type=text  id="acldscp" class="form-control" value="*" name="dscp">
+                <input type="hidden" name="domain" value={{ domain }}>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Add New ACL Rule</button>
+    <br>
+
+  </form>
+</div>
+
+
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+</div>
+{% endblock %}

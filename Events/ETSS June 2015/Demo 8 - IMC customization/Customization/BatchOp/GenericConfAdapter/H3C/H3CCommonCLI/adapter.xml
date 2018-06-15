@@ -1,0 +1,4 @@
+<service name="ComwareNTP">
+    <item type="builder_definition">H3CCommonCLI_NTP_Builder.xml</item>
+    <item type="tcl_script">H3CCommonCLI_NTP_Builder_Script.xml</item>
+ </service>

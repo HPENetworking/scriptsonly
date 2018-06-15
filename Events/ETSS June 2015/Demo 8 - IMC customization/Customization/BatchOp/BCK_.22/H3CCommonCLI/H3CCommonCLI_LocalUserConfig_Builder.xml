@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<definition>
+
+	<action name="query_local_user">
+	    <step>
+    		<command name="query_local_user" description="query local user through CLI">
+    			<result name="FormatResult">
+    				<parser parserName="CleanupParser" parserRet="FormatResult" parserScript="cleanupLocalUser"/>
+    			</result>
+    		</command>    		
+		</step>
+	</action>
+
+	<action name="create_local_user">
+	    <step>
+    		<command name="create_local_user" description="create local user through CLI">    		    
+    		</command>    		
+		</step>	    
+	</action>
+
+	<action name="create_local_user_v7">
+	    <step>
+    		<command name="create_local_user_v7" description="create local user on V7 device through CLI">    		    
+    		</command>    		
+		</step>	    
+	</action>
+	
+</definition>
