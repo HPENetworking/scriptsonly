@@ -26,7 +26,7 @@ __status__ = "Prototype"
 '''
 
 from flask import Flask, request, render_template, redirect, url_for, flash, session
-from flask.ext.bootstrap import Bootstrap
+from flask_bootstrap import Bootstrap
 from pyhpeimc.auth import *
 from pyhpeimc.plat.device import *
 from pyhpeimc.plat.termaccess import *
