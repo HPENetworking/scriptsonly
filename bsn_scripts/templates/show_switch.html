@@ -1,0 +1,75 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}Big Switch Controller API{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+ <div class="jumbotron">
+				<p class="lead"></p>
+        </div>
+
+<div class="container">
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+  <div>
+    <h3> List of switches managed by controller </h3>
+      <form action = "/return_to" method = "post">
+       <p> Total processes switches {{ switches|length }}
+      <table class="table table-responsive">
+         <thead>
+            <tr>
+               <th>IP Address</th>
+               <th>Switch Name</th>
+               <th>Data Path Identifier</th>
+               <th>Connection State</th>
+               <th>Fabric Role</th>
+               <th>Leaf Group</th>
+            </tr>
+         </thead>
+
+         <tbody>
+                {% for item in switches %}
+               <tr>
+                  <td> {{ item.0 }}</td>
+                  <td> {{ item.1 }} </td>
+                  <td> {{ item.2 }}</td>
+                  <td> {{ item.3 }} </td>
+                  <td> {{ item.4 }}</td>
+                  <td> {{ item.5 }} </td>
+               </tr>
+                {% endfor %}
+
+         </tbody>
+      </table>
+      <hr>
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Back to Main</button>
+      <br>
+
+    </form>
+  </div>
+</div>
+
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+
+{% endblock %}

@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<definition>
+	<action name="query_ssh_global">		 	
+		<step >	    	    		    
+	   		<command name="query_ssh_global" description="Query SSH Global Config Info through SNMP">    
+	   			<result name="FormatResult">
+    				<parser parserName="CleanupParser" parserRet="FormatResult" parserScript="cleanupSSHGlobal"/>
+    			</result>	   			    
+	    	</command>  	    		    		    			
+		</step>		
+	</action>
+
+	<action name="set_ssh_global">		    	
+		<step >	    	    		    
+	   		<command name="set_ssh_global" description="Set ssh global info through SNMP">    		    
+	    	</command>  	    		    		    			
+		</step>			    
+	</action>
+	
+	<action name="query_ssh_user">		
+		<step >	    	    		    
+	   		<command name="query_ssh_user" description="Query SSH User Info through SNMP">   
+	   			<result name="FormatResult">
+    				<parser parserName="CleanupParser" parserRet="FormatResult" parserScript="cleanupSSHUser"/>
+    			</result> 		    
+	    	</command>  	    		    		    			
+		</step>
+	</action>
+	
+	<action name="set_ssh_user">		  					
+		<step >	    	    		    
+	   		<command name="set_ssh_user" description="Set SSH User through SNMP">    		    
+	    	</command>  	    		    		    			
+		</step>
+	</action>
+
+	<action name="set_ssh_user_v7">		  					
+		<step >	    	    		    
+	   		<command name="set_ssh_user_v7" description="Set SSH User through SNMP">    		    
+	    	</command>  	    		    		    			
+		</step>
+	</action>	
+</definition>

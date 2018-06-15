@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tools-config xmlns="http://www.h3c.com/device-tools-config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.h3c.com/device-tools-config dev-tools-config_1_0.xsd ">
+  <description>MikroTik Router Doc</description>
+  <resource-bundle>com.h3c.imc.plat.LocalStrings</resource-bundle> 
+  <config id="MikroTikManual">
+    <conditions>
+      <sys-oid use-when-no-sysoid="false">
+        <value>1.3.6.1.4.1.14988.1</value>
+      </sys-oid>
+    </conditions>
+    <action>
+      <url>
+        <url.name>Download manuals</url.name>
+        <img.url>res/icon_dev_reg_16x16.png</img.url>
+        <url.value>http://wiki.mikrotik.com/wiki/Manual:TOC</url.value>
+        <param name="sp4ts.oid" value="5443163"/>
+      </url>
+    </action>
+    </config>
+</tools-config>

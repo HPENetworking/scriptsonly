@@ -1,0 +1,55 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}DCN Manager help{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+ <div class="jumbotron">
+				<h3>help for DCN Manager</h3>
+				<p class="lead"></p>
+        </div>
+
+<div class="container">
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+
+    </div>
+    <div class="form">
+    <form action = "/index">
+        <p> DCN Manager help information</p>
+        <p>
+          <h4> Create New Tenant </h4>
+          Creating a new tenant will copy a default 3-Tier Layer 3 domain into the new tenant. It will
+          also add three new zones, each with a subnet and 2 vPorts for a starting point.<br><hr>
+
+       <input type = "submit" value = "Main" />
+
+     </form>
+  </div>
+
+
+
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+
+{% endblock %}

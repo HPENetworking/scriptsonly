@@ -1,0 +1,52 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}Add New Switch{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+ <div class="jumbotron">
+            {% for host in hosts %}
+				<h1>Add a new switch to the database</h1>
+				<p class="lead"></p>
+			{% endfor %}
+        </div>
+
+<div class="container">
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+
+    </div>
+
+    {%- for category, message in get_flashed_messages(with_categories = true) %}
+       <div class = "alert alert-danger">
+          {{ message }}
+       </div>
+    {%- endfor %}
+
+  
+
+
+    <footer class="footer">
+            <p>&copy; Company 2015</p>
+        </footer>
+
+{% endblock %}

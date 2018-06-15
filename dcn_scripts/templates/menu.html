@@ -1,0 +1,65 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}Distributed Cloud Networking{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+ <div class="jumbotron">
+				<h3>Distrubuted Cloud Networking utilities</h3>
+				<p class="lead"></p>
+        </div>
+
+<div class="container">
+  <!-- Single button -->
+
+  <ul class="nav nav-pills">
+    <li role="presentation" class="active"><a href="#">Main Menu</a></li>
+    <li role="presentation"><a href="bulk">Bulk Load ACL file</a></li>
+    <li role="presentation"><a href="inventory">Inventory Report</a></li>
+  </ul>
+  <hr>
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+
+    {%- for category, message in get_flashed_messages(with_categories = true) %}
+       <div class = "alert alert-danger">
+          {{ message }}
+       </div>
+    {%- endfor %}
+
+  <div>
+
+    <form action = "/add_tenant" method = "post">
+       <button class="btn btn-lg btn-primary btn-block" type="submit">Easy Button</button>
+    </form>
+
+    <form action = "/newacl" method = "post">
+       <button class="btn btn-lg btn-primary btn-block" type="submit">New ACL Rule</button>
+
+
+  </div>
+</div>
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+
+{% endblock %}

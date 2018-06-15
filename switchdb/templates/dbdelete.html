@@ -1,0 +1,50 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}Database Delete{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+ <div class="jumbotron">
+				<h3>delete switchdb database</h3>
+				<p class="lead"></p>
+        </div>
+
+<div class="container">
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+
+    </div>
+
+    <form action ="/killthemall">
+
+    CAUTION!!! You are about to delete all records....Are you sure?<br>
+
+       <input type = "submit" value = "Delete All Records" />
+
+    </form>
+
+
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+
+{% endblock %}

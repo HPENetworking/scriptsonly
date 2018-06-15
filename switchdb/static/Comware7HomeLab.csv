@@ -1,0 +1,50 @@
+"Required
+Name of the configuration file to be deployed on the device. ","Required
+IP address of the device after the selected configuration file is deployed on the device. ",Required MAC address of the device. You must input at least one of the MAC address and current IP address. ,Required Current IP address of the device. You must input at least one of the MAC address and current IP address.  ,"Parameters in the configuration file to be deployed. The parameters are in the format of Parameter name1: Paramter value1; Parameter name2: Paramter value2; ...For example, ACLNumber: 3005. ","Stack member ID, ranging from 1 to 9. A value of ¨C1 indicates that the stack feature is disabled on the device. ","Indicates whether or not the device information is changed. The value can be:
+0 for no
+1 for yes",Device label.,Device group.,Software to be deployed on the device.,Name of the CLI script to be deployed on the device.,"Parameters in the CLI script file to be deployed. The parameters are in the format of Parameter name1: Paramter value1; Parameter name2: Paramter value2; ...For example, ACLNumber: 3005.","Indicates whether or not the device's SNMP parameters are changed. The value can be:
+0 for no
+1 for yes","SNMP version. The value can be:
+1 for SNMPv1
+2 for SNMPv2c
+3 for SNMPv3","Read-only community name, which is public by default and is of up to 32 characters. ","Read and write community name, which is private by default and is of up to 32 characters. ","Username, which applies to only SNMPv3 and is of up to 32 characters. A username corresponds to an SNMPv3 template name. ","SNMPv3 context name, which is of up to 32 characters. ","Security mode. The value can be:
+1 for no authentication and no encryption
+2 for authentication and no encryption
+3 for authentication and encryption
+The SnmpParaAuthScheme and SnmpParaPrivScheme columns must have the same value as this column. ","Authentication mode. The value can be:
+1 for none
+2 for MD5
+3 for SHA","Authentication password, which is of up to 32 characters.","Encryption mode. The value can be:
+1 for none
+2 for DES
+19 for AES128
+21 for AES256","Encryption password, which contains 32 characters at most.","Operation timeout period (in seconds), which is 4 by default.","Retries allowed, which is 3 by default.","Indicates whether or not the ping operation is supported. The value can be:
+0 for yes
+1 for no","Indicates whether or not the device's Telnet parameters are changed. The value can be:
+0 for no
+1 for yes","Telnet type. The value can be:
+0 for password
+1 for username+password
+2 for super password
+3 for password+super password
+5 for no username+no password
+6 for username+no password",Telnet username.,Telnet password.,Telnet super password.,"Telnet timeout period, ranging from 1 to 60 seconds.","Indicates whether or not the device's SSH parameters are changed. The value can be:
+0 for no
+1 for yes","SSH authentication mode. The value can be:
+0 for password authentication
+Other authentication modes are not supported.",SSH port number. ,SSH username.,SSH password.,"Maximum number of SSH retries allowed, ranging from 1 to 5.","SSH timeout period, ranging from 1¨C120 seconds.","Login type. The value can be:
+0 for none
+1 for Telnet
+2 for SSH","Indicates whether or not the device will send traps to IMC. The value can be:
+0 for no
+1 for yes","Indicates whether or not the backup software will be deleted. The value can be:
+0 for no
+1 for yes","Indicates whether or not the current software will be deleted. The value can be:
+0 for no
+1 for yes","Specifies whether or not the current software will be backed up. The value can be:
+0 for no
+1 for yes","Specifies whether or not the current configuration will be backed up. The value can be:
+0 for no
+1 for yes"
+ConfigFile,TargetIp,MACAddress,CurrentDeviceIp,ConfigPara,UnitId,changDeviceInfo,DeviceName,DeviceGroup,DeploySoft,CLIScript,CLIPara,changSnmpPara,SnmpParaVersion,SnmpParaRead,SnmpParaWrite,SnmpParaSecurityUser,SnmpParaContextName,SnmpParaSecuMode,SnmpParaAuthScheme,SnmpParaAuthPassword,SnmpParaPrivScheme,SnmpParaPrivPassword,SnmpParaTimeOut,SnmpParaRetry,PingDevType,changTelnet,TelnetStyle,TelnetUseName,TelnetPassword,TelnetSuperWord,TelnetTimeout,changeSsh,SshParaAuthType,SshParaPort,SshParaUserName,SshParaPassword,SshParaRetries,SshParaTimeOut,LoginType,sendTrap,delBackupSoftFlag,delCurrSoftFlag,mainToBackupFlag,backupCfgFlag
+ADP_Configs\5900ADP_w_Netconf.cfg,10.20.10.10,D0-7E-28-EC-AA-48,,Mgmt IP Address: 10.20.10.10,,0,,,,,,1,2,public,private,,,,,,,,,,0,1,1,admin,password,,4,,,,,,,,1,1,,,,0

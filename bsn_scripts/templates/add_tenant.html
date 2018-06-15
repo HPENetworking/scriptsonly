@@ -1,0 +1,48 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}BigSwitch Cloud Fabric SDN{% endblock %}
+
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+<div class="container">
+  <h3>Add New Tenant</h3>
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<ul class="flashes">
+    {% for message in messages %}
+    <p style=  "color:#ff0000;">
+    <li>{{ message}}</li>
+    {% endfor %}
+
+</ul>
+
+{% endif %}
+
+{% endwith %}
+
+<div>
+  <form action = "/add_tenant" method = "post">
+      <h3>Add New Tenant</h3>
+
+    <hr>
+    <p>Tenant Name: <input type=text  id="bsnTenant" class="form-control" placeholder="Name"  name="tenant"></p>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Add New Tenant</button>
+    <br>
+
+  </form>
+</div>
+
+</div>
+
+    <footer class="footer">
+            <p>&copy; Wookieware 2016</p>
+        </footer>
+
+{% endblock %}

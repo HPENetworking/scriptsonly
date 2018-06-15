@@ -1,0 +1,43 @@
+docker run --privileged=true -d -p 8443:8443 -p 6633:6633 xod442/van611 /etc/supervisor/supervisord.conf
+
+sudo docker run -d -p 80:80 xod442/flotapr2_r1 /usr/sbin/apache2ctl -D FOREGROUND
+
+sudo docker build -t "xod442/d2" .
+
+sudo docker run --privileged -d --name=os1 -v /sys/fs/cgroup:/sys/fs/cgroup openswitch/genericx86-64 /sbin/init
+
+sudo docker exec -ti os1 vtysh
+
+----------------Docker help commands
+
+sudo docker run –name (containerName) -i -t ubuntu /bin/bash
+-Start a docker container, give it a name, pull ubuntu from dockerhub, load into container and offer the bash prompt.
+
+exit – exits the container
+
+sudo docker ps -a – Shows what containers are active and recently stopped. Here you can find the container ID
+
+sudo docker start (containerId) – Starts the container
+
+sudo docker attach lampster – attaches to the console of the container by name
+
+sudo docker exec -i -t containerid bash – gives you bash on a running container
+
+sudo docker rm $(sudo docker ps -a -q) -Removes all containers from your workspace (Danger Will Robinson!!)
+
+sudo docker rmi $(sudo docker images -q) – Removes all images from work space (Danger Will Robinson!!)
+
+sudo docker login – Allows you to login to dockerhub
+
+sudo docker search (Keyword) – Allows you to search the dockerhub for pre-built container
+
+sudo docker pull (owner/ImageName) – Get container from dockerhub
+
+sudo docker commit (containerId) (owner/ImageName) – Builds a new Image from a container
+
+sudo docker push (owner/ImageName) – Put Images on your dockerhub space
+
+
+
+
+check2 =Switches.query.filter_by(sysname='rick').all()

@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<common>
+    <mode name="initialize" method="cli">
+        <require-mode>connect</require-mode>
+        <enter>
+            initialize.tcl
+        </enter>
+    </mode>
+
+    <mode name="exec" method="cli">
+        <error>Failed to get to exec mode. </error>
+        <require-mode>initialize</require-mode>
+        <enter>
+            enter_exec.tcl
+        </enter>
+        <exit>
+            exit_exec.tcl
+        </exit>
+    </mode>
+
+    <mode name="enable" method="cli">
+        <error>Failed to get to enable mode. </error>
+        <require-mode>exec</require-mode>
+        <enter>
+            enter_enable.tcl
+        </enter>
+        <exit>
+            exit_enable.tcl
+        </exit>
+    </mode>
+    
+    <function name="result_check" method="CLI">
+        <error>An error occurred while trying to check result.</error>
+        <enter>
+            result_check.tcl
+        </enter>
+    </function>
+</common>

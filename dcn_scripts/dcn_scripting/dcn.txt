@@ -1,0 +1,321 @@
+VMs inside Enterprise AHA-Tenant
+|- instance-000000c4
+|- instance-000000c5
+|- instance-000000d2
+|- instance-000000f4
+|- instance-000000fc
+|- instance-00000180
+|- instance-0000018c
+|- VSR-FW17
+
+Domains inside Enterprise AHA-Tenant
+|- Domain: AHA-3Tier-Domain
+    |- Zone: AHA-GW-Zone
+        |- Subnets: AHA-GW-Subnet - 192.168.5.0 - 255.255.255.252
+        |- Subnets: App-Subnet - 101.101.2.0 - 255.255.255.0
+        |- Subnets: BM-Subnet - 77.77.77.0 - 255.255.255.0
+        |- Subnets: Branch Subnet - 10.44.77.0 - 255.255.255.0
+        |- Subnets: DB-Subnet - 101.101.1.0 - 255.255.255.0
+        |- Subnets: Docker-Subnet - 80.0.0.0 - 255.255.255.0
+        |- Subnets: Web-Subnet - 101.101.3.0 - 255.255.255.0
+    |- Zone: App-Zone
+        |- Subnets: AHA-GW-Subnet - 192.168.5.0 - 255.255.255.252
+        |- Subnets: App-Subnet - 101.101.2.0 - 255.255.255.0
+        |- Subnets: BM-Subnet - 77.77.77.0 - 255.255.255.0
+        |- Subnets: Branch Subnet - 10.44.77.0 - 255.255.255.0
+        |- Subnets: DB-Subnet - 101.101.1.0 - 255.255.255.0
+        |- Subnets: Docker-Subnet - 80.0.0.0 - 255.255.255.0
+        |- Subnets: Web-Subnet - 101.101.3.0 - 255.255.255.0
+    |- Zone: BareMetal Zone
+        |- Subnets: AHA-GW-Subnet - 192.168.5.0 - 255.255.255.252
+        |- Subnets: App-Subnet - 101.101.2.0 - 255.255.255.0
+        |- Subnets: BM-Subnet - 77.77.77.0 - 255.255.255.0
+        |- Subnets: Branch Subnet - 10.44.77.0 - 255.255.255.0
+        |- Subnets: DB-Subnet - 101.101.1.0 - 255.255.255.0
+        |- Subnets: Docker-Subnet - 80.0.0.0 - 255.255.255.0
+        |- Subnets: Web-Subnet - 101.101.3.0 - 255.255.255.0
+    |- Zone: Branch Zone
+        |- Subnets: AHA-GW-Subnet - 192.168.5.0 - 255.255.255.252
+        |- Subnets: App-Subnet - 101.101.2.0 - 255.255.255.0
+        |- Subnets: BM-Subnet - 77.77.77.0 - 255.255.255.0
+        |- Subnets: Branch Subnet - 10.44.77.0 - 255.255.255.0
+        |- Subnets: DB-Subnet - 101.101.1.0 - 255.255.255.0
+        |- Subnets: Docker-Subnet - 80.0.0.0 - 255.255.255.0
+        |- Subnets: Web-Subnet - 101.101.3.0 - 255.255.255.0
+    |- Zone: DB-Zone
+        |- Subnets: AHA-GW-Subnet - 192.168.5.0 - 255.255.255.252
+        |- Subnets: App-Subnet - 101.101.2.0 - 255.255.255.0
+        |- Subnets: BM-Subnet - 77.77.77.0 - 255.255.255.0
+        |- Subnets: Branch Subnet - 10.44.77.0 - 255.255.255.0
+        |- Subnets: DB-Subnet - 101.101.1.0 - 255.255.255.0
+        |- Subnets: Docker-Subnet - 80.0.0.0 - 255.255.255.0
+        |- Subnets: Web-Subnet - 101.101.3.0 - 255.255.255.0
+    |- Zone: Docker-Zone
+        |- Subnets: AHA-GW-Subnet - 192.168.5.0 - 255.255.255.252
+        |- Subnets: App-Subnet - 101.101.2.0 - 255.255.255.0
+        |- Subnets: BM-Subnet - 77.77.77.0 - 255.255.255.0
+        |- Subnets: Branch Subnet - 10.44.77.0 - 255.255.255.0
+        |- Subnets: DB-Subnet - 101.101.1.0 - 255.255.255.0
+        |- Subnets: Docker-Subnet - 80.0.0.0 - 255.255.255.0
+        |- Subnets: Web-Subnet - 101.101.3.0 - 255.255.255.0
+    |- Zone: Web-Zone
+        |- Subnets: AHA-GW-Subnet - 192.168.5.0 - 255.255.255.252
+        |- Subnets: App-Subnet - 101.101.2.0 - 255.255.255.0
+        |- Subnets: BM-Subnet - 77.77.77.0 - 255.255.255.0
+        |- Subnets: Branch Subnet - 10.44.77.0 - 255.255.255.0
+        |- Subnets: DB-Subnet - 101.101.1.0 - 255.255.255.0
+        |- Subnets: Docker-Subnet - 80.0.0.0 - 255.255.255.0
+        |- Subnets: Web-Subnet - 101.101.3.0 - 255.255.255.0
+    |- Ingress ACL: Admin Defined Policies
+        |- Rule: Drop ICMP
+    |- Ingress ACL: Default-Ingress
+        |- Rule: Deny App 2 App
+        |- Rule: Deny SSH; App 2 DB
+    |- Ingress ACL: Admin Defined Policies - Bottom
+        |- Rule: Allow All
+    |- Egress ACL: Default-Egress
+        |- Rule: NO Ping to APP Zone
+|- Domain: AHA-3Tier-With-Public-Domain
+    |- Zone: App-Zone
+        |- Subnets: App-Subent - 101.101.2.0 - 255.255.255.0
+    |- Zone: DB-Zone
+        |- Subnets: App-Subent - 101.101.2.0 - 255.255.255.0
+    |- Zone: PublicZone
+        |- Subnets: App-Subent - 101.101.2.0 - 255.255.255.0
+    |- Zone: Web-Zone
+        |- Subnets: App-Subent - 101.101.2.0 - 255.255.255.0
+|- Domain: AHA-Branch
+    |- Zone: BZL-Branch-Zone
+        |- Subnets: BZL-Branch-Subnet - 90.90.90.0 - 255.255.255.0
+        |- Subnets: NSG-Head Subnet - 140.140.140.0 - 255.255.255.0
+        |- Subnets: NYC-Branch Subnet - 10.34.51.0 - 255.255.255.0
+        |- Subnets: SJC-Branch-Subnet - 200.200.200.0 - 255.255.255.0
+    |- Zone: NSG-Head Zone
+        |- Subnets: BZL-Branch-Subnet - 90.90.90.0 - 255.255.255.0
+        |- Subnets: NSG-Head Subnet - 140.140.140.0 - 255.255.255.0
+        |- Subnets: NYC-Branch Subnet - 10.34.51.0 - 255.255.255.0
+        |- Subnets: SJC-Branch-Subnet - 200.200.200.0 - 255.255.255.0
+    |- Zone: NYC-Branch Zone
+        |- Subnets: BZL-Branch-Subnet - 90.90.90.0 - 255.255.255.0
+        |- Subnets: NSG-Head Subnet - 140.140.140.0 - 255.255.255.0
+        |- Subnets: NYC-Branch Subnet - 10.34.51.0 - 255.255.255.0
+        |- Subnets: SJC-Branch-Subnet - 200.200.200.0 - 255.255.255.0
+    |- Zone: SJC-Branch-Zone
+        |- Subnets: BZL-Branch-Subnet - 90.90.90.0 - 255.255.255.0
+        |- Subnets: NSG-Head Subnet - 140.140.140.0 - 255.255.255.0
+        |- Subnets: NYC-Branch Subnet - 10.34.51.0 - 255.255.255.0
+        |- Subnets: SJC-Branch-Subnet - 200.200.200.0 - 255.255.255.0
+    |- Ingress ACL: Branch-Ingress-Policy
+    |- Egress ACL: Branch-Egress-Policy
+        |- Rule: icmp app to head
+--------------------------------------------------------------------------------
+VMs inside Enterprise ALV-Tenant
+|- instance-00000193
+|- instance-00000194
+|- instance-000001a0
+|- instance-000001a3
+|- VSR-FW7
+|- win03-244
+
+Domains inside Enterprise ALV-Tenant
+|- Domain: ALV-3Tier-Domain
+    |- Zone: App-Zone-109
+        |- Subnets: App-Subnet-109 - 109.109.2.0 - 255.255.255.0
+        |- Subnets: BM-Subnet - 77.77.77.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-109 - 109.109.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet-109 - 109.109.3.0 - 255.255.255.0
+    |- Zone: BM-Zone
+        |- Subnets: App-Subnet-109 - 109.109.2.0 - 255.255.255.0
+        |- Subnets: BM-Subnet - 77.77.77.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-109 - 109.109.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet-109 - 109.109.3.0 - 255.255.255.0
+    |- Zone: DB-Zone-109
+        |- Subnets: App-Subnet-109 - 109.109.2.0 - 255.255.255.0
+        |- Subnets: BM-Subnet - 77.77.77.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-109 - 109.109.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet-109 - 109.109.3.0 - 255.255.255.0
+    |- Zone: Web-Zone-109
+        |- Subnets: App-Subnet-109 - 109.109.2.0 - 255.255.255.0
+        |- Subnets: BM-Subnet - 77.77.77.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-109 - 109.109.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet-109 - 109.109.3.0 - 255.255.255.0
+    |- Ingress ACL: default
+    |- Egress ACL: default
+|- Domain: Demo NET Claro
+    |- Zone: App-Zone-109
+        |- Subnets: Subnet 0 - 10.128.36.0 - 255.255.255.0
+        |- Subnets: Subnet 1 - 10.97.42.0 - 255.255.255.0
+        |- Subnets: Subnet 2 - 10.75.78.0 - 255.255.255.0
+    |- Zone: DB-Zone-109
+        |- Subnets: Subnet 0 - 10.128.36.0 - 255.255.255.0
+        |- Subnets: Subnet 1 - 10.97.42.0 - 255.255.255.0
+        |- Subnets: Subnet 2 - 10.75.78.0 - 255.255.255.0
+    |- Zone: Web-Zone-109
+        |- Subnets: Subnet 0 - 10.128.36.0 - 255.255.255.0
+        |- Subnets: Subnet 1 - 10.97.42.0 - 255.255.255.0
+        |- Subnets: Subnet 2 - 10.75.78.0 - 255.255.255.0
+--------------------------------------------------------------------------------
+VMs inside Enterprise BAS-Tenant
+
+Domains inside Enterprise BAS-Tenant
+|- Domain: BAS-3Tier-Domain
+    |- Zone: App-Zone-111
+        |- Subnets: App-Subnet-111 - 111.111.2.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-111 - 111.111.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet-111 - 111.111.3.0 - 255.255.255.0
+    |- Zone: DB-Zone-111
+        |- Subnets: App-Subnet-111 - 111.111.2.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-111 - 111.111.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet-111 - 111.111.3.0 - 255.255.255.0
+    |- Zone: Web-Zone-111
+        |- Subnets: App-Subnet-111 - 111.111.2.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-111 - 111.111.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet-111 - 111.111.3.0 - 255.255.255.0
+--------------------------------------------------------------------------------
+VMs inside Enterprise DEMO-Tenant
+
+Domains inside Enterprise DEMO-Tenant
+|- Domain: DEMO-3Tier-Domain
+    |- Zone: App-Zone-120
+        |- Subnets: App-Subnet-120 - 120.120.2.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-120 - 120.120.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet - 120.120.3.0 - 255.255.255.0
+    |- Zone: DB-Zone-120
+        |- Subnets: App-Subnet-120 - 120.120.2.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-120 - 120.120.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet - 120.120.3.0 - 255.255.255.0
+    |- Zone: Web-Zone-120
+        |- Subnets: App-Subnet-120 - 120.120.2.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-120 - 120.120.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet - 120.120.3.0 - 255.255.255.0
+    |- Ingress ACL: default ingress
+    |- Egress ACL: default egress
+--------------------------------------------------------------------------------
+VMs inside Enterprise DHY-Tenant
+
+Domains inside Enterprise DHY-Tenant
+|- Domain: DHY-3Tier-Domain
+    |- Zone: App-Zone-103
+        |- Subnets: App-Subnet-103 - 103.103.2.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-103 - 103.103.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet-103 - 103.103.3.0 - 255.255.255.0
+    |- Zone: DB-Zone-103
+        |- Subnets: App-Subnet-103 - 103.103.2.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-103 - 103.103.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet-103 - 103.103.3.0 - 255.255.255.0
+    |- Zone: Web-Zone-103
+        |- Subnets: App-Subnet-103 - 103.103.2.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-103 - 103.103.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet-103 - 103.103.3.0 - 255.255.255.0
+--------------------------------------------------------------------------------
+VMs inside Enterprise DSZ-Tenant
+|- VSR-FW12
+
+Domains inside Enterprise DSZ-Tenant
+|- Domain: DSZ-3Tier-Domain
+    |- Zone: App-Zone-114
+        |- Subnets: App-Subnet-114 - 114.114.2.0 - 255.255.255.0
+        |- Subnets: BM-Subnet - 77.77.77.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-114 - 114.114.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet-114 - 114.114.3.0 - 255.255.255.0
+    |- Zone: DB-Zone-114
+        |- Subnets: App-Subnet-114 - 114.114.2.0 - 255.255.255.0
+        |- Subnets: BM-Subnet - 77.77.77.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-114 - 114.114.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet-114 - 114.114.3.0 - 255.255.255.0
+    |- Zone: Web-Zone-114
+        |- Subnets: App-Subnet-114 - 114.114.2.0 - 255.255.255.0
+        |- Subnets: BM-Subnet - 77.77.77.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-114 - 114.114.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet-114 - 114.114.3.0 - 255.255.255.0
+    |- Ingress ACL: Template Policy
+        |- Rule: ICMP
+    |- Ingress ACL: Domain Policy
+        |- Rule: ICMP within Zone
+        |- Rule: ICMP to a Network Group
+        |- Rule: SSH App2DB
+    |- Egress ACL: Template Policy
+|- Domain: NewL3Domain
+    |- Zone: App-Zone-114
+    |- Zone: DB-Zone-114
+    |- Zone: Web-Zone-114
+    |- Ingress ACL: Template Policy
+        |- Rule: ICMP
+    |- Egress ACL: Template Policy
+--------------------------------------------------------------------------------
+VMs inside Enterprise EZM-Tenant
+|- instance-0000018d
+|- instance-0000018e
+|- instance-0000018f
+
+Domains inside Enterprise EZM-Tenant
+|- Domain: EZM-3Tier-Domain
+    |- Zone: App-Zone-108
+        |- Subnets: App-Subent-108 - 108.108.2.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-108 - 108.108.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet-108 - 108.108.3.0 - 255.255.255.0
+    |- Zone: DB-Zone-108
+        |- Subnets: App-Subent-108 - 108.108.2.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-108 - 108.108.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet-108 - 108.108.3.0 - 255.255.255.0
+    |- Zone: Web-Zone-108
+        |- Subnets: App-Subent-108 - 108.108.2.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-108 - 108.108.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet-108 - 108.108.3.0 - 255.255.255.0
+    |- Ingress ACL: Ingress Policy
+        |- Rule: Block SSH
+        |- Rule: Block ICMP
+    |- Egress ACL: Egress Policy
+--------------------------------------------------------------------------------
+VMs inside Enterprise GAK-Tenant
+
+Domains inside Enterprise GAK-Tenant
+|- Domain: GAK-3Tier-Domain
+    |- Zone: App-Zone-112
+        |- Subnets: App-Subnet-112 - 112.112.2.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-112 - 112.112.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet-112 - 112.112.3.0 - 255.255.255.0
+    |- Zone: DB-Zone-112
+        |- Subnets: App-Subnet-112 - 112.112.2.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-112 - 112.112.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet-112 - 112.112.3.0 - 255.255.255.0
+    |- Zone: Web-Zone-112
+        |- Subnets: App-Subnet-112 - 112.112.2.0 - 255.255.255.0
+        |- Subnets: DB-Subnet-112 - 112.112.1.0 - 255.255.255.0
+        |- Subnets: Web-Subnet-112 - 112.112.3.0 - 255.255.255.0
+--------------------------------------------------------------------------------
+VMs inside Enterprise HPE
+|- win02-246
+
+Domains inside Enterprise HPE
+|- Domain: AMS DCA VNS
+    |- Zone: NSG HeadEnd
+        |- Subnets: NSG GW IP Fabric Underlay - 192.168.6.0 - 255.255.255.0
+        |- Subnets: NSG HeadEnd Subnet - 100.77.84.0 - 255.255.255.0
+        |- Subnets: NYC Subnet - 111.42.17.0 - 255.255.255.0
+        |- Subnets: PHI Branch - 10.72.102.0 - 255.255.255.0
+        |- Subnets: SJC Branch - 20.61.127.0 - 255.255.255.0
+    |- Zone: NYC Branch
+        |- Subnets: NSG GW IP Fabric Underlay - 192.168.6.0 - 255.255.255.0
+        |- Subnets: NSG HeadEnd Subnet - 100.77.84.0 - 255.255.255.0
+        |- Subnets: NYC Subnet - 111.42.17.0 - 255.255.255.0
+        |- Subnets: PHI Branch - 10.72.102.0 - 255.255.255.0
+        |- Subnets: SJC Branch - 20.61.127.0 - 255.255.255.0
+    |- Zone: PHI Branch
+        |- Subnets: NSG GW IP Fabric Underlay - 192.168.6.0 - 255.255.255.0
+        |- Subnets: NSG HeadEnd Subnet - 100.77.84.0 - 255.255.255.0
+        |- Subnets: NYC Subnet - 111.42.17.0 - 255.255.255.0
+        |- Subnets: PHI Branch - 10.72.102.0 - 255.255.255.0
+        |- Subnets: SJC Branch - 20.61.127.0 - 255.255.255.0
+    |- Zone: SJC Branch
+        |- Subnets: NSG GW IP Fabric Underlay - 192.168.6.0 - 255.255.255.0
+        |- Subnets: NSG HeadEnd Subnet - 100.77.84.0 - 255.255.255.0
+        |- Subnets: NYC Subnet - 111.42.17.0 - 255.255.255.0
+        |- Subnets: PHI Branch - 10.72.102.0 - 255.255.255.0
+        |- Subnets: SJC Branch - 20.61.127.0 - 255.255.255.0
+    |- Ingress ACL: Default
+    |- Egress ACL: Default
+        |- Rule: Drop RDP to Headend
+|- Domain: Bare Metal Domain
+    |- Zone: Bare Metal Zone
+    |- Ingress ACL: Default Ingress

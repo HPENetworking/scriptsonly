@@ -1,0 +1,3 @@
+Flask
+Flask-Bootstrap
+Flask_SQLAlchemy
