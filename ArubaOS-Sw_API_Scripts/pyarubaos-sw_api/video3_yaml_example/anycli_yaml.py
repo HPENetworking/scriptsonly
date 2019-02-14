@@ -21,11 +21,11 @@ with open("anycli_yaml.yaml", 'r') as stream:
         print(exc)
 
 
-url = 'http://' + ip_addr + '/rest/v3/'
+url = 'https://' + ip_addr + '/rest/v3/'
 creds = {'userName': username, 'password': password}
 
 s = requests.Session()
-r = s.post(url + 'login-sessions', data=json.dumps(creds), timeout=1)
+r = s.post(url + 'login-sessions', data=json.dumps(creds), timeout=3, verify=False)
 cookie_response = r.json()['cookie']
 if r.status_code != 201:
     print('Login error, status code {}'.format(r.status_code))
@@ -33,8 +33,7 @@ if r.status_code != 201:
 
 cookie = {'cookie': cookie_response}
 c = {'cmd': command}
-post_command = requests.post(url + 'cli', headers=cookie, data=json.dumps(c), timeout=1)
-
+post_command = requests.post(url + 'cli', headers=cookie, data=json.dumps(c), timeout=3, verify=False)
 
 
 if post_command.status_code != 200:
