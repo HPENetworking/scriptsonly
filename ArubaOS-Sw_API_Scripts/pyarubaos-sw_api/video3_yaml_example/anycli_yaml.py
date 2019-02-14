@@ -21,11 +21,11 @@ with open("anycli_yaml.yaml", 'r') as stream:
         print(exc)
 
 
-url = 'http://' + ip_addr + '/rest/v3/'
+url = 'https://{}/rest/v3/'.format(ip_addr)
 creds = {'userName': username, 'password': password}
 
 s = requests.Session()
-r = s.post(url + 'login-sessions', data=json.dumps(creds), timeout=1)
+r = s.post(url + 'login-sessions', json=creds, timeout=3, verify=False)
 cookie_response = r.json()['cookie']
 if r.status_code != 201:
     print('Login error, status code {}'.format(r.status_code))
@@ -33,15 +33,17 @@ if r.status_code != 201:
 
 cookie = {'cookie': cookie_response}
 c = {'cmd': command}
-post_command = requests.post(url + 'cli', headers=cookie, data=json.dumps(c), timeout=1)
-
-
+post_command = requests.post(url + 'cli', headers=cookie, json=c, timeout=3, verify=False)
 
 if post_command.status_code != 200:
     print(('Error, status code {}'.format(post_command.status_code)))
 else:
-    print('Status Code: ' + str(post_command.status_code))
     response = post_command.json()['result_base64_encoded']
     decoded_r = base64.b64decode(response).decode('utf-8')
     print(decoded_r)
 
+logout = requests.delete(url + 'login-sessions', headers=cookie, verify=False)
+if logout.status_code == 204:
+        print("Logged out!", logout.status_code)
+else:
+    print("Logout is not successful", logout.status_code)
