@@ -21,7 +21,7 @@ with open("anycli_yaml.yaml", 'r') as stream:
         print(exc)
 
 
-url = 'https://' + ip_addr + '/rest/v3/'
+url = 'https://{}/rest/v3/'.format(ip_addr)
 creds = {'userName': username, 'password': password}
 
 s = requests.Session()
@@ -35,12 +35,15 @@ cookie = {'cookie': cookie_response}
 c = {'cmd': command}
 post_command = requests.post(url + 'cli', headers=cookie, data=json.dumps(c), timeout=3, verify=False)
 
-
 if post_command.status_code != 200:
     print(('Error, status code {}'.format(post_command.status_code)))
 else:
-    print('Status Code: ' + str(post_command.status_code))
     response = post_command.json()['result_base64_encoded']
     decoded_r = base64.b64decode(response).decode('utf-8')
     print(decoded_r)
 
+logout = requests.delete(url + 'login-sessions', headers=cookie, verify=False)
+if logout.status_code == 204:
+        print("Logged out!", logout.status_code)
+else:
+    print("Logout is not successful", logout.status_code)
