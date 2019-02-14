@@ -25,7 +25,7 @@ url = 'https://{}/rest/v3/'.format(ip_addr)
 creds = {'userName': username, 'password': password}
 
 s = requests.Session()
-r = s.post(url + 'login-sessions', data=json.dumps(creds), timeout=3, verify=False)
+r = s.post(url + 'login-sessions', json=creds, timeout=3, verify=False)
 cookie_response = r.json()['cookie']
 if r.status_code != 201:
     print('Login error, status code {}'.format(r.status_code))
@@ -33,7 +33,7 @@ if r.status_code != 201:
 
 cookie = {'cookie': cookie_response}
 c = {'cmd': command}
-post_command = requests.post(url + 'cli', headers=cookie, data=json.dumps(c), timeout=3, verify=False)
+post_command = requests.post(url + 'cli', headers=cookie, json=c, timeout=3, verify=False)
 
 if post_command.status_code != 200:
     print(('Error, status code {}'.format(post_command.status_code)))
